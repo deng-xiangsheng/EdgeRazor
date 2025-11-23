@@ -1,0 +1,31 @@
+# Knowledge Distillation Configuration
+
+kd_configuration:
+
+  method: KD
+
+  loss_task_alpha: 1.0
+
+  loss_1:
+    loss_type: logits
+
+    alpha: 0.7  # Weight for distillation
+    loss_function: compute_kld_confidence  # Confidence-aware KLD combines forward and reverse KL
+    # Parameters for loss function
+    padding_id: -100
+    is_router_logits: False
+    reduction: batch_mean
+    temperature: 2.0
+    use_entropy: true
+
+  loss_2:
+    loss_type: hidden_states
+
+    alpha: 0.5  # Weight for feature distillation
+    # Feature Distillation using MSE Loss
+    loss_function: compute_fd
+    layer_index: ["low", "mid", "high"]
+    padding_id: -100
+    reduction: batch_mean
+
+# distill_loss = alpha_1 * loss_1 + alpha_2 * loss_2

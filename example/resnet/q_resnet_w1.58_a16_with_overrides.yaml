@@ -1,0 +1,35 @@
+# Quantization Configuration with Per-Layer Overrides Example
+# This demonstrates the new override feature while maintaining backward compatibility
+
+qat_configuration:
+  method: QAT
+  select:
+    target_types:
+    - linear
+    - conv2d
+    target_names: []
+    exclude_types: []
+    exclude_names: []
+  function:
+    epsilon: 1.0e-05
+    weight_function: weight_quant_uniform_symmetric_clip_per_channel_int1_58
+    w_scale_factor: 2.0
+    is_w_quantized: false
+    activation_function: ''
+    a_block_size: -1
+    kv_cache_function: ''
+    kv_block_size: -1
+  overrides:
+  - type: linear
+    weight_function: weight_quant_uniform_symmetric_absmax_per_channel_int4
+    w_scale_factor: -1
+  - name: layer4.*
+    weight_function: weight_quant_uniform_symmetric_clip_per_block_int1_58
+    w_scale_factor: 2.0
+    w_block_size: 128
+    activation_function: state_quant_uniform_symmetric_absmax_per_token_int8
+  - name: fc
+    weight_function: weight_quant_uniform_symmetric_absmax_per_block_int4
+    w_scale_factor: -1
+    w_block_size: 256
+  training: all

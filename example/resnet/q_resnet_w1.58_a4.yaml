@@ -1,0 +1,23 @@
+# Quantization Configuration for ResNet-18: W1.58-A4
+# Weight: 1.58-bit (Ternary: {-1, 0, 1})
+# State: 4-bit (INT4)
+
+qat_configuration:
+  method: QAT
+  select:
+    target_types:
+    - linear
+    - conv2d
+    target_names: []
+    exclude_types: []
+    exclude_names: []
+  function:
+    epsilon: 1.0e-05
+    weight_function: weight_quant_uniform_symmetric_clip_per_channel_int1_58
+    w_scale_factor: 2.0
+    is_w_quantized: false
+    activation_function: state_quant_uniform_symmetric_absmax_per_token_int4
+    a_block_size: -1
+    kv_cache_function: ''
+    kv_block_size: -1
+  training: all

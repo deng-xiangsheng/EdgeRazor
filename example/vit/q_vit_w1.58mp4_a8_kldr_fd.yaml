@@ -1,0 +1,39 @@
+# Quantization Configuration for ViT: W1.58-A8
+# Weight: 1.58-bit (Ternary: {-1, 0, 1}) + 4-bit (INT4)
+# Activation: 8-bit (INT8)
+
+qat_configuration:
+  method: QAT
+  select:
+    target_types:
+    - linear
+    target_names: []
+    exclude_types: []
+    exclude_names: []
+  function:
+    epsilon: 1.0e-05
+    weight_function: weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static
+    w_scale_factor: 2.0
+    w_block_size: 128
+    is_w_quantized: false
+    activation_function: state_quant_uniform_symmetric_absmax_per_block_int8
+    a_block_size: 128
+    kv_cache_function: ''
+    kv_block_size: -1
+  training: all
+kd_configuration:
+  method: KD
+  loss_1:
+    loss_type: logits
+    loss_function: compute_kld_reverse
+    alpha: 0.01
+    temperature: 2.0
+    padding_id: -100
+    reduction: batch_mean
+  loss_2:
+    loss_type: hidden_states
+    loss_function: compute_fd
+    alpha: 0.01
+    layer_index: ["low", "mid", "high"]
+    padding_id: -100
+    reduction: batch_mean
