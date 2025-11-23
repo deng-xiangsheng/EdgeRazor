@@ -42,7 +42,8 @@ loss, loss_dict = edgerazor.compute_loss(student_outputs, teacher_outputs, label
 
 ## Example
 
-- Lightweight ViT-S/16 on MNIST, check [here](./example/vit/README.md). W1.58A16 achieves 8.58x comp. and only 1.22% acc. loss.
+- Lightweight ViT-S/16 on MNIST, check [here](./example/vit/README.md).
+- Lightweight ResNet-18 on MNIST, check [here](./example/resnet/README.md).
 
 ## Reference
 
