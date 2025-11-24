@@ -10,7 +10,7 @@
 ### Installation
 
 ```
-git clone https://github.com/zhsh9/EdgeRazor.git && cd EdgeRazor
+git clone https://github.com/zhangsq-nju/EdgeRazor.git && cd EdgeRazor
 conda create -n edgerazor python=3.10 -y
 conda activate edgerazor
 pip install -e .[cu128]
