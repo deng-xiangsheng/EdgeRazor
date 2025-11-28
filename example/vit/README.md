@@ -164,6 +164,7 @@ This trains 7 models: Baseline (W16-A16), W1.58-A16, W1.58-A8, W1.58-A4, W4-A16,
 - **Script**: `./run2.sh`
 - **Comp**: W1.58+4 Compression ratio = 16 / ((1-Prop) * 16 + Prop * 0.99 * W_q_l + Prop * 0.01 * W_q_h)
   - e.g., 16 / ((1-0.9802) * 16 + 0.9802 * 0.99 * 1.58 + 0.9802 * 0.01 * 4) = 8.47x
+  - e.g., 16 / ((1-0.9802) * 16 + 0.9802 * 0.90 * 1.58 + 0.9802 * 0.10 * 4) = 7.61x
 
 ![Performance: F1](./asset/perf-f1-2.png)
 

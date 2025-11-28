@@ -133,5 +133,8 @@ def copy_qwen3moeattention_to_qkvcache_qwen3moeattention(
     # Copy normalization layers
     qkvcache_qwen3moe_attn.q_norm.weight.data = qwen3moe_attn.q_norm.weight.data.clone()
     qkvcache_qwen3moe_attn.k_norm.weight.data = qwen3moe_attn.k_norm.weight.data.clone()
+    
+    # Copy state
+    qkvcache_qwen3moe_attn.training = qwen3moe_attn.training
 
     return qkvcache_qwen3moe_attn

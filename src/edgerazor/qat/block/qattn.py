@@ -467,4 +467,7 @@ def copy_multiheadattention_to_qmultiheadattention(
     if mha.bias_v is not None:
         qmha.bias_v.data = mha.bias_v.data.clone()
     
+    # Copy state
+    qmha.training = mha.training
+    
     return qmha

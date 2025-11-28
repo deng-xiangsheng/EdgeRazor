@@ -107,6 +107,8 @@ def copy_linear_to_qlinear(
     qlinear.weight.data = linear.weight.data.clone()
     if linear.bias is not None:
         qlinear.bias.data = linear.bias.data.clone()
+    # Copy state
+    qlinear.training = linear.training
     return qlinear
 
 

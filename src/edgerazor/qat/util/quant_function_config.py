@@ -6,3 +6,5 @@ Configuration for quantization:
 w4a8_block_size = 32
 
 w2a8_block_size = 256
+
+mixed_precision_prop = 0.01

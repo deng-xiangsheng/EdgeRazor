@@ -148,4 +148,6 @@ def copy_conv2d_to_qconv2d(
     qconv.weight.data = conv.weight.data.clone()
     if conv.bias is not None:
         qconv.bias.data = conv.bias.data.clone()
+    # Copy state
+    qconv.training = conv.training
     return qconv

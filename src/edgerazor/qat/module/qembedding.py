@@ -106,4 +106,6 @@ def copy_embedding_to_qembedding(
     )
     # Copy weights
     qembedding.weight.data = embedding.weight.data.clone()
+    # Copy state
+    qembedding.training = embedding.training
     return qembedding

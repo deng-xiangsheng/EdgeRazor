@@ -437,4 +437,7 @@ def copy_olmoeattention_qkvcache_olmoeattention(
     qkvcache_olmoe_attn.q_norm.weight.data = olmoe_attn.q_norm.weight.data.clone()
     qkvcache_olmoe_attn.k_norm.weight.data = olmoe_attn.k_norm.weight.data.clone()
     
+    # Copy state
+    qkvcache_olmoe_attn.training = olmoe_attn.training
+    
     return qkvcache_olmoe_attn

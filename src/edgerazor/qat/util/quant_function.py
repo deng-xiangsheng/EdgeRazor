@@ -25,7 +25,7 @@ For example, `state_quant_uniform_symmetric_absmax_per_token_int8`:
 import torch
 from torch import Tensor
 
-from .quant_function_config import w2a8_block_size, w4a8_block_size
+from .quant_function_config import w2a8_block_size, w4a8_block_size, mixed_precision_prop
 
 # =============================================================
 # INT1_58 (Ternary) Weight Quantization - Clip Method
@@ -136,7 +136,7 @@ def weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_dynamic(
     epsilon: float = 1e-5,
     w_scale_factor: float = 2.0,
     block_size: int = w2a8_block_size,
-    mixed_precision_prop: float = 0.01,
+    mixed_precision_prop: float = mixed_precision_prop,
 ) -> Tensor:
     """
     Quantize weight to INT1_58 and INT4 per-block using dynamic mixed precision.
@@ -226,7 +226,7 @@ def weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static(
     epsilon: float = 1e-5,
     w_scale_factor: float = 2.0,
     block_size: int = w2a8_block_size,
-    mixed_precision_prop: float = 0.01,
+    mixed_precision_prop: float = mixed_precision_prop,
 ) -> Tensor:
     """
     Quantize weight to INT1_58 and INT4 per-block using static mixed precision.
@@ -297,7 +297,7 @@ def weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_sparse(
     epsilon: float = 1e-5,
     w_scale_factor: float = 2.0,
     block_size: int = w2a8_block_size,
-    mixed_precision_prop: float = 0.01,
+    mixed_precision_prop: float = mixed_precision_prop,
 ) -> Tensor:
     """
     Quantize weight to INT1_58 and INT4 per-block using sparse static mixed precision.
