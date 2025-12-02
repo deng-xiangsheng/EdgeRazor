@@ -68,9 +68,24 @@ class QMultiheadAttention(nn.MultiheadAttention):
         self.w_quant_function = quant_config.function.weight_function
         self.w_scale_factor = quant_config.function.w_scale_factor
         self.w_block_size = quant_config.function.w_block_size
+        self.w_mixed_precision_prop = quant_config.function.w_mixed_precision_prop
+        self.w_kwargs = {'epsilon': self.epsilon}
+        if self.w_scale_factor > 0:
+            self.w_kwargs['w_scale_factor'] = self.w_scale_factor
+        if self.w_block_size > 0:
+            self.w_kwargs['block_size'] = self.w_block_size
+        if self.w_mixed_precision_prop > 0:
+            self.w_kwargs['mixed_precision_prop'] = self.w_mixed_precision_prop
+        
         ## Activation
         self.a_quant_function = quant_config.function.activation_function
         self.a_block_size = quant_config.function.a_block_size
+        self.a_mixed_precision_prop = quant_config.function.a_mixed_precision_prop
+        self.a_kwargs = {'epsilon': self.epsilon}
+        if self.a_block_size > 0:
+            self.a_kwargs['block_size'] = self.a_block_size
+        if self.a_mixed_precision_prop > 0:
+            self.a_kwargs['mixed_precision_prop'] = self.a_mixed_precision_prop
 
     def _qkv_proj_weight_quant(self, replace_self: bool = False) -> tuple[Tensor, Tensor, Tensor]:
         """Quantize QKV projection weights (when _qkv_same_embed_dim is False)"""
@@ -80,22 +95,9 @@ class QMultiheadAttention(nn.MultiheadAttention):
         v_w = self.v_proj_weight.data.clone()
         
         # Apply quantization function
-        if self.w_scale_factor > 0 and self.w_block_size > 0:
-            q_proj_weight_quant = self.w_quant_function(w=q_w, epsilon=self.epsilon, w_scale_factor=self.w_scale_factor, block_size=self.w_block_size)
-            k_proj_weight_quant = self.w_quant_function(w=k_w, epsilon=self.epsilon, w_scale_factor=self.w_scale_factor, block_size=self.w_block_size)
-            v_proj_weight_quant = self.w_quant_function(w=v_w, epsilon=self.epsilon, w_scale_factor=self.w_scale_factor, block_size=self.w_block_size)
-        elif self.w_scale_factor > 0:
-            q_proj_weight_quant = self.w_quant_function(w=q_w, epsilon=self.epsilon, w_scale_factor=self.w_scale_factor)
-            k_proj_weight_quant = self.w_quant_function(w=k_w, epsilon=self.epsilon, w_scale_factor=self.w_scale_factor)
-            v_proj_weight_quant = self.w_quant_function(w=v_w, epsilon=self.epsilon, w_scale_factor=self.w_scale_factor)
-        elif self.w_block_size > 0:
-            q_proj_weight_quant = self.w_quant_function(w=q_w, epsilon=self.epsilon, block_size=self.w_block_size)
-            k_proj_weight_quant = self.w_quant_function(w=k_w, epsilon=self.epsilon, block_size=self.w_block_size)
-            v_proj_weight_quant = self.w_quant_function(w=v_w, epsilon=self.epsilon, block_size=self.w_block_size)
-        else:
-            q_proj_weight_quant = self.w_quant_function(w=q_w, epsilon=self.epsilon)
-            k_proj_weight_quant = self.w_quant_function(w=k_w, epsilon=self.epsilon)
-            v_proj_weight_quant = self.w_quant_function(w=v_w, epsilon=self.epsilon)
+        q_proj_weight_quant = self.w_quant_function(w=q_w, **self.w_kwargs)
+        k_proj_weight_quant = self.w_quant_function(w=k_w, **self.w_kwargs)
+        v_proj_weight_quant = self.w_quant_function(w=v_w, **self.w_kwargs)
 
         if replace_self:
             if not self.is_qkv_quantized:
@@ -113,14 +115,7 @@ class QMultiheadAttention(nn.MultiheadAttention):
         W = self.in_proj_weight.data.clone()
         
         # Apply quantization function
-        if self.w_scale_factor > 0 and self.w_block_size > 0:
-            w_quant = self.w_quant_function(w=W, epsilon=self.epsilon, w_scale_factor=self.w_scale_factor, block_size=self.w_block_size)
-        elif self.w_scale_factor > 0:
-            w_quant = self.w_quant_function(w=W, epsilon=self.epsilon, w_scale_factor=self.w_scale_factor)
-        elif self.w_block_size > 0:
-            w_quant = self.w_quant_function(w=W, epsilon=self.epsilon, block_size=self.w_block_size)
-        else:
-            w_quant = self.w_quant_function(w=W, epsilon=self.epsilon)
+        w_quant = self.w_quant_function(w=W, **self.w_kwargs)
         
         if replace_self:
             if not self.is_in_proj_quantized:
@@ -136,14 +131,7 @@ class QMultiheadAttention(nn.MultiheadAttention):
         W = self.out_proj.weight.data.clone()
         
         # Apply quantization function
-        if self.w_scale_factor > 0 and self.w_block_size > 0:
-            w_quant = self.w_quant_function(w=W, epsilon=self.epsilon, w_scale_factor=self.w_scale_factor, block_size=self.w_block_size)
-        elif self.w_scale_factor > 0:
-            w_quant = self.w_quant_function(w=W, epsilon=self.epsilon, w_scale_factor=self.w_scale_factor)
-        elif self.w_block_size > 0:
-            w_quant = self.w_quant_function(w=W, epsilon=self.epsilon, block_size=self.w_block_size)
-        else:
-            w_quant = self.w_quant_function(w=W, epsilon=self.epsilon)
+        w_quant = self.w_quant_function(w=W, **self.w_kwargs)
         
         if replace_self:
             if not self.is_out_proj_quantized:
@@ -156,10 +144,7 @@ class QMultiheadAttention(nn.MultiheadAttention):
 
     def _activation_quant(self, x: Tensor) -> Tensor:
         """Quantize activation"""
-        if self.a_block_size > 0:
-            x_quant = self.a_quant_function(x=x, epsilon=self.epsilon, block_size=self.a_block_size)
-        else:
-            x_quant = self.a_quant_function(x=x, epsilon=self.epsilon)
+        x_quant = self.a_quant_function(x=x, **self.a_kwargs)
         return x_quant
     
     def forward(

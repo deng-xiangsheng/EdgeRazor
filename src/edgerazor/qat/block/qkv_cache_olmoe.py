@@ -56,6 +56,12 @@ class QKVCacheOlmoeAttention(OlmoeAttention):
         ## KV Cache (State)
         self.kv_cache_quant_function = quant_config.function.kv_cache_function
         self.kv_block_size = quant_config.function.kv_block_size
+        self.kv_mixed_precision_prop = quant_config.function.kv_mixed_precision_prop
+        self.kv_kwargs = {'epsilon': self.epsilon}
+        if self.kv_block_size > 0:
+            self.kv_kwargs['block_size'] = self.kv_block_size
+        if self.kv_mixed_precision_prop > 0:
+            self.kv_kwargs['mixed_precision_prop'] = self.kv_mixed_precision_prop
 
     @deprecate_kwarg("past_key_value", new_name="past_key_values", version="4.58")
     def forward(
@@ -90,12 +96,8 @@ class QKVCacheOlmoeAttention(OlmoeAttention):
         
         # --------------------------------------------------------------------------
         # After RoPE | Before KV Cache Storing: Apply KV Cache Quantization
-        if self.kv_block_size > 0:
-            key_quant = self.kv_cache_quant_function(x=key_states, epsilon=self.epsilon, block_size=self.kv_block_size)
-            value_quant = self.kv_cache_quant_function(x=value_states, epsilon=self.epsilon, block_size=self.kv_block_size)
-        else:
-            key_quant = self.kv_cache_quant_function(x=key_states, epsilon=self.epsilon)
-            value_quant = self.kv_cache_quant_function(x=value_states, epsilon=self.epsilon)
+        key_quant = self.kv_cache_quant_function(x=key_states, **self.kv_kwargs)
+        value_quant = self.kv_cache_quant_function(x=value_states, **self.kv_kwargs)
         key_states = key_states + (key_quant - key_states).detach()
         value_states = value_states + (value_quant - value_states).detach()
         # --------------------------------------------------------------------------
@@ -163,6 +165,12 @@ class QKVCacheOlmoeFlashAttention2(OlmoeFlashAttention2):
         ## KV Cache (State)
         self.kv_cache_quant_function = quant_config.function.kv_cache_function
         self.kv_block_size = quant_config.function.kv_block_size
+        self.kv_mixed_precision_prop = quant_config.function.kv_mixed_precision_prop
+        self.kv_kwargs = {'epsilon': self.epsilon}
+        if self.kv_block_size > 0:
+            self.kv_kwargs['block_size'] = self.kv_block_size
+        if self.kv_mixed_precision_prop > 0:
+            self.kv_kwargs['mixed_precision_prop'] = self.kv_mixed_precision_prop
 
     @deprecate_kwarg("past_key_value", new_name="past_key_values", version="4.58")
     def forward(
@@ -201,12 +209,8 @@ class QKVCacheOlmoeFlashAttention2(OlmoeFlashAttention2):
 
         # --------------------------------------------------------------------------
         # After RoPE | Before KV Cache Storing: Apply KV Cache Quantization
-        if self.kv_block_size > 0:
-            key_quant = self.kv_cache_quant_function(x=key_states, epsilon=self.epsilon, block_size=self.kv_block_size)
-            value_quant = self.kv_cache_quant_function(x=value_states, epsilon=self.epsilon, block_size=self.kv_block_size)
-        else:
-            key_quant = self.kv_cache_quant_function(x=key_states, epsilon=self.epsilon)
-            value_quant = self.kv_cache_quant_function(x=value_states, epsilon=self.epsilon)
+        key_quant = self.kv_cache_quant_function(x=key_states, **self.kv_kwargs)
+        value_quant = self.kv_cache_quant_function(x=value_states, **self.kv_kwargs)
         key_states = key_states + (key_quant - key_states).detach()
         value_states = value_states + (value_quant - value_states).detach()
         # --------------------------------------------------------------------------
@@ -299,6 +303,12 @@ class QKVCacheOlmoeSdpaAttention(OlmoeSdpaAttention):
         ## KV Cache (State)
         self.kv_cache_quant_function = quant_config.function.kv_cache_function
         self.kv_block_size = quant_config.function.kv_block_size
+        self.kv_mixed_precision_prop = quant_config.function.kv_mixed_precision_prop
+        self.kv_kwargs = {'epsilon': self.epsilon}
+        if self.kv_block_size > 0:
+            self.kv_kwargs['block_size'] = self.kv_block_size
+        if self.kv_mixed_precision_prop > 0:
+            self.kv_kwargs['mixed_precision_prop'] = self.kv_mixed_precision_prop
 
     # Adapted from OlmoeAttention.forward
     @deprecate_kwarg("past_key_value", new_name="past_key_values", version="4.58")
@@ -350,12 +360,8 @@ class QKVCacheOlmoeSdpaAttention(OlmoeSdpaAttention):
 
         # --------------------------------------------------------------------------
         # After RoPE | Before KV Cache Storing: Apply KV Cache Quantization
-        if self.kv_block_size > 0:
-            key_quant = self.kv_cache_quant_function(x=key_states, epsilon=self.epsilon, block_size=self.kv_block_size)
-            value_quant = self.kv_cache_quant_function(x=value_states, epsilon=self.epsilon, block_size=self.kv_block_size)
-        else:
-            key_quant = self.kv_cache_quant_function(x=key_states, epsilon=self.epsilon)
-            value_quant = self.kv_cache_quant_function(x=value_states, epsilon=self.epsilon)
+        key_quant = self.kv_cache_quant_function(x=key_states, **self.kv_kwargs)
+        value_quant = self.kv_cache_quant_function(x=value_states, **self.kv_kwargs)
         key_states = key_states + (key_quant - key_states).detach()
         value_states = value_states + (value_quant - value_states).detach()
         # --------------------------------------------------------------------------

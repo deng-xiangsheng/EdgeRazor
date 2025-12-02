@@ -54,9 +54,24 @@ class QConv3d(nn.Conv3d):
         self.w_quant_function = quant_config.function.weight_function
         self.w_scale_factor = quant_config.function.w_scale_factor
         self.w_block_size = quant_config.function.w_block_size
+        self.w_mixed_precision_prop = quant_config.function.w_mixed_precision_prop
+        self.w_kwargs = {'epsilon': self.epsilon}
+        if self.w_scale_factor > 0:
+            self.w_kwargs['w_scale_factor'] = self.w_scale_factor
+        if self.w_block_size > 0:
+            self.w_kwargs['block_size'] = self.w_block_size
+        if self.w_mixed_precision_prop > 0:
+            self.w_kwargs['mixed_precision_prop'] = self.w_mixed_precision_prop
+        
         ## Activation
         self.a_quant_function = quant_config.function.activation_function
         self.a_block_size = quant_config.function.a_block_size
+        self.a_mixed_precision_prop = quant_config.function.a_mixed_precision_prop
+        self.a_kwargs = {'epsilon': self.epsilon}
+        if self.a_block_size > 0:
+            self.a_kwargs['block_size'] = self.a_block_size
+        if self.a_mixed_precision_prop > 0:
+            self.a_kwargs['mixed_precision_prop'] = self.a_mixed_precision_prop
 
     def _weight_quant(self, replace_self: bool = False) -> Tensor:
         # Quantize weight into {-2^(n-1), 0, 2^(n-1)} * w_scale
@@ -70,14 +85,7 @@ class QConv3d(nn.Conv3d):
         W_reshaped = W.flatten(1)
         
         # Apply quantization function on reshaped weight
-        if self.w_scale_factor > 0 and self.w_block_size > 0:
-            w_quant = self.w_quant_function(w=W_reshaped, epsilon=self.epsilon, w_scale_factor=self.w_scale_factor, block_size=self.w_block_size)
-        elif self.w_scale_factor > 0:
-            w_quant = self.w_quant_function(w=W_reshaped, epsilon=self.epsilon, w_scale_factor=self.w_scale_factor)
-        elif self.w_block_size > 0:
-            w_quant = self.w_quant_function(w=W_reshaped, epsilon=self.epsilon, block_size=self.w_block_size)
-        else:
-            w_quant = self.w_quant_function(w=W_reshaped, epsilon=self.epsilon)
+        w_quant = self.w_quant_function(w=W_reshaped, **self.w_kwargs)
         
         # Reshape back to original shape
         w_quant = w_quant.view(original_shape)
@@ -93,10 +101,7 @@ class QConv3d(nn.Conv3d):
 
     def _activation_quant(self, x: Tensor) -> Tensor:
         # Quantize activation
-        if self.a_block_size > 0:
-            x_quant = self.a_quant_function(x=x, epsilon=self.epsilon, block_size=self.a_block_size)
-        else:
-            x_quant = self.a_quant_function(x=x, epsilon=self.epsilon)
+        x_quant = self.a_quant_function(x=x, **self.a_kwargs)
         return x_quant
 
     def forward(self, x: Tensor) -> Tensor:

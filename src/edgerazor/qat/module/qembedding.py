@@ -38,19 +38,20 @@ class QEmbedding(nn.Embedding):
         self.w_quant_function = quant_config.function.weight_function
         self.w_scale_factor = quant_config.function.w_scale_factor
         self.w_block_size = quant_config.function.w_block_size
+        self.w_mixed_precision_prop = quant_config.function.w_mixed_precision_prop
+        self.w_kwargs = {'epsilon': self.epsilon}
+        if self.w_scale_factor > 0:
+            self.w_kwargs['w_scale_factor'] = self.w_scale_factor
+        if self.w_block_size > 0:
+            self.w_kwargs['block_size'] = self.w_block_size
+        if self.w_mixed_precision_prop > 0:
+            self.w_kwargs['mixed_precision_prop'] = self.w_mixed_precision_prop
         # Embedding's input is LongInt, so no need to quantize the activation.
 
     def _weight_quant(self, replace_self: bool = False) -> Tensor:
         # Quantize weight into quantized format
         W = self.weight.data.clone()
-        if self.w_scale_factor > 0 and self.w_block_size > 0:
-            w_quant = self.w_quant_function(w=W, epsilon=self.epsilon, w_scale_factor=self.w_scale_factor, block_size=self.w_block_size)
-        elif self.w_scale_factor > 0:
-            w_quant = self.w_quant_function(w=W, epsilon=self.epsilon, w_scale_factor=self.w_scale_factor)
-        elif self.w_block_size > 0:
-            w_quant = self.w_quant_function(w=W, epsilon=self.epsilon, block_size=self.w_block_size)
-        else:
-            w_quant = self.w_quant_function(w=W, epsilon=self.epsilon)
+        w_quant = self.w_quant_function(w=W, **self.w_kwargs)
 
         if replace_self:
             if not self.is_w_quantized:

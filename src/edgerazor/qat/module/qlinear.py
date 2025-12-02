@@ -30,21 +30,29 @@ class QLinear(nn.Linear):
         self.w_quant_function = quant_config.function.weight_function
         self.w_scale_factor = quant_config.function.w_scale_factor
         self.w_block_size = quant_config.function.w_block_size
+        self.w_mixed_precision_prop = quant_config.function.w_mixed_precision_prop
+        self.w_kwargs = {'epsilon': self.epsilon}
+        if self.w_scale_factor > 0:
+            self.w_kwargs['w_scale_factor'] = self.w_scale_factor
+        if self.w_block_size > 0:
+            self.w_kwargs['block_size'] = self.w_block_size
+        if self.w_mixed_precision_prop > 0:
+            self.w_kwargs['mixed_precision_prop'] = self.w_mixed_precision_prop
+        
         ## Activation
         self.a_quant_function = quant_config.function.activation_function
         self.a_block_size = quant_config.function.a_block_size
+        self.a_mixed_precision_prop = quant_config.function.a_mixed_precision_prop
+        self.a_kwargs = {'epsilon': self.epsilon}
+        if self.a_block_size > 0:
+            self.a_kwargs['block_size'] = self.a_block_size
+        if self.a_mixed_precision_prop > 0:
+            self.a_kwargs['mixed_precision_prop'] = self.a_mixed_precision_prop
 
     def _weight_quant(self, replace_self: bool = False) -> Tensor:
         # Ternarize weight into {-1, 0, 1} * w_scale
         W = self.weight.data.clone()
-        if self.w_scale_factor > 0 and self.w_block_size > 0:
-            w_quant = self.w_quant_function(w=W, epsilon=self.epsilon, w_scale_factor=self.w_scale_factor, block_size=self.w_block_size)
-        elif self.w_scale_factor > 0:
-            w_quant = self.w_quant_function(w=W, epsilon=self.epsilon, w_scale_factor=self.w_scale_factor)
-        elif self.w_block_size > 0:
-            w_quant = self.w_quant_function(w=W, epsilon=self.epsilon, block_size=self.w_block_size)
-        else:
-            w_quant = self.w_quant_function(w=W, epsilon=self.epsilon)
+        w_quant = self.w_quant_function(w=W, **self.w_kwargs)
 
         if replace_self:
             if not self.is_w_quantized:
@@ -57,10 +65,7 @@ class QLinear(nn.Linear):
 
     def _activation_quant(self, x: Tensor) -> Tensor:
         # Quantize activation
-        if self.a_block_size > 0:
-            x_quant = self.a_quant_function(x=x, epsilon=self.epsilon, block_size=self.a_block_size)
-        else:
-            x_quant = self.a_quant_function(x=x, epsilon=self.epsilon)
+        x_quant = self.a_quant_function(x=x, **self.a_kwargs)
         return x_quant
 
     def forward(self, x: Tensor) -> Tensor:
@@ -136,6 +141,12 @@ class TnLinearKVCacheQuant(QLinear):
         # KV Cache quantization configuration
         self.kv_quant_function = quant_config.function.kv_cache_function
         self.kv_block_size = quant_config.function.kv_block_size
+        self.kv_mixed_precision_prop = quant_config.function.kv_mixed_precision_prop
+        self.kv_kwargs = {'epsilon': self.epsilon}
+        if self.kv_block_size > 0:
+            self.kv_kwargs['block_size'] = self.kv_block_size
+        if self.kv_mixed_precision_prop > 0:
+            self.kv_kwargs['mixed_precision_prop'] = self.kv_mixed_precision_prop
 
     def forward(self, x: Tensor) -> Tensor:
         W = self.weight
@@ -161,10 +172,7 @@ class TnLinearKVCacheQuant(QLinear):
 
         # KV Cache quantization before RoPE
         if self.kv_quant_function is not None:
-            if self.kv_block_size > 0:
-                kv_quant = self.kv_quant_function(x=output, epsilon=self.epsilon, block_size=self.kv_block_size)
-            else:
-                kv_quant = self.kv_quant_function(x=output, epsilon=self.epsilon)
+            kv_quant = self.kv_quant_function(x=output, **self.kv_kwargs)
             output = output + (kv_quant - output).detach()
 
         return output
