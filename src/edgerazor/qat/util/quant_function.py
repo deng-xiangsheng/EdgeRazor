@@ -750,7 +750,7 @@ def weight_quant_uniform_asymmetric_max_per_block_int4(
 # =============================================================
 
 
-def weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_stepped(
+def weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_nested(
     w: Tensor,
     epsilon: float = 1e-5,
     w_scale_factor: float = 2.0,
@@ -804,7 +804,7 @@ def weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_stepped
     return w_quant
 
 
-def weight_quant_uniform_symmetric_clip_per_block_int1_58_stepped(
+def weight_quant_uniform_symmetric_clip_per_block_int1_58_nested(
     w: Tensor,
     epsilon: float = 1e-5,
     w_scale_factor: float = 2.0,
@@ -1158,7 +1158,7 @@ def state_quant_uniform_symmetric_absmax_per_block_int8(
         return x_quant
 
 
-def state_quant_uniform_symmetric_absmax_per_block_int4_stepped(
+def state_quant_uniform_symmetric_absmax_per_block_int4_nested(
     x: Tensor,
     epsilon: float = 1e-5,
     block_size: int = w4a8_block_size,
@@ -1199,7 +1199,7 @@ def state_quant_uniform_symmetric_absmax_per_block_int4_stepped(
     return x_quant
 
 
-def state_quant_uniform_symmetric_absmax_per_block_mp_int4_int8_dynamic_stepped(
+def state_quant_uniform_symmetric_absmax_per_block_mp_int4_int8_dynamic_nested(
     x: Tensor,
     epsilon: float = 1e-5,
     block_size: int = w4a8_block_size,
