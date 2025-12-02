@@ -29,15 +29,18 @@ class FunctionConfig:
     weight_function: str
     w_scale_factor: float
     w_block_size: int
+    w_mixed_precision_prop: float
     is_w_quantized: bool
 
     # State quantization function (Activation) + configuration (can be None to skip quantization)
     activation_function: str | None
     a_block_size: int
+    a_mixed_precision_prop: float
 
     # State quantization function (KV Cache) + configuration (can be None to skip quantization)
     kv_cache_function: str | None
     kv_block_size: int
+    kv_mixed_precision_prop: float
 
     def copy(self) -> 'FunctionConfig':
         """Create a copy of this FunctionConfig"""
@@ -46,11 +49,14 @@ class FunctionConfig:
             weight_function=self.weight_function,
             w_scale_factor=self.w_scale_factor,
             w_block_size=self.w_block_size,
+            w_mixed_precision_prop=self.w_mixed_precision_prop,
             is_w_quantized=self.is_w_quantized,
             activation_function=self.activation_function,
             a_block_size=self.a_block_size,
+            a_mixed_precision_prop=self.a_mixed_precision_prop,
             kv_cache_function=self.kv_cache_function,
-            kv_block_size=self.kv_block_size
+            kv_block_size=self.kv_block_size,
+            kv_mixed_precision_prop=self.kv_mixed_precision_prop,
         )
 
     def merge(self, overrides: dict[str, Any]) -> 'FunctionConfig':
@@ -74,16 +80,22 @@ class FunctionConfig:
             merged.w_scale_factor = float(overrides['w_scale_factor'])
         if 'w_block_size' in overrides:
             merged.w_block_size = int(overrides['w_block_size'])
+        if 'w_mixed_precision_prop' in overrides:
+            merged.w_mixed_precision_prop = float(overrides['w_mixed_precision_prop'])
         if 'is_w_quantized' in overrides:
             merged.is_w_quantized = overrides['is_w_quantized']
         if 'activation_function' in overrides:
             merged.activation_function = overrides['activation_function']
         if 'a_block_size' in overrides:
             merged.a_block_size = int(overrides['a_block_size'])
+        if 'a_mixed_precision_prop' in overrides:
+            merged.a_mixed_precision_prop = float(overrides['a_mixed_precision_prop'])
         if 'kv_cache_function' in overrides:
             merged.kv_cache_function = overrides['kv_cache_function']
         if 'kv_block_size' in overrides:
             merged.kv_block_size = int(overrides['kv_block_size'])
+        if 'kv_mixed_precision_prop' in overrides:
+            merged.kv_mixed_precision_prop = float(overrides['kv_mixed_precision_prop'])
             
         return merged
 
@@ -187,11 +199,14 @@ class QuantConfig:
             ),
             w_scale_factor=float(function_dict.get("w_scale_factor", -1)),
             w_block_size=int(function_dict.get("w_block_size", -1)),
+            w_mixed_precision_prop=float(function_dict.get("w_mixed_precision_prop", -1.0)),
             is_w_quantized=function_dict.get("is_w_quantized", False),
             activation_function=function_dict.get("activation_function", None),
             a_block_size=int(function_dict.get("a_block_size", -1)),
+            a_mixed_precision_prop=float(function_dict.get("a_mixed_precision_prop", -1.0)),
             kv_cache_function=function_dict.get("kv_cache_function", None),
-            kv_block_size=int(function_dict.get("kv_block_size", -1))
+            kv_block_size=int(function_dict.get("kv_block_size", -1)),
+            kv_mixed_precision_prop=float(function_dict.get("kv_mixed_precision_prop", -1.0))
         )
 
         # Parse overrides configuration (new feature, optional for backward compatibility)
@@ -603,11 +618,14 @@ class QuantConfig:
                 ("weight_function", weight_func_str),
                 ("w_scale_factor", self.function.w_scale_factor),
                 ("w_block_size", self.function.w_block_size),
+                ("w_mixed_precision_prop", self.function.w_mixed_precision_prop),
                 ("is_w_quantized", self.function.is_w_quantized),
                 ("activation_function", activation_func_str),
                 ("a_block_size", self.function.a_block_size),
+                ("a_mixed_precision_prop", self.function.a_mixed_precision_prop),
                 ("kv_cache_function", kv_cache_func_str),
-                ("kv_block_size", self.function.kv_block_size)
+                ("kv_block_size", self.function.kv_block_size),
+                ("kv_mixed_precision_prop", self.function.kv_mixed_precision_prop)
             ])),
             ("training", self.training)
         ])
@@ -662,11 +680,14 @@ class QuantConfig:
             f"        weight_function='{self.function.weight_function}',\n"
             f"        w_scale_factor={self.function.w_scale_factor},\n"
             f"        w_block_size={self.function.w_block_size},\n"
+            f"        w_mixed_precision_prop={self.function.w_mixed_precision_prop},\n"
             f"        is_w_quantized={self.function.is_w_quantized},\n"
             f"        activation_function='{self.function.activation_function}',\n"
             f"        a_block_size={self.function.a_block_size},\n"
+            f"        a_mixed_precision_prop={self.function.a_mixed_precision_prop},\n"
             f"        kv_cache_function='{self.function.kv_cache_function}',\n"
-            f"        kv_block_size={self.function.kv_block_size}\n"
+            f"        kv_block_size={self.function.kv_block_size},\n"
+            f"        kv_mixed_precision_prop={self.function.kv_mixed_precision_prop}\n"
             f"    ),\n"
             f"    training='{self.training}'\n"
             f")"
