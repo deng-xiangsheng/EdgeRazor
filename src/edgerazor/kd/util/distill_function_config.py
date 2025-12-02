@@ -12,30 +12,16 @@ from .distill_function import (
     compute_kld_reverse,
 )
 
-# Mapping from string names to distillation loss functions
-# Naming convention: compute_xxx -> abbreviation
-# - compute_kld_forward -> kldf
-# - compute_kld_reverse -> kldr
-# - compute_kld_confidence -> kldc
-# - compute_fd -> fd
-distill_function_map = {
-    # Abbreviated format (recommended)
-    'kldf': compute_kld_forward,
-    'kldr': compute_kld_reverse,
-    'kldc': compute_kld_confidence,
-    'fd': compute_fd,
-    
-    # Backward compatibility
-    'kld_forward': compute_kld_forward,
-    'kld_reverse': compute_kld_reverse,
-    'kld_confidence': compute_kld_confidence,
-    
-    # Full function names (backward compatibility)
-    'compute_kld_forward': compute_kld_forward,
-    'compute_kld_reverse': compute_kld_reverse,
-    'compute_kld_confidence': compute_kld_confidence,
-    'compute_fd': compute_fd,
-}
+# Collect all distillation loss functions automatically
+_distill_functions = [
+    compute_kld_forward,
+    compute_kld_reverse,
+    compute_kld_confidence,
+    compute_fd,
+]
+
+# Build the map automatically: function_name -> function
+distill_function_map = {func.__name__: func for func in _distill_functions}
 
 
 def get_distill_function(function_name: str):

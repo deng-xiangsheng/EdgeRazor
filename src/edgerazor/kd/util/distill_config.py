@@ -12,6 +12,7 @@ loss_2:
   loss_function: fd
   ...
 """
+# ruff: noqa: UP035 UP007 UP006
 
 import json
 from collections import OrderedDict
@@ -141,7 +142,7 @@ class DistillConfig:
         if not yaml_path.exists():
             raise FileNotFoundError(f"Config file not found: {yaml_path}")
         
-        with open(yaml_path, 'r', encoding='utf-8') as f:
+        with open(yaml_path, encoding='utf-8') as f:
             config_dict = yaml.safe_load(f)
         
         return cls.from_dict(config_dict)
@@ -153,7 +154,7 @@ class DistillConfig:
         if not json_path.exists():
             raise FileNotFoundError(f"Config file not found: {json_path}")
         
-        with open(json_path, 'r', encoding='utf-8') as f:
+        with open(json_path, encoding='utf-8') as f:
             config_dict = json.load(f)
         
         return cls.from_dict(config_dict)
