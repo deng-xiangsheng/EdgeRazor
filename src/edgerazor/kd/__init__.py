@@ -20,10 +20,10 @@ from .kd import KD
 from .util import (
     DistillConfig,
     LossConfig,
-    compute_fd,
     compute_kld_confidence,
     compute_kld_forward,
     compute_kld_reverse,
+    compute_state_distill,
 )
 
 __all__ = [
@@ -36,6 +36,6 @@ __all__ = [
     "compute_kld_forward",
     "compute_kld_reverse",
     "compute_kld_confidence",
-    "compute_fd",
+    "compute_state_distill",
 ]
 

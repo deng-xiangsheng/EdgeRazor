@@ -39,7 +39,7 @@ class LossConfig:
     # KLD-related parameters
     temperature: float = 2.0
     use_entropy: bool = True
-    padding_id: int = -100
+    padding_id: int = -100  # also known as ignore_index
     confidence_k: int = 5
     is_router_logits: bool = False
     

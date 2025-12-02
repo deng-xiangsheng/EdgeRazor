@@ -36,8 +36,8 @@ from .util.quant_function import (
     weight_quant_uniform_symmetric_clip_per_block_int1_58_nested,
     weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_dynamic,
     weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static,
-    weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_sparse,
     weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_nested,
+    weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_sparse,
     weight_quant_uniform_symmetric_clip_per_channel_int1_58,
     weight_quant_uniform_symmetric_clip_per_tensor_int1_58,
 )

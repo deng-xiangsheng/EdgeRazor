@@ -6,10 +6,10 @@ actual implementations for knowledge distillation.
 """
 
 from .distill_function import (
-    compute_fd,
     compute_kld_confidence,
     compute_kld_forward,
     compute_kld_reverse,
+    compute_state_distill,
 )
 
 # Collect all distillation loss functions automatically
@@ -17,7 +17,7 @@ _distill_functions = [
     compute_kld_forward,
     compute_kld_reverse,
     compute_kld_confidence,
-    compute_fd,
+    compute_state_distill,
 ]
 
 # Build the map automatically: function_name -> function
