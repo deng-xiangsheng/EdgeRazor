@@ -25,7 +25,11 @@ For example, `state_quant_uniform_symmetric_absmax_per_token_int8`:
 import torch
 from torch import Tensor
 
-from .quant_function_config import w2a8_block_size, w4a8_block_size, mixed_precision_prop
+from .quant_function_config import (
+    mixed_precision_prop,
+    w2a8_block_size,
+    w4a8_block_size,
+)
 
 # =============================================================
 # INT1_58 (Ternary) Weight Quantization - Clip Method
@@ -742,6 +746,105 @@ def weight_quant_uniform_asymmetric_max_per_block_int4(
 
 
 # =============================================================
+# Stepped Weight Quantization - Symmetric Method
+# =============================================================
+
+
+def weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_stepped(
+    w: Tensor,
+    epsilon: float = 1e-5,
+    w_scale_factor: float = 2.0,
+    block_size: int = w2a8_block_size,
+    mixed_precision_prop: float = mixed_precision_prop,
+) -> Tensor:
+    """
+    Quantize weight to INT1_58 and INT4 per-block using static mixed precision
+    and stepped quantization function.
+    
+    SteppedQuantFunc(W) = MP_INT1.58+INT4( INT4(W) )
+    SteppedQuantFunc(X) = MP_INT4+INT8( INT8(W) )
+    
+    Static Strategy (Position-based Block Selection):
+    - Divides weight into blocks in sequential order
+    - Statically assigns the first mixed_precision_prop (e.g., 1%) blocks to INT4
+    - First blocks (by position) are quantized to INT4 using absmax method
+    - Remaining blocks are quantized to INT1_58 using clip method
+    
+    Example:
+    - With mixed_precision_prop=0.01, the first 1% blocks use INT4: [-7, 7]
+    - The remaining 99% blocks use INT1_58: {-1, 0, 1}
+    
+    This approach uses a fixed pattern without analyzing weight importance,
+    assuming that earlier blocks in the tensor are more critical.
+    
+    Args:
+        w: Weight tensor to quantize, shape (out_dim, in_dim)
+        epsilon: Small value to prevent division by zero
+        w_scale_factor: Multiplier for the mean absolute value (default: 2.0)
+        block_size: Size of each quantization block
+        mixed_precision_prop: Proportion of blocks to quantize to higher precision (INT4)
+    
+    Returns:
+        Quantized weight tensor with values in {-1, 0, 1} * w_scale
+    """
+    w_hidden_int4 = weight_quant_uniform_symmetric_absmax_per_block_int4(
+        w=w,
+        epsilon=epsilon,
+        block_size=block_size,
+    )
+    
+    w_quant = weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static(
+        w=w_hidden_int4,
+        epsilon=epsilon,
+        w_scale_factor=w_scale_factor,
+        block_size=block_size,
+        mixed_precision_prop=mixed_precision_prop,
+    )
+    
+    return w_quant
+
+
+def weight_quant_uniform_symmetric_clip_per_block_int1_58_stepped(
+    w: Tensor,
+    epsilon: float = 1e-5,
+    w_scale_factor: float = 2.0,
+    block_size: int = w2a8_block_size,
+) -> Tensor:
+    """
+    Quantize weight to INT1_58 per-block using clip method and stepped quantization.
+    
+    SteppedQuantFunc(W) = INT1.58( INT4(W) )
+    SteppedQuantFunc(X) = INT4( INT8(W) )
+    
+    Ternarizes weight into INT1_58: {-1, 0, 1} * w_scale.
+    Scale factor is computed per block within each output channel.
+    
+    Args:
+        w: Weight tensor to quantize, shape (out_dim, in_dim)
+        epsilon: Small value to prevent division by zero
+        w_scale_factor: Multiplier for the mean absolute value (default: 2.0)
+        block_size: Size of each quantization block
+    
+    Returns:
+        Quantized weight tensor with values in {-1, 0, 1} * w_scale
+    """
+    w_hidden_int4 = weight_quant_uniform_symmetric_absmax_per_block_int4(
+        w=w,
+        epsilon=epsilon,
+        block_size=block_size,
+    )
+    
+    w_quant = weight_quant_uniform_symmetric_clip_per_block_int1_58(
+        w=w_hidden_int4,
+        epsilon=epsilon,
+        w_scale_factor=w_scale_factor,
+        block_size=block_size,
+    )
+    
+    return w_quant
+
+
+# =============================================================
 # INT2 State Quantization - Absmax Method
 # =============================================================
 
@@ -891,6 +994,95 @@ def state_quant_uniform_symmetric_absmax_per_block_int4(
         return x_quant
 
 
+def state_quant_uniform_symmetric_absmax_per_block_mp_int4_int8_dynamic(
+    x: Tensor,
+    epsilon: float = 1e-5,
+    block_size: int = w4a8_block_size,
+    mixed_precision_prop: float = mixed_precision_prop,
+) -> Tensor:
+    """
+    Quantize state (activation/kv_cache) to INT4 and INT8 per-block using dynamic mixed precision.
+    
+    Dynamic Strategy (Variance-based Block Selection):
+    - Divides activation into blocks and calculates variance for each block
+    - Dynamically selects top mixed_precision_prop (e.g., 1%) blocks with highest variance
+    - High-variance blocks (important activations) are quantized to INT8 using absmax method
+    - Remaining blocks are quantized to INT4 using absmax method
+    
+    Example:
+    - With mixed_precision_prop=0.01, the top 1% most variable blocks use INT8: [-127, 127]
+    - The remaining 99% less variable blocks use INT4: [-7, 7]
+    
+    This approach adapts to activation distribution, allocating higher precision to
+    more important blocks based on their variance.
+    
+    Args:
+        x: Input tensor to quantize, shape ([batch,] seq_len, hidden_dim)
+        epsilon: Small value to prevent division by zero
+        block_size: Size of each quantization block
+        mixed_precision_prop: Proportion of blocks to quantize to higher precision (INT8)
+    
+    Returns:
+        Quantized tensor with dynamic mixed precision quantization
+    """
+    bits_int4 = 4
+    max_val_int4 = 2**(bits_int4 - 1) - 1  # 7 for INT4
+    bits_int8 = 8
+    max_val_int8 = 2**(bits_int8 - 1) - 1  # 127 for INT8
+    
+    with torch.no_grad():
+        # Reshape to [..., -1, block_size]
+        original_shape = x.shape
+        intermediate_shape = list(original_shape[:-1]) + [-1, block_size]
+        x_blocked = x.view(intermediate_shape)
+        
+        # Flatten all dimensions except the last one (block_size) to make indexing easier
+        # Shape: (total_num_blocks, block_size)
+        num_blocks = x_blocked.numel() // block_size
+        x_flat = x_blocked.view(num_blocks, block_size)
+        
+        # Calculate importance score for each block (using variance as metric)
+        # Shape: (num_blocks,)
+        block_variance = x_flat.var(dim=-1)
+        
+        # Determine how many blocks should use INT8 (higher precision)
+        num_int8_blocks = min(max(1, int(num_blocks * mixed_precision_prop)), num_blocks)
+        
+        # Select top-k blocks with highest variance for INT8 quantization
+        # Shape: (num_int8_blocks,)
+        _, top_indices = torch.topk(block_variance, k=num_int8_blocks, dim=-1)
+        
+        # Create mask for INT8 blocks
+        # Shape: (num_blocks,)
+        int8_mask = torch.zeros_like(block_variance, dtype=torch.bool)
+        int8_mask.scatter_(dim=-1, index=top_indices, value=True)
+        
+        # Expand mask to match block dimension
+        # Shape: (num_blocks, 1)
+        int8_mask_expanded = int8_mask.unsqueeze(-1)
+        
+        # ===== INT8 Quantization (absmax method) for selected blocks =====
+        # Compute scale factor for INT8 blocks using maximum absolute value
+        x_scale_int8 = x_flat.abs().max(dim=-1, keepdim=True).values.clamp_(min=epsilon) / max_val_int8
+        # Quantize to INT8: [-127, 127]
+        x_quant_int8 = (x_flat / x_scale_int8).round().clamp(-max_val_int8, max_val_int8) * x_scale_int8
+        
+        # ===== INT4 Quantization (absmax method) for remaining blocks =====
+        # Compute scale factor for INT4 blocks using maximum absolute value
+        x_scale_int4 = x_flat.abs().max(dim=-1, keepdim=True).values.clamp_(min=epsilon) / max_val_int4
+        # Quantize to INT4: [-7, 7]
+        x_quant_int4 = (x_flat / x_scale_int4).round().clamp(-max_val_int4, max_val_int4) * x_scale_int4
+        
+        # ===== Combine INT8 and INT4 blocks =====
+        # Use INT8 for high-variance blocks, INT4 for others
+        x_quant_flat = torch.where(int8_mask_expanded, x_quant_int8, x_quant_int4)
+        
+        # Reshape back to original shape
+        x_quant = x_quant_flat.view(original_shape)
+    
+    return x_quant
+
+
 # =============================================================
 # INT8 State Quantization - Absmax Method
 # =============================================================
@@ -964,3 +1156,97 @@ def state_quant_uniform_symmetric_absmax_per_block_int8(
         x_quant = x_quant.view(original_shape)
 
         return x_quant
+
+
+def state_quant_uniform_symmetric_absmax_per_block_int4_stepped(
+    x: Tensor,
+    epsilon: float = 1e-5,
+    block_size: int = w4a8_block_size,
+) -> Tensor:
+    """
+    Quantize state (activation/kv_cache) to INT4 per-block using absmax method and stepped quantization.
+    
+    SteppedQuantFunc(X) = INT4( INT8(X) )
+    
+    Applies two-stage quantization:
+    1. First quantize to INT8 per-block
+    2. Then quantize the INT8 result to INT4 per-block
+    
+    This stepped approach can help preserve more information compared to direct INT4 quantization.
+    
+    Args:
+        x: Input tensor to quantize, shape ([batch,] seq_len, hidden_dim)
+        epsilon: Small value to prevent division by zero
+        block_size: Size of each quantization block
+    
+    Returns:
+        Quantized tensor with values in [-7, 7] * x_scale
+    """
+    # Step 1: Quantize to INT8
+    x_hidden_int8 = state_quant_uniform_symmetric_absmax_per_block_int8(
+        x=x,
+        epsilon=epsilon,
+        block_size=block_size,
+    )
+    
+    # Step 2: Quantize INT8 result to INT4
+    x_quant = state_quant_uniform_symmetric_absmax_per_block_int4(
+        x=x_hidden_int8,
+        epsilon=epsilon,
+        block_size=block_size,
+    )
+    
+    return x_quant
+
+
+def state_quant_uniform_symmetric_absmax_per_block_mp_int4_int8_dynamic_stepped(
+    x: Tensor,
+    epsilon: float = 1e-5,
+    block_size: int = w4a8_block_size,
+    mixed_precision_prop: float = mixed_precision_prop,
+) -> Tensor:
+    """
+    Quantize state (activation/kv_cache) to INT4 and INT8 per-block using dynamic mixed precision
+    and stepped quantization function.
+    
+    SteppedQuantFunc(X) = MP_INT4+INT8( INT8(X) )
+    
+    Dynamic Strategy (Variance-based Block Selection):
+    - First quantizes input to INT8 per-block
+    - Then divides the INT8 result into blocks and calculates variance for each block
+    - Dynamically selects top mixed_precision_prop (e.g., 1%) blocks with highest variance
+    - High-variance blocks are kept at INT8 precision
+    - Remaining blocks are further quantized to INT4
+    
+    Example:
+    - With mixed_precision_prop=0.01, the top 1% most variable blocks stay at INT8: [-127, 127]
+    - The remaining 99% less variable blocks are quantized to INT4: [-7, 7]
+    
+    This approach combines stepped quantization with dynamic mixed precision for better
+    quality preservation.
+    
+    Args:
+        x: Input tensor to quantize, shape ([batch,] seq_len, hidden_dim)
+        epsilon: Small value to prevent division by zero
+        block_size: Size of each quantization block
+        mixed_precision_prop: Proportion of blocks to keep at higher precision (INT8)
+    
+    Returns:
+        Quantized tensor with dynamic mixed precision stepped quantization
+    """
+    # Step 1: Quantize to INT8
+    x_hidden_int8 = state_quant_uniform_symmetric_absmax_per_block_int8(
+        x=x,
+        epsilon=epsilon,
+        block_size=block_size,
+    )
+    
+    # Step 2: Apply dynamic mixed precision quantization
+    x_quant = state_quant_uniform_symmetric_absmax_per_block_mp_int4_int8_dynamic(
+        x=x_hidden_int8,
+        epsilon=epsilon,
+        block_size=block_size,
+        mixed_precision_prop=mixed_precision_prop,
+    )
+    
+    return x_quant

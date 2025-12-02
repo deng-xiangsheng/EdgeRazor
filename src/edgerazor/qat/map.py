@@ -16,7 +16,10 @@ from transformers.models.qwen3_moe.modeling_qwen3_moe import Qwen3MoeAttention
 from .util.quant_function import (
     state_quant_uniform_symmetric_absmax_per_block_int2,
     state_quant_uniform_symmetric_absmax_per_block_int4,
+    state_quant_uniform_symmetric_absmax_per_block_int4_stepped,
     state_quant_uniform_symmetric_absmax_per_block_int8,
+    state_quant_uniform_symmetric_absmax_per_block_mp_int4_int8_dynamic,
+    state_quant_uniform_symmetric_absmax_per_block_mp_int4_int8_dynamic_stepped,
     state_quant_uniform_symmetric_absmax_per_token_int2,
     state_quant_uniform_symmetric_absmax_per_token_int4,
     state_quant_uniform_symmetric_absmax_per_token_int8,
@@ -30,40 +33,55 @@ from .util.quant_function import (
     weight_quant_uniform_symmetric_absmax_per_tensor_int1_58,
     weight_quant_uniform_symmetric_absmax_per_tensor_int4,
     weight_quant_uniform_symmetric_clip_per_block_int1_58,
+    weight_quant_uniform_symmetric_clip_per_block_int1_58_stepped,
     weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_dynamic,
     weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static,
     weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_sparse,
+    weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_stepped,
     weight_quant_uniform_symmetric_clip_per_channel_int1_58,
     weight_quant_uniform_symmetric_clip_per_tensor_int1_58,
 )
 
-quant_function_map = {
-    # Weight Quantization Functions - INT1_58 (Ternary)
-    "weight_quant_uniform_symmetric_clip_per_tensor_int1_58": weight_quant_uniform_symmetric_clip_per_tensor_int1_58,
-    "weight_quant_uniform_symmetric_clip_per_channel_int1_58": weight_quant_uniform_symmetric_clip_per_channel_int1_58,
-    "weight_quant_uniform_symmetric_clip_per_block_int1_58": weight_quant_uniform_symmetric_clip_per_block_int1_58,
-    "weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_dynamic": weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_dynamic,
-    "weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static": weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static,
-    "weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_sparse": weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_sparse,
-    "weight_quant_uniform_symmetric_absmax_per_tensor_int1_58": weight_quant_uniform_symmetric_absmax_per_tensor_int1_58,
-    "weight_quant_uniform_symmetric_absmax_per_channel_int1_58": weight_quant_uniform_symmetric_absmax_per_channel_int1_58,
-    "weight_quant_uniform_symmetric_absmax_per_block_int1_58": weight_quant_uniform_symmetric_absmax_per_block_int1_58,
-    # Weight Quantization Functions - INT4
-    "weight_quant_uniform_symmetric_absmax_per_tensor_int4": weight_quant_uniform_symmetric_absmax_per_tensor_int4,
-    "weight_quant_uniform_symmetric_absmax_per_channel_int4": weight_quant_uniform_symmetric_absmax_per_channel_int4,
-    "weight_quant_uniform_symmetric_absmax_per_block_int4": weight_quant_uniform_symmetric_absmax_per_block_int4,
-    "weight_quant_uniform_asymmetric_max_per_tensor_int4": weight_quant_uniform_asymmetric_max_per_tensor_int4,
-    "weight_quant_uniform_asymmetric_max_per_channel_int4": weight_quant_uniform_asymmetric_max_per_channel_int4,
-    "weight_quant_uniform_asymmetric_max_per_block_int4": weight_quant_uniform_asymmetric_max_per_block_int4,
-    # State Quantization Functions (Activation & KV Cache) - Per Token
-    "state_quant_uniform_symmetric_absmax_per_token_int2": state_quant_uniform_symmetric_absmax_per_token_int2,
-    "state_quant_uniform_symmetric_absmax_per_token_int4": state_quant_uniform_symmetric_absmax_per_token_int4,
-    "state_quant_uniform_symmetric_absmax_per_token_int8": state_quant_uniform_symmetric_absmax_per_token_int8,
-    # State Quantization Functions (Activation & KV Cache) - Per Block
-    "state_quant_uniform_symmetric_absmax_per_block_int2": state_quant_uniform_symmetric_absmax_per_block_int2,
-    "state_quant_uniform_symmetric_absmax_per_block_int4": state_quant_uniform_symmetric_absmax_per_block_int4,
-    "state_quant_uniform_symmetric_absmax_per_block_int8": state_quant_uniform_symmetric_absmax_per_block_int8,
-}
+# Collect all quantization functions automatically
+_quant_functions = [
+    # INT1_58 (Ternary) Weight Quantization - Clip Method
+    weight_quant_uniform_symmetric_clip_per_tensor_int1_58,
+    weight_quant_uniform_symmetric_clip_per_channel_int1_58,
+    weight_quant_uniform_symmetric_clip_per_block_int1_58,
+    weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_dynamic,
+    weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static,
+    weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_sparse,
+    # INT1_58 (Ternary) Weight Quantization - Absmax Method
+    weight_quant_uniform_symmetric_absmax_per_tensor_int1_58,
+    weight_quant_uniform_symmetric_absmax_per_channel_int1_58,
+    weight_quant_uniform_symmetric_absmax_per_block_int1_58,
+    # INT4 Weight Quantization - Symmetric Absmax Method
+    weight_quant_uniform_symmetric_absmax_per_tensor_int4,
+    weight_quant_uniform_symmetric_absmax_per_channel_int4,
+    weight_quant_uniform_symmetric_absmax_per_block_int4,
+    # INT4 Weight Quantization - Asymmetric Max Method
+    weight_quant_uniform_asymmetric_max_per_tensor_int4,
+    weight_quant_uniform_asymmetric_max_per_channel_int4,
+    weight_quant_uniform_asymmetric_max_per_block_int4,
+    # Stepped Weight Quantization - Symmetric Method
+    weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_stepped,
+    weight_quant_uniform_symmetric_clip_per_block_int1_58_stepped,
+    # INT2 State Quantization - Absmax Method
+    state_quant_uniform_symmetric_absmax_per_token_int2,
+    state_quant_uniform_symmetric_absmax_per_block_int2,
+    # INT4 State Quantization - Absmax Method
+    state_quant_uniform_symmetric_absmax_per_token_int4,
+    state_quant_uniform_symmetric_absmax_per_block_int4,
+    state_quant_uniform_symmetric_absmax_per_block_mp_int4_int8_dynamic,
+    # INT8 State Quantization - Absmax Method
+    state_quant_uniform_symmetric_absmax_per_token_int8,
+    state_quant_uniform_symmetric_absmax_per_block_int8,
+    state_quant_uniform_symmetric_absmax_per_block_int4_stepped,
+    state_quant_uniform_symmetric_absmax_per_block_mp_int4_int8_dynamic_stepped,
+]
+
+# Build the map automatically: function_name -> function
+quant_function_map = {func.__name__: func for func in _quant_functions}
 
 
 modules_map = {
