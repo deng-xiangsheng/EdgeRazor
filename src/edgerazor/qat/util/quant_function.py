@@ -1034,12 +1034,12 @@ def state_quant_uniform_symmetric_absmax_per_block_mp_int4_int8_dynamic(
         # Reshape to [..., -1, block_size]
         original_shape = x.shape
         intermediate_shape = list(original_shape[:-1]) + [-1, block_size]
-        x_blocked = x.view(intermediate_shape)
+        x_blocked = x.reshape(intermediate_shape)
         
         # Flatten all dimensions except the last one (block_size) to make indexing easier
         # Shape: (total_num_blocks, block_size)
         num_blocks = x_blocked.numel() // block_size
-        x_flat = x_blocked.view(num_blocks, block_size)
+        x_flat = x_blocked.reshape(num_blocks, block_size)
         
         # Calculate importance score for each block (using variance as metric)
         # Shape: (num_blocks,)
@@ -1078,7 +1078,7 @@ def state_quant_uniform_symmetric_absmax_per_block_mp_int4_int8_dynamic(
         x_quant_flat = torch.where(int8_mask_expanded, x_quant_int8, x_quant_int4)
         
         # Reshape back to original shape
-        x_quant = x_quant_flat.view(original_shape)
+        x_quant = x_quant_flat.reshape(original_shape)
     
     return x_quant
 
