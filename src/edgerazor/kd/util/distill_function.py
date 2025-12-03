@@ -52,9 +52,14 @@ def compute_kld(
         target_probs = F.softmax(target_logits, dim=-1)
     else:
         # Attention scores: assume already in probability space (after softmax)
+        # # Method1: add small value for numerical stability
+        # log_probs = torch.log(
+        #     input_logits + 1e-8
+        # )
+        ## Method2: use clamp to avoid log(0)
         log_probs = torch.log(
-            input_logits + 1e-8
-        )  # add small value for numerical stability
+            input_logits.clamp(min=1e-8)
+        )
         target_probs = target_logits
 
     # Compute raw KL divergence elements
