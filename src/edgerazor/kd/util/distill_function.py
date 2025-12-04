@@ -50,7 +50,7 @@ def compute_kld(
         # Numerically stable computation using log-softmax and softmax
         log_probs = F.log_softmax(input_logits, dim=-1)
         target_probs = F.softmax(target_logits, dim=-1)
-    else:
+    elif is_attention and input_logits.dim() == 4:
         # Attention scores: assume already in probability space (after softmax)
         # # Method1: add small value for numerical stability
         # log_probs = torch.log(
@@ -283,7 +283,12 @@ def compute_teacher_confidence(
         # print(f"avg_entropy={sample_avg_entropy}, max_entropy={max_entropy}")
     else:
         # Original method: based on label token probability
-        target_expanded = labels.unsqueeze(-1)
+        # Replace padding_id with 0 to avoid invalid index in gather
+        # (padding positions will be masked out later)
+        safe_labels = labels.clone()
+        safe_labels[pad_mask] = 0
+        
+        target_expanded = safe_labels.unsqueeze(-1)
         target_probs = torch.gather(
             teacher_probs, dim=-1, index=target_expanded
         ).squeeze(-1)
