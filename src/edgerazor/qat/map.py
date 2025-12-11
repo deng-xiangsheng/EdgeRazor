@@ -3,6 +3,8 @@ Mapping of quantization functions and classes.
 
 `str -> function/class`
 """
+from collections import OrderedDict
+
 import torch.nn as nn
 from transformers.models.olmoe.modeling_olmoe import (
     OlmoeAttention,
@@ -87,7 +89,6 @@ _quant_functions = [
 # Build the map automatically: function_name -> function
 quant_function_map = {func.__name__: func for func in _quant_functions}
 
-
 modules_map = {
     "linear": nn.Linear,
     "embedding": nn.Embedding,
@@ -100,4 +101,266 @@ modules_map = {
     "olmoeflashattention2": OlmoeFlashAttention2,
     "qwen3moeattention": Qwen3MoeAttention,
     "qwen3attention": Qwen3Attention,
+}
+
+def create_w1_58_config(mp_prop, with_activation_kv=False):
+    """
+    创建 w1_58 量化配置
+    
+    Args:
+        mp_prop: mixed precision proportion (例如 0.01 或 0.05)
+        with_activation_kv: 是否包含 activation 和 kv_cache 量化
+    """
+    target_types = ["linear", "embedding"]
+    if with_activation_kv:
+        target_types.append("qwen3attention")
+    
+    config = OrderedDict([
+        ("method", "QAT"),
+        (
+            "select",
+            OrderedDict([
+                ("target_types", target_types),
+                ("target_names", []),
+                ("exclude_types", []),
+                ("exclude_names", []),
+            ])
+        ),
+        (
+            "function",
+            OrderedDict([
+                ("epsilon", 1e-05),
+                (
+                    "weight_function",
+                    "weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse",
+                ),
+                ("w_scale_factor", 2.0),
+                ("w_block_size", 128),
+                ("w_mixed_precision_prop", mp_prop),
+                ("is_w_quantized", True),
+                ("activation_function", ""),
+                ("a_block_size", -1),
+                ("a_mixed_precision_prop", -1.0),
+                ("kv_cache_function", ""),
+                ("kv_block_size", -1),
+                ("kv_mixed_precision_prop", -1.0),
+            ])
+        ),
+        ("training", "all"),
+    ])
+    
+    if with_activation_kv:
+        config["function"]["activation_function"] = "state_quant_uniform_symmetric_absmax_per_block_int8"
+        config["function"]["a_block_size"] = 128
+        config["function"]["kv_cache_function"] = "state_quant_uniform_symmetric_absmax_per_block_int8"
+        config["function"]["kv_block_size"] = 128
+    
+    return config
+
+w4a16kv16 = OrderedDict(
+    [
+        ("method", "QAT"),
+        (
+            "select",
+            OrderedDict(
+                [
+                    ("target_types", ["linear", "embedding"]),
+                    ("target_names", []),
+                    ("exclude_types", []),
+                    ("exclude_names", []),
+                ]
+            ),
+        ),
+        (
+            "function",
+            OrderedDict(
+                [
+                    ("epsilon", 1e-05),
+                    (
+                        "weight_function",
+                        "weight_quant_uniform_symmetric_absmax_per_block_int4",
+                    ),
+                    ("w_scale_factor", 2.0),
+                    ("w_block_size", 256),
+                    ("w_mixed_precision_prop", -1.0),
+                    ("is_w_quantized", True),
+                    ("activation_function", ""),
+                    ("a_block_size", -1),
+                    ("a_mixed_precision_prop", -1.0),
+                    ("kv_cache_function", ""),
+                    ("kv_block_size", -1),
+                    ("kv_mixed_precision_prop", -1.0),
+                ]
+            ),
+        ),
+        ("training", "all"),
+    ]
+)
+
+w4a8kv8 = OrderedDict(
+    [
+        ("method", "QAT"),
+        (
+            "select",
+            OrderedDict(
+                [
+                    ("target_types", ["linear", "embedding", "qwen3attention"]),
+                    ("target_names", []),
+                    ("exclude_types", []),
+                    ("exclude_names", []),
+                ]
+            ),
+        ),
+        (
+            "function",
+            OrderedDict(
+                [
+                    ("epsilon", 1e-05),
+                    (
+                        "weight_function",
+                        "weight_quant_uniform_symmetric_absmax_per_block_int4",
+                    ),
+                    ("w_scale_factor", 2.0),
+                    ("w_block_size", 256),
+                    ("w_mixed_precision_prop", -1.0),
+                    ("is_w_quantized", True),
+                    (
+                        "activation_function",
+                        "state_quant_uniform_symmetric_absmax_per_block_int8",
+                    ),
+                    ("a_block_size", 256),
+                    ("a_mixed_precision_prop", -1.0),
+                    (
+                        "kv_cache_function",
+                        "state_quant_uniform_symmetric_absmax_per_block_int8",
+                    ),
+                    ("kv_block_size", 32),
+                    ("kv_mixed_precision_prop", -1.0),
+                ]
+            ),
+        ),
+        ("training", "all"),
+    ]
+)
+
+w1_58a16kv16 =OrderedDict(
+    [
+        ("method", "QAT"),
+        (
+            "select",
+            OrderedDict(
+                [
+                    ("target_types", ["linear", "embedding"]),
+                    ("target_names", []),
+                    ("exclude_types", []),
+                    ("exclude_names", []),
+                ]
+            ),
+        ),
+        (
+            "function",
+            OrderedDict(
+                [
+                    ("epsilon", 1e-05),
+                    (
+                        "weight_function",
+                        "weight_quant_uniform_symmetric_clip_per_block_int1_58",
+                    ),
+                    ("w_scale_factor", 2.0),
+                    ("w_block_size", 128),
+                    ("w_mixed_precision_prop", 0.05),
+                    ("is_w_quantized", True),
+                    ("activation_function", ""),
+                    ("a_block_size", -1),
+                    ("a_mixed_precision_prop", -1.0),
+                    ("kv_cache_function", ""),
+                    ("kv_block_size", -1),
+                    ("kv_mixed_precision_prop", -1.0),
+                ]
+            ),
+        ),
+        ("training", "all"),
+    ]
+)
+
+w1_58a8kv8 = OrderedDict(
+    [
+        ("method", "QAT"),
+        (
+            "select",
+            OrderedDict(
+                [
+                    ("target_types", ["linear", "embedding", "qwen3attention"]),
+                    ("target_names", []),
+                    ("exclude_types", []),
+                    ("exclude_names", []),
+                ]
+            ),
+        ),
+        (
+            "function",
+            OrderedDict(
+                [
+                    ("epsilon", 1e-05),
+                    (
+                        "weight_function",
+                        "weight_quant_uniform_symmetric_clip_per_block_int1_58",
+                    ),
+                    ("w_scale_factor", 2.0),
+                    ("w_block_size", 128),
+                    ("w_mixed_precision_prop", 0.05),
+                    ("is_w_quantized", True),
+                    (
+                        "activation_function",
+                        "state_quant_uniform_symmetric_absmax_per_block_int8",
+                    ),
+                    ("a_block_size", 128),
+                    ("a_mixed_precision_prop", -1.0),
+                    (
+                        "kv_cache_function",
+                        "state_quant_uniform_symmetric_absmax_per_block_int8",
+                    ),
+                    ("kv_block_size", 128),
+                    ("kv_mixed_precision_prop", -1.0),
+                ]
+            ),
+        ),
+        ("training", "all"),
+    ]
+)
+
+# 使用函数生成配置
+w1_58_mp1a16kv16 = create_w1_58_config(mp_prop=0.01, with_activation_kv=False)
+w1_58_mp1a8kv8 = create_w1_58_config(mp_prop=0.01, with_activation_kv=True)
+w1_58_mp5a16kv16 = create_w1_58_config(mp_prop=0.05, with_activation_kv=False)
+w1_58_mp5a8kv8 = create_w1_58_config(mp_prop=0.05, with_activation_kv=True)
+w1_58_mp10a16kv16 = create_w1_58_config(mp_prop=0.10, with_activation_kv=False)
+w1_58_mp10a8kv8 = create_w1_58_config(mp_prop=0.10, with_activation_kv=True)
+w1_58_mp15a16kv16 = create_w1_58_config(mp_prop=0.15, with_activation_kv=False)
+w1_58_mp15a8kv8 = create_w1_58_config(mp_prop=0.15, with_activation_kv=True)
+w1_58_mp20a16kv16 = create_w1_58_config(mp_prop=0.20, with_activation_kv=False)
+w1_58_mp20a8kv8 = create_w1_58_config(mp_prop=0.20, with_activation_kv=True)
+
+# Map quant_mode string to imported config dict
+quant_config_map = {
+    "w4a16kv16": w4a16kv16,
+    "w4a8kv8": w4a8kv8,
+    
+    "w1_58a16kv16": w1_58a16kv16,
+    "w1_58a8kv8": w1_58a8kv8,
+    
+    "w1_58_mp1a16kv16": w1_58_mp1a16kv16,
+    "w1_58_mp1a8kv8": w1_58_mp1a8kv8,
+    
+    "w1_58_mp5a16kv16": w1_58_mp5a16kv16,
+    "w1_58_mp5a8kv8": w1_58_mp5a8kv8,
+    
+    "w1_58_mp10a16kv16": w1_58_mp10a16kv16,
+    "w1_58_mp10a8kv8": w1_58_mp10a8kv8,
+    
+    "w1_58_mp15a16kv16": w1_58_mp15a16kv16,
+    "w1_58_mp15a8kv8": w1_58_mp15a8kv8,
+    
+    "w1_58_mp20a16kv16": w1_58_mp20a16kv16,
+    "w1_58_mp20a8kv8": w1_58_mp20a8kv8,
 }

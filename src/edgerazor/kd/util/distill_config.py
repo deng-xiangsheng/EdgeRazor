@@ -28,7 +28,7 @@ class LossConfig:
     """Configuration for a single loss function"""
     
     # Loss type identifier (used for configuration validation only)
-    loss_type: str = "logits"  # logits, features, attention, hidden
+    loss_type: str = "logits"  # ['logits', 'past_key_values', 'hidden_states', 'attentions']
     
     # Loss function name (abbreviated form)
     loss_function: str = "compute_kld_reverse"  # compute_kld_reverse, compute_kld_confidence, compute_fd, etc.
