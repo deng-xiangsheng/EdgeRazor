@@ -340,6 +340,10 @@ w1_58_mp15a16kv16 = create_w1_58_config(mp_prop=0.15, with_activation_kv=False)
 w1_58_mp15a8kv8 = create_w1_58_config(mp_prop=0.15, with_activation_kv=True)
 w1_58_mp20a16kv16 = create_w1_58_config(mp_prop=0.20, with_activation_kv=False)
 w1_58_mp20a8kv8 = create_w1_58_config(mp_prop=0.20, with_activation_kv=True)
+w1_58_mp30a16kv16 = create_w1_58_config(mp_prop=0.30, with_activation_kv=False)
+w1_58_mp30a8kv8 = create_w1_58_config(mp_prop=0.30, with_activation_kv=True)
+w1_58_mp50a16kv16 = create_w1_58_config(mp_prop=0.50, with_activation_kv=False)
+w1_58_mp50a8kv8 = create_w1_58_config(mp_prop=0.50, with_activation_kv=True)
 
 # Map quant_mode string to imported config dict
 quant_config_map = {
@@ -363,4 +367,10 @@ quant_config_map = {
     
     "w1_58_mp20a16kv16": w1_58_mp20a16kv16,
     "w1_58_mp20a8kv8": w1_58_mp20a8kv8,
+    
+    "w1_58_mp30a16kv16": w1_58_mp30a16kv16,
+    "w1_58_mp30a8kv8": w1_58_mp30a8kv8,
+    
+    "w1_58_mp50a16kv16": w1_58_mp50a16kv16,
+    "w1_58_mp50a8kv8": w1_58_mp50a8kv8,
 }
