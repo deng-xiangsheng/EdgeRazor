@@ -351,7 +351,7 @@ def weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_column_
         # Determine how many blocks per channel should use INT4
         # At least 1 block if prop > 0, at most all blocks
         num_int4_blocks_per_channel = min(
-            max(1, int(blocks_per_channel * mixed_precision_prop)), 
+            max(1, int(blocks_per_channel * mixed_precision_prop)),
             blocks_per_channel
         )
         
