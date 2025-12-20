@@ -2,12 +2,23 @@
 
 EdgeRazor is a unified lightweight framework for edge AI, designed to make models lighter, faster, and deployable across diverse scenarios. It seamlessly integrates mainstream lightweight techniques into your existing full-precision training pipeline with minimal code modification. Whether you're targeting mobile devices, embedded systems, resource-constrained edge deployments, or compute-intensive cloud services, EdgeRazor empowers you to compress state-of-the-art models without sacrificing unacceptable performance.
 
+**Table of Contents**
+
+- [News](#news)
+- [Getting Started](#getting-started)
+  - [Installation](#installation)
+  - [Usage](#usage)
+- [Features](#features)
+- [Example](#example)
+- [Reference](#reference)
+- [Contributors](#contributors)
+
 ## News
 
 - [2026/01] 🔥 EdgeRazor V1 is released!
 - [2025/10] 📝 TernaryCLIP is released! Check our paper [here](https://arxiv.org/abs/2510.21879).
 
-## Contents
+## Getting Started
 
 ### Installation
 
@@ -17,13 +28,6 @@ conda create -n edgerazor python=3.10 -y
 conda activate edgerazor
 pip install -e .[cu128]
 ```
-
-### Features
-
-- Quantization-Aware Training, QAT 🔢
-- Knowledge Distillation, KD ⚗️
-- Quantization-Aware Distillation, QAD 💎
-- Pruning ✂️ (Work in Progress)
 
 ### Usage
 
@@ -41,6 +45,13 @@ teacher_outputs = teacher(inputs)
 # Calculate loss
 loss, loss_dict = edgerazor.compute_loss(student_outputs, teacher_outputs, labels)
 ```
+
+## Features
+
+- Quantization-Aware Training, QAT 🔢
+- Knowledge Distillation, KD ⚗️
+- Quantization-Aware Distillation, QAD 💎
+- Pruning ✂️ (Work in Progress)
 
 ## Example
 
