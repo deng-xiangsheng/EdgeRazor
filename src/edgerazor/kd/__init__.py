@@ -23,7 +23,7 @@ from .util import (
     compute_kld_confidence,
     compute_kld_forward,
     compute_kld_reverse,
-    compute_state_distill,
+    compute_mse,
 )
 
 __all__ = [
@@ -36,6 +36,6 @@ __all__ = [
     "compute_kld_forward",
     "compute_kld_reverse",
     "compute_kld_confidence",
-    "compute_state_distill",
+    "compute_mse",
 ]
 

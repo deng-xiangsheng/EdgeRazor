@@ -356,7 +356,7 @@ def compute_kld_confidence(
 
 
 # ========================================= State Distillation: MSE =========================================
-def compute_state_distill(
+def compute_mse(
     student_features: torch.Tensor,
     teacher_features: torch.Tensor,
     labels: torch.Tensor | None,

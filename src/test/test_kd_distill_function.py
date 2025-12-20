@@ -11,7 +11,7 @@ import torch.nn.functional as F
 
 from edgerazor.kd.util.distill_config import LossConfig
 from edgerazor.kd.util.distill_function import (
-    compute_state_distill,
+    compute_mse,
     compute_kld,
     compute_kld_confidence,
     compute_kld_forward,
@@ -350,7 +350,7 @@ class TestFeatureDistillation:
         )
         
         # Compute using our function
-        fd_result = compute_state_distill(student_features, teacher_features, target, config)
+        fd_result = compute_mse(student_features, teacher_features, target, config)
         
         # Manual computation: MSE sum
         manual_mse = ((student_features - teacher_features) ** 2).sum()
@@ -375,7 +375,7 @@ class TestFeatureDistillation:
             reduction="mean"
         )
         
-        fd_result = compute_state_distill(features, features, target, config)
+        fd_result = compute_mse(features, features, target, config)
         
         assert torch.isclose(fd_result, torch.tensor(0.0), atol=1e-7), \
             f"FD should be zero for identical features, got {fd_result}"
@@ -402,7 +402,7 @@ class TestFeatureDistillation:
             padding_id=-100
         )
         
-        fd_with_padding = compute_state_distill(student_features, teacher_features, target, config)
+        fd_with_padding = compute_mse(student_features, teacher_features, target, config)
         
         # Manually compute without padding positions
         mask = target != -100
@@ -431,19 +431,19 @@ class TestFeatureDistillation:
         
         # Test sum
         config_sum = LossConfig(loss_type="hidden_states", reduction="sum")
-        fd_sum = compute_state_distill(student_features, teacher_features, target, config_sum)
+        fd_sum = compute_mse(student_features, teacher_features, target, config_sum)
         
         # Test mean (averages over valid tokens and hidden dimensions)
         config_mean = LossConfig(loss_type="hidden_states", reduction="mean")
-        fd_mean = compute_state_distill(student_features, teacher_features, target, config_mean)
+        fd_mean = compute_mse(student_features, teacher_features, target, config_mean)
         
         # Test batch_mean
         config_batch_mean = LossConfig(loss_type="hidden_states", reduction="batch_mean")
-        fd_batch_mean = compute_state_distill(student_features, teacher_features, target, config_batch_mean)
+        fd_batch_mean = compute_mse(student_features, teacher_features, target, config_batch_mean)
         
         # Test none
         config_none = LossConfig(loss_type="hidden_states", reduction="none")
-        fd_none = compute_state_distill(student_features, teacher_features, target, config_none)
+        fd_none = compute_mse(student_features, teacher_features, target, config_none)
         
         # Verify relationships
         assert fd_sum > fd_mean, "Sum should be greater than mean"
@@ -477,7 +477,7 @@ class TestFeatureDistillation:
         )
         
         # Should work without target for 2D features
-        fd_result = compute_state_distill(student_features, teacher_features, None, config)
+        fd_result = compute_mse(student_features, teacher_features, None, config)
         
         # Manual computation
         manual_mse = F.mse_loss(student_features, teacher_features, reduction='mean')
@@ -496,7 +496,7 @@ class TestFeatureDistillation:
         config = LossConfig(loss_type="hidden_states", loss_function="fd")
         
         with pytest.raises(ValueError, match="must have same shape"):
-            compute_state_distill(student_features, teacher_features, target, config)
+            compute_mse(student_features, teacher_features, target, config)
 
 
 class TestNumericalStability:
@@ -557,7 +557,7 @@ class TestNumericalStability:
             
             config = LossConfig(loss_type="hidden_states", reduction="mean")
             
-            fd = compute_state_distill(student_features, teacher_features, target, config)
+            fd = compute_mse(student_features, teacher_features, target, config)
             
             assert fd >= 0, f"FD should be non-negative, got {fd}"
 

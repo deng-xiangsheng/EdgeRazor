@@ -38,7 +38,7 @@ from .kd import KD, DistillConfig
 from .qat import QAT, QuantConfig
 from .qat.map import quant_config_map
 
-__version__ = "1.0.6"
+__version__ = "1.1.0"
 
 __all__ = [
     # Unified API

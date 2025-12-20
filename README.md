@@ -1,9 +1,11 @@
 ![EdgeRazor Title](./asset/Title.png)
 
+EdgeRazor is a unified lightweight framework for edge AI, designed to make models lighter, faster, and deployable across diverse scenarios. It seamlessly integrates mainstream lightweight techniques into your existing full-precision training pipeline with minimal code modification. Whether you're targeting mobile devices, embedded systems, resource-constrained edge deployments, or compute-intensive cloud services, EdgeRazor empowers you to compress state-of-the-art models without sacrificing unacceptable performance.
+
 ## News
 
-- [2025/11] 🔥 EdgeRazor V1.0.0 is publicly released!
-- [2025/10] 📝 TernaryCLIP is publicly released! Check our paper [here](https://arxiv.org/abs/2510.21879).
+- [2026/01] 🔥 EdgeRazor V1 is released!
+- [2025/10] 📝 TernaryCLIP is released! Check our paper [here](https://arxiv.org/abs/2510.21879).
 
 ## Contents
 
@@ -57,3 +59,7 @@ loss, loss_dict = edgerazor.compute_loss(student_outputs, teacher_outputs, label
   journal={arXiv preprint arXiv:2510.21879}
 }
 ```
+
+## Contributors
+
+- Shu-Hao Zhang: Core developer and maintainer of EdgeRazor-V1.

@@ -9,7 +9,7 @@ from .distill_function import (
     compute_kld_confidence,
     compute_kld_forward,
     compute_kld_reverse,
-    compute_state_distill,
+    compute_mse,
 )
 
 # Collect all distillation loss functions automatically
@@ -17,7 +17,7 @@ _distill_functions = [
     compute_kld_forward,
     compute_kld_reverse,
     compute_kld_confidence,
-    compute_state_distill,
+    compute_mse,
 ]
 
 # Build the map automatically: function_name -> function

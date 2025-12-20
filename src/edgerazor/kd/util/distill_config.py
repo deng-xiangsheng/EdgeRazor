@@ -53,6 +53,10 @@ class LossConfig:
     # Predefined string choices: "low", "mid", "high"
     # Examples: 0, -1, [0, 3, 6], [1, -1], "low", "mid", "high", ["low", "mid", "high"]
     layer_index: int | str | list | None = None
+    layer_index_adaptive_metric: str = "cosine_similarity"  # e.g., "l2", "cosine", etc.
+    layer_index_adaptive_topk: int = 3  # Number of top layers to select based on adaptive metric
+    
+    self_relation_dsitill_component: str = "value"  # for attention distillation: "key", "value", "both"
     
     def __post_init__(self):
         """Validate configuration parameters"""
@@ -65,7 +69,7 @@ class LossConfig:
             raise ValueError(f"reduction must be one of {valid_reductions}, got '{self.reduction}'")
         
         # Validate layer_index if it's a string or list of strings
-        valid_layer_names = ["low", "mid", "high"]
+        valid_layer_names = ["low", "mid", "high", "adaptive"]
         if isinstance(self.layer_index, str):
             if self.layer_index not in valid_layer_names:
                 raise ValueError(
@@ -77,6 +81,14 @@ class LossConfig:
                     raise ValueError(
                         f"layer_index string must be one of {valid_layer_names}, got '{idx}'"
                     )
+        
+        # Validate layer_index_adaptive_metric
+        valid_adaptive_metrics = ["cosine_similarity", "l2", "variance"]
+        if self.layer_index_adaptive_metric is not None:
+            if self.layer_index_adaptive_metric not in valid_adaptive_metrics:
+                raise ValueError(
+                    f"layer_index_adaptive_metric must be one of {valid_adaptive_metrics}, got '{self.layer_index_adaptive_metric}'"
+                )
 
 
 @dataclass

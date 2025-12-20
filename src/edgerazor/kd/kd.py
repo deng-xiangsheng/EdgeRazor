@@ -63,9 +63,11 @@ Distill function format: `compute_xxx(...)`
 from pathlib import Path
 
 import torch
+from transformers.cache_utils import Cache
 
 from ..log import get_logger
 from .util import DistillConfig, get_distill_function
+from .util.layer_select import resolve_layer_indices, resolve_layer_indices_adaptive
 
 
 class KD:
@@ -369,29 +371,21 @@ class KD:
                         num_layers = len(student_features)
                         
                         # Resolve string layer names to actual indices
-                        resolved_indices = []
-                        for idx in layer_indices:
-                            if isinstance(idx, str):
-                                # Map predefined string choices to actual layer indices
-                                if idx == "low":
-                                    actual_idx = 1 if num_layers > 1 else 0
-                                elif idx == "mid":
-                                    actual_idx = num_layers // 2
-                                elif idx == "high":
-                                    actual_idx = num_layers - 1
-                                else:
-                                    self.logger.warning(
-                                        f'{loss_key}: unknown layer_index string "{idx}", skipping'
-                                    )
-                                    continue
-                                resolved_indices.append(actual_idx)
-                                self.logger.debug(
-                                    f'{loss_key}: resolved "{idx}" to layer {actual_idx}'
-                                )
-                            else:
-                                # Handle negative indexing for integer indices
-                                actual_idx = idx if idx >= 0 else num_layers + idx
-                                resolved_indices.append(actual_idx)
+                        # If fixed layer_indices are used,
+                        if "adaptive" not in layer_indices:
+                            resolved_indices = resolve_layer_indices(
+                                layer_indices=layer_indices,
+                                num_layers=num_layers,
+                                loss_key=loss_key,
+                                logger=self.logger,
+                            )
+                        # If adaptive layer selection is used, calculate cosine similarity to select layers
+                        elif "adaptive" in layer_indices:
+                            resolved_indices = resolve_layer_indices_adaptive(
+                                hidden_states=student_features,
+                                metric=loss_config.layer_index_adaptive_metric,
+                                topk=loss_config.layer_index_adaptive_topk,
+                            )
                         
                         # Compute loss for each selected layer and accumulate
                         layer_loss = 0.0
@@ -456,10 +450,16 @@ class KD:
                 distill_loss += weighted_loss
                 loss_dict['distill_loss_details'][loss_key] = loss_value.item()
             
-            # Attention distillation (future support)
+            # Attention distillation (KLD-based on attention distributions)
             elif loss_config.loss_type == 'attention':
                 student_attentions = student_outputs.get('attentions')
                 teacher_attentions = teacher_outputs.get('attentions')
+                
+                # Attention data structure:
+                # Tuple of length num_layers,
+                # each element is of shape (batch_size, num_attention_heads, seq_len, seq_len)
+                # The last dimension represents attention distribution over keys for each query
+                # KLD/MSE loss is typically applied on the last dimension (attention weights)
                 
                 if student_attentions is None or teacher_attentions is None:
                     self.logger.warning(
@@ -467,10 +467,401 @@ class KD:
                     )
                     continue
                 
-                # TODO: Implement attention distillation
-                self.logger.warning(
-                    f'{loss_key}: attention distillation not implemented yet'
-                )
+                if loss_config.layer_index is not None:
+                    # If attentions is tuple, select specific layers
+                    if isinstance(student_attentions, tuple):
+                        # Convert layer_index to list for unified handling
+                        if isinstance(loss_config.layer_index, int):
+                            layer_indices = [loss_config.layer_index]
+                        elif isinstance(loss_config.layer_index, str):
+                            layer_indices = [loss_config.layer_index]
+                        else:
+                            layer_indices = loss_config.layer_index
+                        
+                        # Get total number of layers
+                        num_layers = len(student_attentions)
+                        
+                        # Resolve string layer names to actual indices
+                        if "adaptive" not in layer_indices:
+                            resolved_indices = resolve_layer_indices(
+                                layer_indices=layer_indices,
+                                num_layers=num_layers,
+                                loss_key=loss_key,
+                                logger=self.logger,
+                            )
+                        # Adaptive layer selection based on attention patterns
+                        elif "adaptive" in layer_indices:
+                            # For attention, we can use the attention matrices directly
+                            # Flatten attention to (batch_size, num_heads * seq_len * seq_len) for similarity
+                            resolved_indices = resolve_layer_indices_adaptive(
+                                hidden_states=student_attentions,
+                                metric=loss_config.layer_index_adaptive_metric,
+                                topk=loss_config.layer_index_adaptive_topk,
+                            )
+                        
+                        # Compute loss for each selected layer and accumulate
+                        layer_loss = 0.0
+                        num_valid_layers = 0
+                        
+                        for actual_idx in resolved_indices:
+                            if actual_idx < 0 or actual_idx >= num_layers:
+                                self.logger.warning(
+                                    f'{loss_key}: layer_index {actual_idx} out of range '
+                                    f'(total {num_layers} layers), skipping this layer'
+                                )
+                                continue
+                            
+                            if actual_idx >= len(teacher_attentions):
+                                self.logger.warning(
+                                    f'{loss_key}: teacher layer {actual_idx} out of range '
+                                    f'(total {len(teacher_attentions)} layers), skipping this layer'
+                                )
+                                continue
+                            
+                            # Get attention matrices for this layer
+                            # Shape: (batch_size, num_attention_heads, seq_len, seq_len)
+                            student_attn = student_attentions[actual_idx]
+                            teacher_attn = teacher_attentions[actual_idx]
+                            
+                            # Handle head dimension mismatch if student has fewer heads
+                            if student_attn.shape[1] != teacher_attn.shape[1]:
+                                # Average teacher heads to match student head count
+                                teacher_num_heads = teacher_attn.shape[1]
+                                student_num_heads = student_attn.shape[1]
+                                
+                                if teacher_num_heads > student_num_heads:
+                                    # Group teacher heads and average
+                                    heads_per_group = teacher_num_heads // student_num_heads
+                                    teacher_attn = teacher_attn.view(
+                                        teacher_attn.shape[0],
+                                        student_num_heads,
+                                        heads_per_group,
+                                        teacher_attn.shape[2],
+                                        teacher_attn.shape[3]
+                                    ).mean(dim=2)
+                                else:
+                                    self.logger.warning(
+                                        f'{loss_key}: student has more attention heads than teacher, '
+                                        f'this is unusual, skipping layer {actual_idx}'
+                                    )
+                                    continue
+                            
+                            # Compute loss for this layer
+                            # The loss function should handle attention matrices
+                            # Attention weights are already normalized (softmax applied)
+                            loss_value = loss_fn(
+                                student_attentions=student_attn,
+                                teacher_attentions=teacher_attn,
+                                labels=labels,
+                                kd_config_loss=loss_config
+                            )
+                            
+                            layer_loss += loss_value
+                            num_valid_layers += 1
+                        
+                        if num_valid_layers == 0:
+                            self.logger.warning(
+                                f'{loss_key}: no valid layers found for attention distillation, skipping'
+                            )
+                            continue
+                        
+                        # Average loss across selected layers
+                        loss_value = layer_loss / num_valid_layers
+                    else:
+                        # If attentions is a single tensor, use it directly
+                        self.logger.warning(
+                            f'{loss_key}: layer_index specified but attentions is not a tuple, '
+                            f'using the single tensor for distillation'
+                        )
+                        loss_value = loss_fn(
+                            student_attentions=student_attentions,
+                            teacher_attentions=teacher_attentions,
+                            labels=labels,
+                            kd_config_loss=loss_config
+                        )
+                else:
+                    # No layer_index specified, compute loss across all layers
+                    # Combine all tuple elements into single tensors for loss computation
+                    student_attentions_all = torch.stack(student_attentions, dim=0)
+                    teacher_attentions_all = torch.stack(teacher_attentions, dim=0)
+                    loss_value = loss_fn(
+                        student_attentions=student_attentions_all,
+                        teacher_attentions=teacher_attentions_all,
+                        labels=labels,
+                        kd_config_loss=loss_config
+                    )
+                
+                weighted_loss = loss_config.alpha * loss_value
+                distill_loss += weighted_loss
+                loss_dict['distill_loss_details'][loss_key] = loss_value.item()
+            
+            # Past key values distillation (Value-Value relation based)
+            elif loss_config.loss_type == 'past_key_values':
+                student_past = student_outputs.get('past_key_values')
+                teacher_past = teacher_outputs.get('past_key_values')
+                
+                # past_key_values data structure:
+                # transformers.cache_utils.DynamicCache or tuple of length num_layers,
+                # each element is a tuple of (key_states, value_states)
+                # each of shape (batch_size, num_key_value_heads, seq_len, head_dim)
+                #
+                # For value-value relation distillation:
+                # V @ V^T => (batch_size, num_key_value_heads, seq_len, seq_len)
+                # This captures the similarity between different positions in the sequence
+                # KLD/MSE loss is applied on the last dimension after softmax normalization
+                
+                if student_past is None or teacher_past is None:
+                    self.logger.warning(
+                        f'{loss_key}: past_key_values not found in outputs, skipping'
+                    )
+                    continue
+                
+                # Convert DynamicCache to tuple if necessary
+                if hasattr(student_past, 'key_cache') and hasattr(student_past, 'value_cache'):
+                    # DynamicCache format: separate key_cache and value_cache lists
+                    student_past = tuple(
+                        (student_past.key_cache[i], student_past.value_cache[i])
+                        for i in range(len(student_past.key_cache))
+                    )
+                if hasattr(teacher_past, 'key_cache') and hasattr(teacher_past, 'value_cache'):
+                    teacher_past = tuple(
+                        (teacher_past.key_cache[i], teacher_past.value_cache[i])
+                        for i in range(len(teacher_past.key_cache))
+                    )
+                
+                # Determine which component to use: 'key', 'value', or 'both'
+                kv_component = loss_config.self_relation_dsitill_component
+                
+                if loss_config.layer_index is not None:
+                    # If past_key_values is Cache, select specific layers
+                    if isinstance(student_past, Cache):
+                        # Convert layer_index to list for unified handling
+                        if isinstance(loss_config.layer_index, int):
+                            layer_indices = [loss_config.layer_index]
+                        elif isinstance(loss_config.layer_index, str):
+                            layer_indices = [loss_config.layer_index]
+                        else:
+                            layer_indices = loss_config.layer_index
+                        
+                        # Get total number of layers
+                        num_layers = len(student_past)
+                        
+                        # Resolve string layer names to actual indices
+                        if "adaptive" not in layer_indices:
+                            resolved_indices = resolve_layer_indices(
+                                layer_indices=layer_indices,
+                                num_layers=num_layers,
+                                loss_key=loss_key,
+                                logger=self.logger,
+                            )
+                        # Adaptive layer selection based on key/value patterns
+                        elif "adaptive" in layer_indices:
+                            # Extract value states for adaptive selection
+                            value_states = tuple(kv[1] for kv in student_past)
+                            resolved_indices = resolve_layer_indices_adaptive(
+                                hidden_states=value_states,
+                                metric=loss_config.layer_index_adaptive_metric,
+                                topk=loss_config.layer_index_adaptive_topk,
+                            )
+                        
+                        # Compute loss for each selected layer and accumulate
+                        layer_loss = 0.0
+                        num_valid_layers = 0
+                        
+                        for actual_idx in resolved_indices:
+                            if actual_idx < 0 or actual_idx >= num_layers:
+                                self.logger.warning(
+                                    f'{loss_key}: layer_index {actual_idx} out of range '
+                                    f'(total {num_layers} layers), skipping this layer'
+                                )
+                                continue
+                            
+                            if actual_idx >= len(teacher_past):
+                                self.logger.warning(
+                                    f'{loss_key}: teacher layer {actual_idx} out of range '
+                                    f'(total {len(teacher_past)} layers), skipping this layer'
+                                )
+                                continue
+                            
+                            # Get key and value states for this layer
+                            # Each element is (key_states, value_states)
+                            # Shape: (batch_size, num_key_value_heads, seq_len, head_dim)
+                            student_kv = student_past[actual_idx]
+                            teacher_kv = teacher_past[actual_idx]
+                            
+                            # Extract key and value states
+                            student_keys, student_values = student_kv[0], student_kv[1]
+                            teacher_keys, teacher_values = teacher_kv[0], teacher_kv[1]
+                            
+                            # Compute relation matrices based on kv_component setting
+                            if kv_component == 'value' or kv_component == 'both':
+                                # Compute V @ V^T for value-value relations
+                                # Shape: (batch_size, num_kv_heads, seq_len, seq_len)
+                                student_vv = torch.matmul(
+                                    student_values, student_values.transpose(-1, -2)
+                                )
+                                teacher_vv = torch.matmul(
+                                    teacher_values, teacher_values.transpose(-1, -2)
+                                )
+                                
+                                # Scale by sqrt(head_dim) for numerical stability
+                                head_dim = student_values.shape[-1]
+                                student_vv = student_vv / (head_dim ** 0.5)
+                                teacher_vv = teacher_vv / (head_dim ** 0.5)
+                                
+                                # Handle head count mismatch
+                                if student_vv.shape[1] != teacher_vv.shape[1]:
+                                    teacher_num_heads = teacher_vv.shape[1]
+                                    student_num_heads = student_vv.shape[1]
+                                    
+                                    if teacher_num_heads > student_num_heads:
+                                        heads_per_group = teacher_num_heads // student_num_heads
+                                        teacher_vv = teacher_vv.view(
+                                            teacher_vv.shape[0],
+                                            student_num_heads,
+                                            heads_per_group,
+                                            teacher_vv.shape[2],
+                                            teacher_vv.shape[3]
+                                        ).mean(dim=2)
+                                    else:
+                                        self.logger.warning(
+                                            f'{loss_key}: student has more kv heads than teacher, '
+                                            f'skipping layer {actual_idx}'
+                                        )
+                                        continue
+                            
+                            if kv_component == 'key' or kv_component == 'both':
+                                # Compute K @ K^T for key-key relations
+                                # Shape: (batch_size, num_kv_heads, seq_len, seq_len)
+                                student_kk = torch.matmul(
+                                    student_keys, student_keys.transpose(-1, -2)
+                                )
+                                teacher_kk = torch.matmul(
+                                    teacher_keys, teacher_keys.transpose(-1, -2)
+                                )
+                                
+                                # Scale by sqrt(head_dim) for numerical stability
+                                head_dim = student_keys.shape[-1]
+                                student_kk = student_kk / (head_dim ** 0.5)
+                                teacher_kk = teacher_kk / (head_dim ** 0.5)
+                                
+                                # Handle head count mismatch
+                                if student_kk.shape[1] != teacher_kk.shape[1]:
+                                    teacher_num_heads = teacher_kk.shape[1]
+                                    student_num_heads = student_kk.shape[1]
+                                    
+                                    if teacher_num_heads > student_num_heads:
+                                        heads_per_group = teacher_num_heads // student_num_heads
+                                        teacher_kk = teacher_kk.view(
+                                            teacher_kk.shape[0],
+                                            student_num_heads,
+                                            heads_per_group,
+                                            teacher_kk.shape[2],
+                                            teacher_kk.shape[3]
+                                        ).mean(dim=2)
+                                    else:
+                                        self.logger.warning(
+                                            f'{loss_key}: student has more kv heads than teacher, '
+                                            f'skipping layer {actual_idx}'
+                                        )
+                                        continue
+                            
+                            # Compute loss based on component selection
+                            if kv_component == 'value':
+                                loss_value = loss_fn(
+                                    student_relations=student_vv,
+                                    teacher_relations=teacher_vv,
+                                    labels=labels,
+                                    kd_config_loss=loss_config
+                                )
+                            elif kv_component == 'key':
+                                loss_value = loss_fn(
+                                    student_relations=student_kk,
+                                    teacher_relations=teacher_kk,
+                                    labels=labels,
+                                    kd_config_loss=loss_config
+                                )
+                            elif kv_component == 'both':
+                                # Average loss from both key and value relations
+                                loss_value_vv = loss_fn(
+                                    student_relations=student_vv,
+                                    teacher_relations=teacher_vv,
+                                    labels=labels,
+                                    kd_config_loss=loss_config
+                                )
+                                loss_value_kk = loss_fn(
+                                    student_relations=student_kk,
+                                    teacher_relations=teacher_kk,
+                                    labels=labels,
+                                    kd_config_loss=loss_config
+                                )
+                                loss_value = (loss_value_vv + loss_value_kk) / 2
+                            else:
+                                self.logger.warning(
+                                    f'{loss_key}: unknown kv_component "{kv_component}", '
+                                    f'defaulting to "value"'
+                                )
+                                loss_value = loss_fn(
+                                    student_relations=student_vv,
+                                    teacher_relations=teacher_vv,
+                                    labels=labels,
+                                    kd_config_loss=loss_config
+                                )
+                            
+                            layer_loss += loss_value
+                            num_valid_layers += 1
+                        
+                        if num_valid_layers == 0:
+                            self.logger.warning(
+                                f'{loss_key}: no valid layers found for past_key_values distillation, skipping'
+                            )
+                            continue
+                        
+                        # Average loss across selected layers
+                        loss_value = layer_loss / num_valid_layers
+                    else:
+                        # If past_key_values is not a Cache, log warning
+                        self.logger.warning(
+                            f'{loss_key}: layer_index specified but past_key_values is not a Cache, '
+                            f'skipping distillation'
+                        )
+                        continue
+                else:
+                    # No layer_index specified, compute loss across the last layers, both key and value
+                    if isinstance(student_past, tuple) and isinstance(teacher_past, tuple):
+                        num_layers = min(len(student_past), len(teacher_past))
+                        
+                        # Extract key and value states from all layers
+                        # Each element in past is (key_states, value_states)
+                        # Shape of each: (batch_size, num_key_value_heads, seq_len, head_dim)
+                        student_keys_list = [student_past[i][0] for i in range(num_layers)]
+                        student_values_list = [student_past[i][1] for i in range(num_layers)]
+                        teacher_keys_list = [teacher_past[i][0] for i in range(num_layers)]
+                        teacher_values_list = [teacher_past[i][1] for i in range(num_layers)]
+                        
+                        # Stack all layers: (num_layers, batch_size, num_kv_heads, seq_len, head_dim)
+                        student_keys_all = torch.stack(student_keys_list, dim=0)
+                        student_values_all = torch.stack(student_values_list, dim=0)
+                        teacher_keys_all = torch.stack(teacher_keys_list, dim=0)
+                        teacher_values_all = torch.stack(teacher_values_list, dim=0)
+                        
+                        loss_value = loss_fn(
+                            student_keys=student_keys_all,
+                            student_values=student_values_all,
+                            teacher_keys=teacher_keys_all,
+                            teacher_values=teacher_values_all,
+                            labels=labels,
+                            kd_config_loss=loss_config
+                        )
+                    else:
+                        self.logger.warning(
+                            f'{loss_key}: past_key_values is not a tuple, skipping distillation'
+                        )
+                        continue
+                
+                weighted_loss = loss_config.alpha * loss_value
+                distill_loss += weighted_loss
+                loss_dict['distill_loss_details'][loss_key] = loss_value.item()
             
             # Unknown loss type
             else:
