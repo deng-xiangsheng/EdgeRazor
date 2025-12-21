@@ -302,7 +302,7 @@ class KD:
                 'logits': getattr(teacher_outputs, 'logits', None),
                 'hidden_states': getattr(teacher_outputs, 'hidden_states', None),
                 'attentions': getattr(teacher_outputs, 'attentions', None),
-                'past_key_values': getattr(student_outputs, 'past_key_values', None),
+                'past_key_values': getattr(teacher_outputs, 'past_key_values', None),
             }
         
         # Initialize loss dictionary
@@ -623,19 +623,6 @@ class KD:
                         f'{loss_key}: teacher past_key_values not found in outputs, skipping'
                     )
                     continue
-                
-                # Convert DynamicCache to tuple if necessary
-                if hasattr(student_past, 'key_cache') and hasattr(student_past, 'value_cache'):
-                    # DynamicCache format: separate key_cache and value_cache lists
-                    student_past = tuple(
-                        (student_past.key_cache[i], student_past.value_cache[i])
-                        for i in range(len(student_past.key_cache))
-                    )
-                if hasattr(teacher_past, 'key_cache') and hasattr(teacher_past, 'value_cache'):
-                    teacher_past = tuple(
-                        (teacher_past.key_cache[i], teacher_past.value_cache[i])
-                        for i in range(len(teacher_past.key_cache))
-                    )
                 
                 # Determine which component to use: 'key', 'value', or 'both'
                 kv_component = loss_config.self_relation_dsitill_component
