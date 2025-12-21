@@ -612,9 +612,15 @@ class KD:
                 # This captures the similarity between different positions in the sequence
                 # KLD/MSE loss is applied on the last dimension after softmax normalization
                 
-                if student_past is None or teacher_past is None:
+                if student_past is None:
                     self.logger.warning(
-                        f'{loss_key}: past_key_values not found in outputs, skipping'
+                        f'{loss_key}: student past_key_values not found in outputs, skipping'
+                    )
+                    continue
+                
+                if teacher_past is None:
+                    self.logger.warning(
+                        f'{loss_key}: teacher past_key_values not found in outputs, skipping'
                     )
                     continue
                 
