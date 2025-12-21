@@ -37,7 +37,7 @@ def compute_kld(
     reduction = kd_config_loss.reduction
     temp = kd_config_loss.temperature
 
-    # Determine if input is attention map based on dimensions
+    # Determine if input is attention/past_key_values map based on dimensions
     # Logits: [B, S, V] (3 dims), Attention: [B, H, S, S] (4 dims)
     is_attention = input_logits.dim() == 4
 
@@ -265,6 +265,12 @@ def compute_teacher_confidence(
         # - Higher entropy → lower confidence → prefer Forward KLD (mode seeking)
         # Compute entropy of teacher distribution
         entropy = -torch.sum(teacher_probs * torch.log(teacher_probs + 1e-8), dim=-1)
+        
+        # If attentions/past_key_values map, shape: [batch_size, num_heads, seq_len]
+        if entropy.dim() != pad_mask.dim():
+            while pad_mask.dim() < entropy.dim():
+                pad_mask = pad_mask.unsqueeze(1)
+        
         entropy = entropy.masked_fill(
             pad_mask, 0.0
         )  # shape: [num_hidden_layers, batch_size*seq_len]
