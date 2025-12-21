@@ -60,7 +60,8 @@ class LossConfig:
     
     def __post_init__(self):
         """Validate configuration parameters"""
-        valid_loss_types = ["logits", "hidden_states", "attention"] # "router_logits" TODO
+        # outputs keys(['logits', 'past_key_values', 'hidden_states', 'attentions'])
+        valid_loss_types = ["logits", "hidden_states", "attentions", "past_key_values"] # "router_logits" TODO
         if self.loss_type not in valid_loss_types:
             raise ValueError(f"loss_type must be one of {valid_loss_types}, got '{self.loss_type}'")
         
