@@ -552,8 +552,8 @@ class KD:
                             # The loss function should handle attention matrices
                             # Attention weights are already normalized (softmax applied)
                             loss_value = loss_fn(
-                                student_attentions=student_attn,
-                                teacher_attentions=teacher_attn,
+                                student_logits=student_attn,
+                                teacher_logits=teacher_attn,
                                 labels=labels,
                                 kd_config_loss=loss_config
                             )
@@ -576,8 +576,8 @@ class KD:
                             f'using the single tensor for distillation'
                         )
                         loss_value = loss_fn(
-                            student_attentions=student_attentions,
-                            teacher_attentions=teacher_attentions,
+                            student_logits=student_attentions,
+                            teacher_logits=teacher_attentions,
                             labels=labels,
                             kd_config_loss=loss_config
                         )
@@ -587,8 +587,8 @@ class KD:
                     student_attentions_all = torch.stack(student_attentions, dim=0)
                     teacher_attentions_all = torch.stack(teacher_attentions, dim=0)
                     loss_value = loss_fn(
-                        student_attentions=student_attentions_all,
-                        teacher_attentions=teacher_attentions_all,
+                        student_logits=student_attentions_all,
+                        teacher_logits=teacher_attentions_all,
                         labels=labels,
                         kd_config_loss=loss_config
                     )
@@ -771,29 +771,29 @@ class KD:
                             # Compute loss based on component selection
                             if kv_component == 'value':
                                 loss_value = loss_fn(
-                                    student_relations=student_vv,
-                                    teacher_relations=teacher_vv,
+                                    student_logits=student_vv,
+                                    teacher_logits=teacher_vv,
                                     labels=labels,
                                     kd_config_loss=loss_config
                                 )
                             elif kv_component == 'key':
                                 loss_value = loss_fn(
-                                    student_relations=student_kk,
-                                    teacher_relations=teacher_kk,
+                                    student_logits=student_kk,
+                                    teacher_logits=teacher_kk,
                                     labels=labels,
                                     kd_config_loss=loss_config
                                 )
                             elif kv_component == 'both':
                                 # Average loss from both key and value relations
                                 loss_value_vv = loss_fn(
-                                    student_relations=student_vv,
-                                    teacher_relations=teacher_vv,
+                                    student_logits=student_vv,
+                                    teacher_logits=teacher_vv,
                                     labels=labels,
                                     kd_config_loss=loss_config
                                 )
                                 loss_value_kk = loss_fn(
-                                    student_relations=student_kk,
-                                    teacher_relations=teacher_kk,
+                                    student_logits=student_kk,
+                                    teacher_logits=teacher_kk,
                                     labels=labels,
                                     kd_config_loss=loss_config
                                 )
@@ -804,8 +804,8 @@ class KD:
                                     f'defaulting to "value"'
                                 )
                                 loss_value = loss_fn(
-                                    student_relations=student_vv,
-                                    teacher_relations=teacher_vv,
+                                    student_logits=student_vv,
+                                    teacher_logits=teacher_vv,
                                     labels=labels,
                                     kd_config_loss=loss_config
                                 )
@@ -847,14 +847,21 @@ class KD:
                         teacher_keys_all = torch.stack(teacher_keys_list, dim=0)
                         teacher_values_all = torch.stack(teacher_values_list, dim=0)
                         
-                        loss_value = loss_fn(
-                            student_keys=student_keys_all,
-                            student_values=student_values_all,
-                            teacher_keys=teacher_keys_all,
-                            teacher_values=teacher_values_all,
+                        loss_value_key = loss_fn(
+                            student_logits=student_keys_all,
+                            teacher_logits=teacher_keys_all,
                             labels=labels,
                             kd_config_loss=loss_config
                         )
+                        
+                        loss_value_value = loss_fn(
+                            student_logits=student_values_all,
+                            teacher_logits=teacher_values_all,
+                            labels=labels,
+                            kd_config_loss=loss_config
+                        )
+                        
+                        loss_value = (loss_value_key + loss_value_value) / 2
                     else:
                         self.logger.warning(
                             f'{loss_key}: past_key_values is not a tuple, skipping distillation'
