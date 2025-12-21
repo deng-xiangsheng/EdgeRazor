@@ -63,6 +63,7 @@ Distill function format: `compute_xxx(...)`
 from pathlib import Path
 
 import torch
+import torch.nn.functional as F
 from transformers.cache_utils import Cache
 
 from ..log import get_logger
@@ -704,6 +705,11 @@ class KD:
                                 student_vv = student_vv / (head_dim ** 0.5)
                                 teacher_vv = teacher_vv / (head_dim ** 0.5)
                                 
+                                # Apply softmax to convert attention relations to probability distributions
+                                # Normalize over the key dimension (last dimension)
+                                student_vv = F.softmax(student_vv, dim=-1)
+                                teacher_vv = F.softmax(teacher_vv, dim=-1)
+                                
                                 # Handle head count mismatch
                                 if student_vv.shape[1] != teacher_vv.shape[1]:
                                     teacher_num_heads = teacher_vv.shape[1]
@@ -739,6 +745,11 @@ class KD:
                                 head_dim = student_keys.shape[-1]
                                 student_kk = student_kk / (head_dim ** 0.5)
                                 teacher_kk = teacher_kk / (head_dim ** 0.5)
+                                
+                                # Apply softmax to convert attention relations to probability distributions
+                                # Normalize over the key dimension (last dimension)
+                                student_kk = F.softmax(student_kk, dim=-1)
+                                teacher_kk = F.softmax(teacher_kk, dim=-1)
                                 
                                 # Handle head count mismatch
                                 if student_kk.shape[1] != teacher_kk.shape[1]:
@@ -822,39 +833,65 @@ class KD:
                         )
                         continue
                 else:
-                    # No layer_index specified, compute loss across the last layers, both key and value
+                    # No layer_index specified, compute loss for last layer only with relation matrices
                     if isinstance(student_past, tuple) and isinstance(teacher_past, tuple):
                         num_layers = min(len(student_past), len(teacher_past))
                         
-                        # Extract key and value states from all layers
-                        # Each element in past is (key_states, value_states)
-                        # Shape of each: (batch_size, num_key_value_heads, seq_len, head_dim)
-                        student_keys_list = [student_past[i][0] for i in range(num_layers)]
-                        student_values_list = [student_past[i][1] for i in range(num_layers)]
-                        teacher_keys_list = [teacher_past[i][0] for i in range(num_layers)]
-                        teacher_values_list = [teacher_past[i][1] for i in range(num_layers)]
+                        # Get last layer index
+                        layer_idx = num_layers - 1
                         
-                        # Stack all layers: (num_layers, batch_size, num_kv_heads, seq_len, head_dim)
-                        student_keys_all = torch.stack(student_keys_list, dim=0)
-                        student_values_all = torch.stack(student_values_list, dim=0)
-                        teacher_keys_all = torch.stack(teacher_keys_list, dim=0)
-                        teacher_values_all = torch.stack(teacher_values_list, dim=0)
+                        # Get key and value states for this layer
+                        student_kv = student_past[layer_idx]
+                        teacher_kv = teacher_past[layer_idx]
                         
-                        loss_value_key = loss_fn(
-                            student_logits=student_keys_all,
-                            teacher_logits=teacher_keys_all,
+                        # Extract key and value states
+                        student_keys, student_values = student_kv[0], student_kv[1]
+                        teacher_keys, teacher_values = teacher_kv[0], teacher_kv[1]
+                        
+                        # Compute V @ V^T for value-value relations
+                        # Shape: (batch_size, num_kv_heads, seq_len, seq_len)
+                        student_vv = torch.matmul(
+                            student_values, student_values.transpose(-1, -2)
+                        )
+                        teacher_vv = torch.matmul(
+                            teacher_values, teacher_values.transpose(-1, -2)
+                        )
+                        
+                        # Scale and apply softmax for numerical stability and probability distribution
+                        head_dim = student_values.shape[-1]
+                        student_vv = student_vv / (head_dim ** 0.5)
+                        teacher_vv = teacher_vv / (head_dim ** 0.5)
+                        student_vv = F.softmax(student_vv, dim=-1)
+                        teacher_vv = F.softmax(teacher_vv, dim=-1)
+                        
+                        # Handle head count mismatch
+                        if student_vv.shape[1] != teacher_vv.shape[1]:
+                            teacher_num_heads = teacher_vv.shape[1]
+                            student_num_heads = student_vv.shape[1]
+                            
+                            if teacher_num_heads > student_num_heads:
+                                heads_per_group = teacher_num_heads // student_num_heads
+                                teacher_vv = teacher_vv.view(
+                                    teacher_vv.shape[0],
+                                    student_num_heads,
+                                    heads_per_group,
+                                    teacher_vv.shape[2],
+                                    teacher_vv.shape[3]
+                                ).mean(dim=2)
+                            else:
+                                self.logger.warning(
+                                    f'{loss_key}: student has more kv heads than teacher, '
+                                    f'skipping layer {layer_idx}'
+                                )
+                                continue
+                        
+                        # Compute loss for last layer
+                        loss_value = loss_fn(
+                            student_logits=student_vv,
+                            teacher_logits=teacher_vv,
                             labels=labels,
                             kd_config_loss=loss_config
                         )
-                        
-                        loss_value_value = loss_fn(
-                            student_logits=student_values_all,
-                            teacher_logits=teacher_values_all,
-                            labels=labels,
-                            kd_config_loss=loss_config
-                        )
-                        
-                        loss_value = (loss_value_key + loss_value_value) / 2
                     else:
                         self.logger.warning(
                             f'{loss_key}: past_key_values is not a tuple, skipping distillation'
