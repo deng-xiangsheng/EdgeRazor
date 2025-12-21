@@ -292,6 +292,7 @@ class KD:
                 'logits': getattr(student_outputs, 'logits', None),
                 'hidden_states': getattr(student_outputs, 'hidden_states', None),
                 'attentions': getattr(student_outputs, 'attentions', None),
+                'past_key_values': getattr(student_outputs, 'past_key_values', None),
             }
 
         if isinstance(teacher_outputs, torch.Tensor):
@@ -301,6 +302,7 @@ class KD:
                 'logits': getattr(teacher_outputs, 'logits', None),
                 'hidden_states': getattr(teacher_outputs, 'hidden_states', None),
                 'attentions': getattr(teacher_outputs, 'attentions', None),
+                'past_key_values': getattr(student_outputs, 'past_key_values', None),
             }
         
         # Initialize loss dictionary
@@ -451,7 +453,7 @@ class KD:
                 loss_dict['distill_loss_details'][loss_key] = loss_value.item()
             
             # Attention distillation (KLD-based on attention distributions)
-            elif loss_config.loss_type == 'attention':
+            elif loss_config.loss_type == 'attentions':
                 student_attentions = student_outputs.get('attentions')
                 teacher_attentions = teacher_outputs.get('attentions')
                 
