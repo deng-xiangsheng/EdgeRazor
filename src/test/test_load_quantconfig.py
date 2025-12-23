@@ -392,6 +392,7 @@ def test_with_overrides():
     }
     
     config = QuantConfig(config_dict)
+    print("this is loaded config:", config)
     
     # Test saving and loading with overrides
     with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
@@ -402,6 +403,11 @@ def test_with_overrides():
         # Verify by loading back
         _ = QuantConfig.from_json(json_path)
         print("\n✓ QuantConfig with overrides saved and loaded successfully")
+        # Output json file
+        with open(json_path, encoding='utf-8') as f:
+            content = f.read()
+            print("\nSaved JSON content with overrides:")
+            print(content)
     finally:
         # Clean up temporary file
         Path(json_path).unlink()

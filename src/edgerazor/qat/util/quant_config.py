@@ -557,7 +557,7 @@ class QuantConfig:
         
         Returns:
             Dictionary representation of the configuration with ordered fields:
-            method, select, function, training
+            method, select, function, overrides, training
         """
         # Convert module types back to string names for serialization
         target_types_list = []
@@ -605,7 +605,19 @@ class QuantConfig:
         elif kv_cache_func_str is None:
             kv_cache_func_str = ""
 
-        return OrderedDict([
+        # Convert overrides to list of dicts
+        overrides_list = []
+        for override in self.overrides:
+            override_dict = {}
+            if override.module_type is not None:
+                override_dict["type"] = override.module_type
+            if override.module_name is not None:
+                override_dict["name"] = override.module_name
+            # Merge the override parameters
+            override_dict.update(override.overrides)
+            overrides_list.append(override_dict)
+
+        result = OrderedDict([
             ("method", self.method),
             ("select", OrderedDict([
                 ("target_types", target_types_list),
@@ -626,9 +638,17 @@ class QuantConfig:
                 ("kv_cache_function", kv_cache_func_str),
                 ("kv_block_size", self.function.kv_block_size),
                 ("kv_mixed_precision_prop", self.function.kv_mixed_precision_prop)
-            ])),
-            ("training", self.training)
+            ]))
         ])
+        
+        # Add overrides if present
+        if self.overrides:
+            result["overrides"] = overrides_list
+        
+        # Add training at the end
+        result["training"] = self.training
+        
+        return result
     
     def to_yaml(self, yaml_path: str | Path) -> None:
         """
@@ -666,6 +686,28 @@ class QuantConfig:
 
     def __str__(self) -> str:
         """String representation of the configuration"""
+        # Format overrides if present
+        overrides_str = ""
+        if self.overrides:
+            overrides_str = f",\n    overrides=[\n"
+            for idx, override in enumerate(self.overrides):
+                overrides_str += f"        {{"
+                if override.module_type:
+                    overrides_str += f"type='{override.module_type}'"
+                if override.module_name:
+                    if override.module_type:
+                        overrides_str += f", name='{override.module_name}'"
+                    else:
+                        overrides_str += f"name='{override.module_name}'"
+                if override.overrides:
+                    overrides_str += f", overrides={override.overrides}"
+                overrides_str += f"}}"
+                if idx < len(self.overrides) - 1:
+                    overrides_str += ",\n"
+                else:
+                    overrides_str += "\n"
+            overrides_str += "    ]"
+        
         return (
             f"QuantConfig(\n"
             f"    method='{self.method}',\n"
@@ -688,7 +730,7 @@ class QuantConfig:
             f"        kv_cache_function='{self.function.kv_cache_function}',\n"
             f"        kv_block_size={self.function.kv_block_size},\n"
             f"        kv_mixed_precision_prop={self.function.kv_mixed_precision_prop}\n"
-            f"    ),\n"
+            f"    ){overrides_str},\n"
             f"    training='{self.training}'\n"
             f")"
         )
