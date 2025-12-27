@@ -3,6 +3,7 @@ Mapping of quantization functions and classes.
 
 `str -> function/class`
 """
+
 from collections import OrderedDict
 
 import torch.nn as nn
@@ -103,10 +104,17 @@ modules_map = {
     "qwen3attention": Qwen3Attention,
 }
 
-def create_w1_58_config(w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse", mp_prop=0.01, with_activation_kv=False):
+
+def create_w1_58_config(
+    w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse",
+    mp_prop=0.01,
+    with_activation_kv=False,
+    a_block_size=256,
+    kv_block_size=128,
+):
     """
     创建 w1_58 量化配置
-    
+
     Args:
         mp_prop: mixed precision proportion (例如 0.01 或 0.05)
         with_activation_kv: 是否包含 activation 和 kv_cache 量化
@@ -114,48 +122,145 @@ def create_w1_58_config(w_func="weight_quant_uniform_symmetric_clip_per_block_mp
     target_types = ["linear", "embedding"]
     if with_activation_kv:
         target_types.append("qwen3attention")
-    
-    config = OrderedDict([
-        ("method", "QAT"),
-        (
-            "select",
-            OrderedDict([
-                ("target_types", target_types),
-                ("target_names", []),
-                ("exclude_types", []),
-                ("exclude_names", []),
-            ])
-        ),
-        (
-            "function",
-            OrderedDict([
-                ("epsilon", 1e-05),
-                (
-                    "weight_function",
-                    w_func,
+
+    config = OrderedDict(
+        [
+            ("method", "QAT"),
+            (
+                "select",
+                OrderedDict(
+                    [
+                        ("target_types", target_types),
+                        ("target_names", []),
+                        ("exclude_types", []),
+                        ("exclude_names", []),
+                    ]
                 ),
-                ("w_scale_factor", 2.0),
-                ("w_block_size", 256),
-                ("w_mixed_precision_prop", mp_prop),
-                ("is_w_quantized", True),
-                ("activation_function", ""),
-                ("a_block_size", -1),
-                ("a_mixed_precision_prop", -1.0),
-                ("kv_cache_function", ""),
-                ("kv_block_size", -1),
-                ("kv_mixed_precision_prop", -1.0),
-            ])
-        ),
-        ("training", "all"),
-    ])
-    
+            ),
+            (
+                "function",
+                OrderedDict(
+                    [
+                        ("epsilon", 1e-05),
+                        (
+                            "weight_function",
+                            w_func,
+                        ),
+                        ("w_scale_factor", 2.0),
+                        ("w_block_size", 256),
+                        ("w_mixed_precision_prop", mp_prop),
+                        ("is_w_quantized", True),
+                        ("activation_function", ""),
+                        ("a_block_size", -1),
+                        ("a_mixed_precision_prop", -1.0),
+                        ("kv_cache_function", ""),
+                        ("kv_block_size", -1),
+                        ("kv_mixed_precision_prop", -1.0),
+                    ]
+                ),
+            ),
+            ("training", "all"),
+        ]
+    )
+
     if with_activation_kv:
-        config["function"]["activation_function"] = "state_quant_uniform_symmetric_absmax_per_block_int8"
-        config["function"]["a_block_size"] = 256
-        config["function"]["kv_cache_function"] = "state_quant_uniform_symmetric_absmax_per_block_int8"
-        config["function"]["kv_block_size"] = 128
-    
+        config["function"]["activation_function"] = (
+            "state_quant_uniform_symmetric_absmax_per_block_int8"
+        )
+        config["function"]["a_block_size"] = a_block_size
+        config["function"]["kv_cache_function"] = (
+            "state_quant_uniform_symmetric_absmax_per_block_int8"
+        )
+        config["function"]["kv_block_size"] = kv_block_size
+
     return config
+
+
+def create_w1_58_config_embint4(
+    w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse",
+    mp_prop=0.125,
+    with_activation_kv=False,
+    a_block_size=256,
+    kv_block_size=128,
+):
+    """
+    创建 w1_58 量化配置，embedding 和 lm_head 使用 int4 量化
+
+    Args:
+        mp_prop: mixed precision proportion (例如 0.125 0.25 或 0.50)
+        with_activation_kv: 是否包含 activation 和 kv_cache 量化
+    """
+    target_types = ["linear", "embedding"]
+    if with_activation_kv:
+        target_types.append("qwen3attention")
+
+    config = OrderedDict(
+        [
+            ("method", "QAT"),
+            (
+                "select",
+                OrderedDict(
+                    [
+                        ("target_types", target_types),
+                        ("target_names", []),
+                        ("exclude_types", []),
+                        ("exclude_names", []),
+                    ]
+                ),
+            ),
+            (
+                "function",
+                OrderedDict(
+                    [
+                        ("epsilon", 1e-05),
+                        (
+                            "weight_function",
+                            w_func,
+                        ),
+                        ("w_scale_factor", 2.0),
+                        ("w_block_size", 256),
+                        ("w_mixed_precision_prop", mp_prop),
+                        ("is_w_quantized", True),
+                        ("activation_function", ""),
+                        ("a_block_size", -1),
+                        ("a_mixed_precision_prop", -1.0),
+                        ("kv_cache_function", ""),
+                        ("kv_block_size", -1),
+                        ("kv_mixed_precision_prop", -1.0),
+                    ]
+                ),
+            ),
+            (
+                "overrides",
+                [
+                    {
+                        "name": ".*embed_tokens",
+                        "weight_function": "weight_quant_uniform_symmetric_absmax_per_block_int4",
+                        "w_scale_factor": -1,
+                    },
+                    {
+                        "name": ".*lm_head",
+                        "weight_function": "weight_quant_uniform_symmetric_absmax_per_block_int4",
+                        "w_scale_factor": -1,
+                    },
+                ],
+            ),
+            ("training", "all"),
+        ]
+    )
+
+    if with_activation_kv:
+        config["function"]["activation_function"] = (
+            "state_quant_uniform_symmetric_absmax_per_block_int8"
+        )
+        config["function"]["a_block_size"] = a_block_size
+        config["function"]["kv_cache_function"] = (
+            "state_quant_uniform_symmetric_absmax_per_block_int8"
+        )
+        config["function"]["kv_block_size"] = kv_block_size
+
+    return config
+
 
 w4a16kv16 = OrderedDict(
     [
@@ -243,7 +348,7 @@ w4a8kv8 = OrderedDict(
     ]
 )
 
-w1_58a16kv16 =OrderedDict(
+w1_58a16kv16 = OrderedDict(
     [
         ("method", "QAT"),
         (
@@ -330,88 +435,304 @@ w1_58a8kv8 = OrderedDict(
 )
 
 # Use function to create config - Row-wise Sparse (rws -> default, no suffix)
-w1_58_mp1a16kv16   = create_w1_58_config(w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse", mp_prop=0.01, with_activation_kv=False)
-w1_58_mp1a8kv8     = create_w1_58_config(w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse", mp_prop=0.01, with_activation_kv=True)
-w1_58_mp5a16kv16   = create_w1_58_config(w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse", mp_prop=0.05, with_activation_kv=False)
-w1_58_mp5a8kv8     = create_w1_58_config(w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse", mp_prop=0.05, with_activation_kv=True)
-w1_58_mp10a16kv16  = create_w1_58_config(w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse", mp_prop=0.10, with_activation_kv=False)
-w1_58_mp10a8kv8    = create_w1_58_config(w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse", mp_prop=0.10, with_activation_kv=True)
-w1_58_mp15a16kv16  = create_w1_58_config(w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse", mp_prop=0.15, with_activation_kv=False)
-w1_58_mp15a8kv8    = create_w1_58_config(w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse", mp_prop=0.15, with_activation_kv=True)
-w1_58_mp20a16kv16  = create_w1_58_config(w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse", mp_prop=0.20, with_activation_kv=False)
-w1_58_mp20a8kv8    = create_w1_58_config(w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse", mp_prop=0.20, with_activation_kv=True)
-w1_58_mp30a16kv16  = create_w1_58_config(w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse", mp_prop=0.30, with_activation_kv=False)
-w1_58_mp30a8kv8    = create_w1_58_config(w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse", mp_prop=0.30, with_activation_kv=True)
+w1_58_mp1a16kv16 = create_w1_58_config(
+    w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse",
+    mp_prop=0.01,
+    with_activation_kv=False,
+)
+w1_58_mp1a8kv8 = create_w1_58_config(
+    w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse",
+    mp_prop=0.01,
+    with_activation_kv=True,
+)
+w1_58_mp5a16kv16 = create_w1_58_config(
+    w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse",
+    mp_prop=0.05,
+    with_activation_kv=False,
+)
+w1_58_mp5a8kv8 = create_w1_58_config(
+    w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse",
+    mp_prop=0.05,
+    with_activation_kv=True,
+)
+w1_58_mp10a16kv16 = create_w1_58_config(
+    w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse",
+    mp_prop=0.10,
+    with_activation_kv=False,
+)
+w1_58_mp10a8kv8 = create_w1_58_config(
+    w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse",
+    mp_prop=0.10,
+    with_activation_kv=True,
+)
+w1_58_mp15a16kv16 = create_w1_58_config(
+    w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse",
+    mp_prop=0.15,
+    with_activation_kv=False,
+)
+w1_58_mp15a8kv8 = create_w1_58_config(
+    w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse",
+    mp_prop=0.15,
+    with_activation_kv=True,
+)
+w1_58_mp20a16kv16 = create_w1_58_config(
+    w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse",
+    mp_prop=0.20,
+    with_activation_kv=False,
+)
+w1_58_mp20a8kv8 = create_w1_58_config(
+    w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse",
+    mp_prop=0.20,
+    with_activation_kv=True,
+)
+w1_58_mp30a16kv16 = create_w1_58_config(
+    w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse",
+    mp_prop=0.30,
+    with_activation_kv=False,
+)
+w1_58_mp30a8kv8 = create_w1_58_config(
+    w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse",
+    mp_prop=0.30,
+    with_activation_kv=True,
+)
 
 ## Guarantee divisibility ratio
-w1_58_mp50a16kv16  = create_w1_58_config(w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse", mp_prop=0.50, with_activation_kv=False)
-w1_58_mp50a8kv8    = create_w1_58_config(w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse", mp_prop=0.50, with_activation_kv=True)
-w1_58_mp25a16kv16  = create_w1_58_config(w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse", mp_prop=0.25, with_activation_kv=False)
-w1_58_mp25a8kv8    = create_w1_58_config(w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse", mp_prop=0.25, with_activation_kv=True)
-w1_58_mp12_5a16kv16  = create_w1_58_config(w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse", mp_prop=0.125, with_activation_kv=False)
-w1_58_mp12_5a8kv8    = create_w1_58_config(w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse", mp_prop=0.125, with_activation_kv=True)
-w1_58_mp6_25a16kv16  = create_w1_58_config(w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse", mp_prop=0.0625, with_activation_kv=False)
-w1_58_mp6_25a8kv8    = create_w1_58_config(w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse", mp_prop=0.0625, with_activation_kv=True)
-w1_58_mp3_125a16kv16  = create_w1_58_config(w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse", mp_prop=0.03125, with_activation_kv=False)
-w1_58_mp3_125a8kv8    = create_w1_58_config(w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse", mp_prop=0.03125, with_activation_kv=True)
-w1_58_mp1_5625a16kv16  = create_w1_58_config(w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse", mp_prop=0.015625, with_activation_kv=False)
-w1_58_mp1_5625a8kv8    = create_w1_58_config(w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse", mp_prop=0.015625, with_activation_kv=True)
+w1_58_mp50a16kv16 = create_w1_58_config(
+    w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse",
+    mp_prop=0.50,
+    with_activation_kv=False,
+)
+w1_58_mp50a8kv8 = create_w1_58_config(
+    w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse",
+    mp_prop=0.50,
+    with_activation_kv=True,
+)
+w1_58_mp25a16kv16 = create_w1_58_config(
+    w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse",
+    mp_prop=0.25,
+    with_activation_kv=False,
+)
+w1_58_mp25a8kv8 = create_w1_58_config(
+    w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse",
+    mp_prop=0.25,
+    with_activation_kv=True,
+)
+w1_58_mp12_5a16kv16 = create_w1_58_config(
+    w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse",
+    mp_prop=0.125,
+    with_activation_kv=False,
+)
+w1_58_mp12_5a8kv8 = create_w1_58_config(
+    w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse",
+    mp_prop=0.125,
+    with_activation_kv=True,
+)
+w1_58_mp6_25a16kv16 = create_w1_58_config(
+    w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse",
+    mp_prop=0.0625,
+    with_activation_kv=False,
+)
+w1_58_mp6_25a8kv8 = create_w1_58_config(
+    w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse",
+    mp_prop=0.0625,
+    with_activation_kv=True,
+)
+w1_58_mp3_125a16kv16 = create_w1_58_config(
+    w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse",
+    mp_prop=0.03125,
+    with_activation_kv=False,
+)
+w1_58_mp3_125a8kv8 = create_w1_58_config(
+    w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse",
+    mp_prop=0.03125,
+    with_activation_kv=True,
+)
+w1_58_mp1_5625a16kv16 = create_w1_58_config(
+    w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse",
+    mp_prop=0.015625,
+    with_activation_kv=False,
+)
+w1_58_mp1_5625a8kv8 = create_w1_58_config(
+    w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse",
+    mp_prop=0.015625,
+    with_activation_kv=True,
+)
 
 # Use function to create config - Column-wise Dense (cwd suffix)
-w1_58_mp1a16kv16_cwd   = create_w1_58_config(w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static", mp_prop=0.01, with_activation_kv=False)
-w1_58_mp1a8kv8_cwd     = create_w1_58_config(w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static", mp_prop=0.01, with_activation_kv=True)
-w1_58_mp5a16kv16_cwd   = create_w1_58_config(w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static", mp_prop=0.05, with_activation_kv=False)
-w1_58_mp5a8kv8_cwd     = create_w1_58_config(w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static", mp_prop=0.05, with_activation_kv=True)
-w1_58_mp10a16kv16_cwd  = create_w1_58_config(w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static", mp_prop=0.10, with_activation_kv=False)
-w1_58_mp10a8kv8_cwd    = create_w1_58_config(w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static", mp_prop=0.10, with_activation_kv=True)
-w1_58_mp15a16kv16_cwd  = create_w1_58_config(w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static", mp_prop=0.15, with_activation_kv=False)
-w1_58_mp15a8kv8_cwd    = create_w1_58_config(w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static", mp_prop=0.15, with_activation_kv=True)
-w1_58_mp20a16kv16_cwd  = create_w1_58_config(w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static", mp_prop=0.20, with_activation_kv=False)
-w1_58_mp20a8kv8_cwd    = create_w1_58_config(w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static", mp_prop=0.20, with_activation_kv=True)
-w1_58_mp30a16kv16_cwd  = create_w1_58_config(w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static", mp_prop=0.30, with_activation_kv=False)
-w1_58_mp30a8kv8_cwd    = create_w1_58_config(w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static", mp_prop=0.30, with_activation_kv=True)
+w1_58_mp1a16kv16_cwd = create_w1_58_config(
+    w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static",
+    mp_prop=0.01,
+    with_activation_kv=False,
+)
+w1_58_mp1a8kv8_cwd = create_w1_58_config(
+    w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static",
+    mp_prop=0.01,
+    with_activation_kv=True,
+)
+w1_58_mp5a16kv16_cwd = create_w1_58_config(
+    w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static",
+    mp_prop=0.05,
+    with_activation_kv=False,
+)
+w1_58_mp5a8kv8_cwd = create_w1_58_config(
+    w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static",
+    mp_prop=0.05,
+    with_activation_kv=True,
+)
+w1_58_mp10a16kv16_cwd = create_w1_58_config(
+    w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static",
+    mp_prop=0.10,
+    with_activation_kv=False,
+)
+w1_58_mp10a8kv8_cwd = create_w1_58_config(
+    w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static",
+    mp_prop=0.10,
+    with_activation_kv=True,
+)
+w1_58_mp15a16kv16_cwd = create_w1_58_config(
+    w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static",
+    mp_prop=0.15,
+    with_activation_kv=False,
+)
+w1_58_mp15a8kv8_cwd = create_w1_58_config(
+    w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static",
+    mp_prop=0.15,
+    with_activation_kv=True,
+)
+w1_58_mp20a16kv16_cwd = create_w1_58_config(
+    w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static",
+    mp_prop=0.20,
+    with_activation_kv=False,
+)
+w1_58_mp20a8kv8_cwd = create_w1_58_config(
+    w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static",
+    mp_prop=0.20,
+    with_activation_kv=True,
+)
+w1_58_mp30a16kv16_cwd = create_w1_58_config(
+    w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static",
+    mp_prop=0.30,
+    with_activation_kv=False,
+)
+w1_58_mp30a8kv8_cwd = create_w1_58_config(
+    w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static",
+    mp_prop=0.30,
+    with_activation_kv=True,
+)
 
 ## Guarantee divisibility ratio
-w1_58_mp50a16kv16_cwd  = create_w1_58_config(w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static", mp_prop=0.50, with_activation_kv=False)
-w1_58_mp50a8kv8_cwd    = create_w1_58_config(w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static", mp_prop=0.50, with_activation_kv=True)
-w1_58_mp25a16kv16_cwd  = create_w1_58_config(w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static", mp_prop=0.25, with_activation_kv=False)
-w1_58_mp25a8kv8_cwd    = create_w1_58_config(w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static", mp_prop=0.25, with_activation_kv=True)
-w1_58_mp12_5a16kv16_cwd  = create_w1_58_config(w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static", mp_prop=0.125, with_activation_kv=False)
-w1_58_mp12_5a8kv8_cwd    = create_w1_58_config(w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static", mp_prop=0.125, with_activation_kv=True)
-w1_58_mp6_25a16kv16_cwd  = create_w1_58_config(w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static", mp_prop=0.0625, with_activation_kv=False)
-w1_58_mp6_25a8kv8_cwd    = create_w1_58_config(w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static", mp_prop=0.0625, with_activation_kv=True)
-w1_58_mp3_125a16kv16_cwd  = create_w1_58_config(w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static", mp_prop=0.03125, with_activation_kv=False)
-w1_58_mp3_125a8kv8_cwd    = create_w1_58_config(w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static", mp_prop=0.03125, with_activation_kv=True)
-w1_58_mp1_5625a16kv16_cwd  = create_w1_58_config(w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static", mp_prop=0.015625, with_activation_kv=False)
-w1_58_mp1_5625a8kv8_cwd    = create_w1_58_config(w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static", mp_prop=0.015625, with_activation_kv=True)
+w1_58_mp50a16kv16_cwd = create_w1_58_config(
+    w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static",
+    mp_prop=0.50,
+    with_activation_kv=False,
+)
+w1_58_mp50a8kv8_cwd = create_w1_58_config(
+    w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static",
+    mp_prop=0.50,
+    with_activation_kv=True,
+)
+w1_58_mp25a16kv16_cwd = create_w1_58_config(
+    w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static",
+    mp_prop=0.25,
+    with_activation_kv=False,
+)
+w1_58_mp25a8kv8_cwd = create_w1_58_config(
+    w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static",
+    mp_prop=0.25,
+    with_activation_kv=True,
+)
+w1_58_mp12_5a16kv16_cwd = create_w1_58_config(
+    w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static",
+    mp_prop=0.125,
+    with_activation_kv=False,
+)
+w1_58_mp12_5a8kv8_cwd = create_w1_58_config(
+    w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static",
+    mp_prop=0.125,
+    with_activation_kv=True,
+)
+w1_58_mp6_25a16kv16_cwd = create_w1_58_config(
+    w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static",
+    mp_prop=0.0625,
+    with_activation_kv=False,
+)
+w1_58_mp6_25a8kv8_cwd = create_w1_58_config(
+    w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static",
+    mp_prop=0.0625,
+    with_activation_kv=True,
+)
+w1_58_mp3_125a16kv16_cwd = create_w1_58_config(
+    w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static",
+    mp_prop=0.03125,
+    with_activation_kv=False,
+)
+w1_58_mp3_125a8kv8_cwd = create_w1_58_config(
+    w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static",
+    mp_prop=0.03125,
+    with_activation_kv=True,
+)
+w1_58_mp1_5625a16kv16_cwd = create_w1_58_config(
+    w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static",
+    mp_prop=0.015625,
+    with_activation_kv=False,
+)
+w1_58_mp1_5625a8kv8_cwd = create_w1_58_config(
+    w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static",
+    mp_prop=0.015625,
+    with_activation_kv=True,
+)
+
+## Standard quantization config
+w1_58a16kv16_embint4 = create_w1_58_config_embint4(
+    w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse",
+    mp_prop=0.00,
+    with_activation_kv=False,
+)
+w1_58a8kv8_embint4 = create_w1_58_config_embint4(
+    w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse",
+    mp_prop=0.00,
+    with_activation_kv=True,
+)
+w1_88a16kv16_embint4 = create_w1_58_config_embint4(
+    w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse",
+    mp_prop=0.125,
+    with_activation_kv=False,
+)
+w1_88a8kv8_embint4 = create_w1_58_config_embint4(
+    w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse",
+    mp_prop=0.125,
+    with_activation_kv=True,
+)
+w2_79a16kv16_embint4 = create_w1_58_config_embint4(
+    w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse",
+    mp_prop=0.50,
+    with_activation_kv=False,
+)
+w2_79a8kv8_embint4 = create_w1_58_config_embint4(
+    w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse",
+    mp_prop=0.50,
+    with_activation_kv=True,
+)
 
 # Map quant_mode string to imported config dict
 quant_config_map = {
     "w4a16kv16": w4a16kv16,
     "w4a8kv8": w4a8kv8,
-    
     "w1_58a16kv16": w1_58a16kv16,
     "w1_58a8kv8": w1_58a8kv8,
-    
     # w_func: weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse (default)
     "w1_58_mp1a16kv16": w1_58_mp1a16kv16,
     "w1_58_mp1a8kv8": w1_58_mp1a8kv8,
-    
     "w1_58_mp5a16kv16": w1_58_mp5a16kv16,
     "w1_58_mp5a8kv8": w1_58_mp5a8kv8,
-    
     "w1_58_mp10a16kv16": w1_58_mp10a16kv16,
     "w1_58_mp10a8kv8": w1_58_mp10a8kv8,
-    
     "w1_58_mp15a16kv16": w1_58_mp15a16kv16,
     "w1_58_mp15a8kv8": w1_58_mp15a8kv8,
-    
     "w1_58_mp20a16kv16": w1_58_mp20a16kv16,
     "w1_58_mp20a8kv8": w1_58_mp20a8kv8,
-    
     "w1_58_mp30a16kv16": w1_58_mp30a16kv16,
     "w1_58_mp30a8kv8": w1_58_mp30a8kv8,
-    
     ## Guarantee divisibility ratio
     "w1_58_mp50a16kv16": w1_58_mp50a16kv16,
     "w1_58_mp50a8kv8": w1_58_mp50a8kv8,
@@ -425,26 +746,19 @@ quant_config_map = {
     "w1_58_mp3_125a8kv8": w1_58_mp3_125a8kv8,
     "w1_58_mp1_5625a16kv16": w1_58_mp1_5625a16kv16,
     "w1_58_mp1_5625a8kv8": w1_58_mp1_5625a8kv8,
-    
     # w_func: weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static (cwd suffix)
     "w1_58_mp1a16kv16_cwd": w1_58_mp1a16kv16_cwd,
     "w1_58_mp1a8kv8_cwd": w1_58_mp1a8kv8_cwd,
-    
     "w1_58_mp5a16kv16_cwd": w1_58_mp5a16kv16_cwd,
     "w1_58_mp5a8kv8_cwd": w1_58_mp5a8kv8_cwd,
-    
     "w1_58_mp10a16kv16_cwd": w1_58_mp10a16kv16_cwd,
     "w1_58_mp10a8kv8_cwd": w1_58_mp10a8kv8_cwd,
-    
     "w1_58_mp15a16kv16_cwd": w1_58_mp15a16kv16_cwd,
     "w1_58_mp15a8kv8_cwd": w1_58_mp15a8kv8_cwd,
-    
     "w1_58_mp20a16kv16_cwd": w1_58_mp20a16kv16_cwd,
     "w1_58_mp20a8kv8_cwd": w1_58_mp20a8kv8_cwd,
-    
     "w1_58_mp30a16kv16_cwd": w1_58_mp30a16kv16_cwd,
     "w1_58_mp30a8kv8_cwd": w1_58_mp30a8kv8_cwd,
-    
     ## Guarantee divisibility ratio
     "w1_58_mp50a16kv16_cwd": w1_58_mp50a16kv16_cwd,
     "w1_58_mp50a8kv8_cwd": w1_58_mp50a8kv8_cwd,
@@ -458,4 +772,11 @@ quant_config_map = {
     "w1_58_mp3_125a8kv8_cwd": w1_58_mp3_125a8kv8_cwd,
     "w1_58_mp1_5625a16kv16_cwd": w1_58_mp1_5625a16kv16_cwd,
     "w1_58_mp1_5625a8kv8_cwd": w1_58_mp1_5625a8kv8_cwd,
+    # Standard quantization config with embedding int4
+    "w1_58a16kv16_embint4": w1_58a16kv16_embint4,
+    "w1_58a8kv8_embint4": w1_58a8kv8_embint4,
+    "w1_88a16kv16_embint4": w1_88a16kv16_embint4,
+    "w1_88a8kv8_embint4": w1_88a8kv8_embint4,
+    "w2_79a16kv16_embint4": w2_79a16kv16_embint4,
+    "w2_79a8kv8_embint4": w2_79a8kv8_embint4,
 }
