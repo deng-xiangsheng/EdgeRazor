@@ -180,6 +180,7 @@ def create_w1_58_config_embint4(
     w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse",
     mp_prop=0.125,
     with_activation_kv=False,
+    w_block_size=256,
     a_block_size=256,
     kv_block_size=128,
 ):
@@ -480,6 +481,52 @@ w1_58a8kv8 = OrderedDict(
     ]
 )
 
+w1_58a8kv8_bs256 = OrderedDict(
+    [
+        ("method", "QAT"),
+        (
+            "select",
+            OrderedDict(
+                [
+                    ("target_types", ["linear", "embedding", "qwen3attention"]),
+                    ("target_names", []),
+                    ("exclude_types", []),
+                    ("exclude_names", []),
+                ]
+            ),
+        ),
+        (
+            "function",
+            OrderedDict(
+                [
+                    ("epsilon", 1e-05),
+                    (
+                        "weight_function",
+                        "weight_quant_uniform_symmetric_clip_per_block_int1_58",
+                    ),
+                    ("w_scale_factor", 2.0),
+                    ("w_block_size", 256),
+                    ("w_mixed_precision_prop", 0.05),
+                    ("is_w_quantized", True),
+                    (
+                        "activation_function",
+                        "state_quant_uniform_symmetric_absmax_per_block_int8",
+                    ),
+                    ("a_block_size", 256),
+                    ("a_mixed_precision_prop", -1.0),
+                    (
+                        "kv_cache_function",
+                        "state_quant_uniform_symmetric_absmax_per_block_int8",
+                    ),
+                    ("kv_block_size", 256),
+                    ("kv_mixed_precision_prop", -1.0),
+                ]
+            ),
+        ),
+        ("training", "all"),
+    ]
+)
+
 # Use function to create config - Row-wise Sparse (rws -> default, no suffix)
 w1_58_mp1a16kv16 = create_w1_58_config(
     w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse",
@@ -739,6 +786,14 @@ w1_58a8kv8_embint4 = create_w1_58_config_embint4(
     mp_prop=0.00,
     with_activation_kv=True,
 )
+w1_58a8kv8_embint4_bs256 = create_w1_58_config_embint4(
+    w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse",
+    mp_prop=0.00,
+    with_activation_kv=True,
+    w_block_size=256,
+    a_block_size=256,
+    kv_block_size=256,
+)
 w1_88a16kv16_embint4 = create_w1_58_config_embint4(
     w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse",
     mp_prop=0.125,
@@ -748,6 +803,14 @@ w1_88a8kv8_embint4 = create_w1_58_config_embint4(
     w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse",
     mp_prop=0.125,
     with_activation_kv=True,
+)
+w1_88a8kv8_embint4_bs256 = create_w1_58_config_embint4(
+    w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse",
+    mp_prop=0.125,
+    with_activation_kv=True,
+    w_block_size=256,
+    a_block_size=256,
+    kv_block_size=256,
 )
 w2_79a16kv16_embint4 = create_w1_58_config_embint4(
     w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse",
@@ -759,6 +822,14 @@ w2_79a8kv8_embint4 = create_w1_58_config_embint4(
     mp_prop=0.50,
     with_activation_kv=True,
 )
+w2_79a8kv8_embint4_bs256 = create_w1_58_config_embint4(
+    w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse",
+    mp_prop=0.50,
+    with_activation_kv=True,
+    w_block_size=256,
+    a_block_size=256,
+    kv_block_size=256,
+)
 
 # Map quant_mode string to imported config dict
 quant_config_map = {
@@ -767,6 +838,7 @@ quant_config_map = {
     "w4a8kv8_bs256": w4a8kv8_bs256,
     "w1_58a16kv16": w1_58a16kv16,
     "w1_58a8kv8": w1_58a8kv8,
+    "w1_58a8kv8_bs256": w1_58a8kv8_bs256,
     # w_func: weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse (default)
     "w1_58_mp1a16kv16": w1_58_mp1a16kv16,
     "w1_58_mp1a8kv8": w1_58_mp1a8kv8,
@@ -822,8 +894,11 @@ quant_config_map = {
     # Standard quantization config with embedding int4
     "w1_58a16kv16_embint4": w1_58a16kv16_embint4,
     "w1_58a8kv8_embint4": w1_58a8kv8_embint4,
+    "w1_58a8kv8_embint4_bs256": w1_58a8kv8_embint4_bs256,
     "w1_88a16kv16_embint4": w1_88a16kv16_embint4,
     "w1_88a8kv8_embint4": w1_88a8kv8_embint4,
+    "w1_88a8kv8_embint4_bs256": w1_88a8kv8_embint4_bs256,
     "w2_79a16kv16_embint4": w2_79a16kv16_embint4,
     "w2_79a8kv8_embint4": w2_79a8kv8_embint4,
+    "w2_79a8kv8_embint4_bs256": w2_79a8kv8_embint4_bs256,
 }
