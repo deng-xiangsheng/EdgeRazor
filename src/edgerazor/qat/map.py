@@ -219,7 +219,7 @@ def create_w1_58_config_embint4(
                             w_func,
                         ),
                         ("w_scale_factor", 2.0),
-                        ("w_block_size", 256),
+                        ("w_block_size", w_block_size),
                         ("w_mixed_precision_prop", mp_prop),
                         ("is_w_quantized", True),
                         ("activation_function", ""),

@@ -36,6 +36,7 @@ def compute_kld(
     is_router_logits = kd_config_loss.is_router_logits
     reduction = kd_config_loss.reduction
     temp = kd_config_loss.temperature
+    EPS = 1e-8
 
     # Determine if input is attention/past_key_values map based on dimensions
     # Logits: [B, S, V] (3 dims), Attention: [B, H, S, S] (4 dims)
@@ -46,6 +47,10 @@ def compute_kld(
         temp = max(temp, 0.1)
         input_logits = input_logits / temp
         target_logits = target_logits / temp
+        
+        # Ensure numerical stability by clamping logits
+        input_logits = input_logits.clamp(min=EPS)
+        target_logits = target_logits.clamp(min=EPS)
 
         # Numerically stable computation using log-softmax and softmax
         log_probs = F.log_softmax(input_logits, dim=-1)
@@ -57,9 +62,10 @@ def compute_kld(
         #     input_logits + 1e-8
         # )
         ## Method2: use clamp to avoid log(0)
-        log_probs = torch.log(
-            input_logits.clamp(min=1e-8)
-        )
+        input_logits = input_logits.clamp(min=EPS)
+        target_logits = target_logits.clamp(min=EPS)
+        
+        log_probs = torch.log(input_logits)
         target_probs = target_logits
 
     # Compute raw KL divergence elements
