@@ -54,10 +54,10 @@ def resolve_layer_indices_adaptive(
         h = layers[i].squeeze(0)  # [seq, hidden]
         
         if metric == "l2":
-            metric_list.append(float(h.norm(dim=-1).mean()))
+            metric_list.append(float(h.norm(dim=-1).mean().detach()))
 
         elif metric == "variance":
-            metric_list.append(float(h.var(dim=0).mean()))
+            metric_list.append(float(h.var(dim=0).mean().detach()))
         
         elif metric == "cosine_similarity":
             # Compute cosine similarity with previous layer
@@ -68,7 +68,7 @@ def resolve_layer_indices_adaptive(
             else:
                 prev = layers[i-1].squeeze(0)
             cos = F.cosine_similarity(h, prev, dim=-1).mean()
-            metric_list.append(float(cos))
+            metric_list.append(float(cos.detach()))
 
     # Select top-k layers based on the metric => list[int=layer_index] -> layer_index_scope [1, L]
     # For "l2" and "variance", higher is better; for "cosine_similarity", lower is better
