@@ -5,12 +5,14 @@ from transformers.models.olmoe.modeling_olmoe import (
     OlmoeFlashAttention2,
     OlmoeSdpaAttention,
 )
+from transformers.models.qwen2_5_omni.modeling_qwen2_5_omni import Qwen2_5OmniAttention
 from transformers.models.qwen3.modeling_qwen3 import Qwen3Attention
 from transformers.models.qwen3_moe.modeling_qwen3_moe import Qwen3MoeAttention
 
 from .block import (
     copy_multiheadattention_to_qmultiheadattention,
     copy_olmoeattention_qkvcache_olmoeattention,
+    copy_qwen2_5omniattention_to_qkvcache_qwen2_5omniattention,
     copy_qwen3attention_to_qkvcache_qwen3attention,
     copy_qwen3moeattention_to_qkvcache_qwen3moeattention,
 )
@@ -58,6 +60,7 @@ def apply_quantization(
     qkvcacheolmoeattention_cls: nn.Module = None,  # Quantized QKVCacheOlmoeAttention class to replace with (optional)
     qkvcacheolmoeflashattention2_cls: nn.Module = None,  # Quantized QKVCacheOlmoeFlashAttention2 class to replace with (optional)
     qkvcacheolmoesdpaattention_cls: nn.Module = None,  # Quantized QKVCacheOlmoeSdpaAttention class to replace with (optional)
+    qkvcacheqwen2_5omniattention_cls: nn.Module = None,  # Quantized QKVCacheQwen2_5OmniAttention class to replace with (optional)
     qkvcacheqwen3attention_cls: nn.Module = None,  # Quantized QKVCacheQwen3Attention class to replace with (optional)
     qkvcacheqwen3moeattention_cls: nn.Module = None,  # Quantized QKVCacheQwen3MoeAttention class to replace with (optional)
 ) -> nn.Module:
@@ -107,6 +110,11 @@ def apply_quantization(
         elif isinstance(module, OlmoeAttention) and qkvcacheolmoeattention_cls is not None:
             new_module = copy_olmoeattention_qkvcache_olmoeattention(
                 module, qkvcacheolmoeattention_cls, module_specific_quant_config
+            )
+            block_replacements.append((parent_module, child_name, new_module))
+        elif isinstance(module, Qwen2_5OmniAttention) and qkvcacheqwen2_5omniattention_cls is not None:
+            new_module = copy_qwen2_5omniattention_to_qkvcache_qwen2_5omniattention(
+                module, qkvcacheqwen2_5omniattention_cls, module_specific_quant_config
             )
             block_replacements.append((parent_module, child_name, new_module))
         elif isinstance(module, Qwen3MoeAttention) and qkvcacheqwen3moeattention_cls is not None:

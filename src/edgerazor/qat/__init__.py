@@ -12,6 +12,7 @@ from .block import (
     QKVCacheOlmoeAttention,
     QKVCacheOlmoeFlashAttention2,
     QKVCacheOlmoeSdpaAttention,
+    QKVCacheQwen2_5OmniAttention,
     QMultiheadAttention,
 )
 from .module import QConv1d, QConv2d, QConv3d, QEmbedding, QLinear
@@ -33,4 +34,5 @@ __all__ = [
     "QKVCacheOlmoeAttention",
     "QKVCacheOlmoeFlashAttention2",
     "QKVCacheOlmoeSdpaAttention",
+    "QKVCacheQwen2_5OmniAttention",
 ]

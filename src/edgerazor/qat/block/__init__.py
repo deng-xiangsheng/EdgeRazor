@@ -13,6 +13,10 @@ from .qkv_cache_olmoe import (
     QKVCacheOlmoeSdpaAttention,
     copy_olmoeattention_qkvcache_olmoeattention,
 )
+from .qkv_cache_qwen2_5omni import (
+    QKVCacheQwen2_5OmniAttention,
+    copy_qwen2_5omniattention_to_qkvcache_qwen2_5omniattention,
+)
 from .qkv_cache_qwen3 import (
     QKVCacheQwen3Attention,
     copy_qwen3attention_to_qkvcache_qwen3attention,

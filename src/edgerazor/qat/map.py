@@ -12,6 +12,7 @@ from transformers.models.olmoe.modeling_olmoe import (
     OlmoeFlashAttention2,
     OlmoeSdpaAttention,
 )
+from transformers.models.qwen2_5_omni.modeling_qwen2_5_omni import Qwen2_5OmniAttention
 from transformers.models.qwen3.modeling_qwen3 import Qwen3Attention
 from transformers.models.qwen3_moe.modeling_qwen3_moe import Qwen3MoeAttention
 
@@ -102,6 +103,7 @@ modules_map = {
     "olmoeflashattention2": OlmoeFlashAttention2,
     "qwen3moeattention": Qwen3MoeAttention,
     "qwen3attention": Qwen3Attention,
+    "qwen2_5omniattention": Qwen2_5OmniAttention,
 }
 
 
@@ -122,6 +124,7 @@ def create_w1_58_config(
     target_types = ["linear", "embedding"]
     if with_activation_kv:
         target_types.append("qwen3attention")
+        target_types.append("qwen2_5omniattention")
 
     config = OrderedDict(
         [
@@ -194,6 +197,7 @@ def create_w1_58_config_embint4(
     target_types = ["linear", "embedding"]
     if with_activation_kv:
         target_types.append("qwen3attention")
+        target_types.append("qwen2_5omniattention")
 
     config = OrderedDict(
         [
@@ -310,7 +314,7 @@ w4a8kv8 = OrderedDict(
             "select",
             OrderedDict(
                 [
-                    ("target_types", ["linear", "embedding", "qwen3attention"]),
+                    ("target_types", ["linear", "embedding", "qwen3attention", "qwen2_5omniattention"]),
                     ("target_names", []),
                     ("exclude_types", []),
                     ("exclude_names", []),
@@ -341,52 +345,6 @@ w4a8kv8 = OrderedDict(
                         "state_quant_uniform_symmetric_absmax_per_block_int8",
                     ),
                     ("kv_block_size", 128),
-                    ("kv_mixed_precision_prop", -1.0),
-                ]
-            ),
-        ),
-        ("training", "all"),
-    ]
-)
-
-w4a8kv8_bs256 = OrderedDict(
-    [
-        ("method", "QAT"),
-        (
-            "select",
-            OrderedDict(
-                [
-                    ("target_types", ["linear", "embedding", "qwen3attention"]),
-                    ("target_names", []),
-                    ("exclude_types", []),
-                    ("exclude_names", []),
-                ]
-            ),
-        ),
-        (
-            "function",
-            OrderedDict(
-                [
-                    ("epsilon", 1e-05),
-                    (
-                        "weight_function",
-                        "weight_quant_uniform_symmetric_absmax_per_block_int4",
-                    ),
-                    ("w_scale_factor", 2.0),
-                    ("w_block_size", 256),
-                    ("w_mixed_precision_prop", -1.0),
-                    ("is_w_quantized", True),
-                    (
-                        "activation_function",
-                        "state_quant_uniform_symmetric_absmax_per_block_int8",
-                    ),
-                    ("a_block_size", 256),
-                    ("a_mixed_precision_prop", -1.0),
-                    (
-                        "kv_cache_function",
-                        "state_quant_uniform_symmetric_absmax_per_block_int8",
-                    ),
-                    ("kv_block_size", 256),
                     ("kv_mixed_precision_prop", -1.0),
                 ]
             ),
@@ -442,7 +400,7 @@ w1_58a8kv8 = OrderedDict(
             "select",
             OrderedDict(
                 [
-                    ("target_types", ["linear", "embedding", "qwen3attention"]),
+                    ("target_types", ["linear", "embedding", "qwen3attention", "qwen2_5omniattention"]),
                     ("target_names", []),
                     ("exclude_types", []),
                     ("exclude_names", []),
@@ -473,52 +431,6 @@ w1_58a8kv8 = OrderedDict(
                         "state_quant_uniform_symmetric_absmax_per_block_int8",
                     ),
                     ("kv_block_size", 128),
-                    ("kv_mixed_precision_prop", -1.0),
-                ]
-            ),
-        ),
-        ("training", "all"),
-    ]
-)
-
-w1_58a8kv8_bs256 = OrderedDict(
-    [
-        ("method", "QAT"),
-        (
-            "select",
-            OrderedDict(
-                [
-                    ("target_types", ["linear", "embedding", "qwen3attention"]),
-                    ("target_names", []),
-                    ("exclude_types", []),
-                    ("exclude_names", []),
-                ]
-            ),
-        ),
-        (
-            "function",
-            OrderedDict(
-                [
-                    ("epsilon", 1e-05),
-                    (
-                        "weight_function",
-                        "weight_quant_uniform_symmetric_clip_per_block_int1_58",
-                    ),
-                    ("w_scale_factor", 2.0),
-                    ("w_block_size", 256),
-                    ("w_mixed_precision_prop", 0.05),
-                    ("is_w_quantized", True),
-                    (
-                        "activation_function",
-                        "state_quant_uniform_symmetric_absmax_per_block_int8",
-                    ),
-                    ("a_block_size", 256),
-                    ("a_mixed_precision_prop", -1.0),
-                    (
-                        "kv_cache_function",
-                        "state_quant_uniform_symmetric_absmax_per_block_int8",
-                    ),
-                    ("kv_block_size", 256),
                     ("kv_mixed_precision_prop", -1.0),
                 ]
             ),
@@ -786,14 +698,6 @@ w1_58a8kv8_embint4 = create_w1_58_config_embint4(
     mp_prop=0.00,
     with_activation_kv=True,
 )
-w1_58a8kv8_embint4_bs256 = create_w1_58_config_embint4(
-    w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse",
-    mp_prop=0.00,
-    with_activation_kv=True,
-    w_block_size=256,
-    a_block_size=256,
-    kv_block_size=256,
-)
 w1_88a16kv16_embint4 = create_w1_58_config_embint4(
     w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse",
     mp_prop=0.125,
@@ -803,14 +707,6 @@ w1_88a8kv8_embint4 = create_w1_58_config_embint4(
     w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse",
     mp_prop=0.125,
     with_activation_kv=True,
-)
-w1_88a8kv8_embint4_bs256 = create_w1_58_config_embint4(
-    w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse",
-    mp_prop=0.125,
-    with_activation_kv=True,
-    w_block_size=256,
-    a_block_size=256,
-    kv_block_size=256,
 )
 w2_79a16kv16_embint4 = create_w1_58_config_embint4(
     w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse",
@@ -822,23 +718,13 @@ w2_79a8kv8_embint4 = create_w1_58_config_embint4(
     mp_prop=0.50,
     with_activation_kv=True,
 )
-w2_79a8kv8_embint4_bs256 = create_w1_58_config_embint4(
-    w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse",
-    mp_prop=0.50,
-    with_activation_kv=True,
-    w_block_size=256,
-    a_block_size=256,
-    kv_block_size=256,
-)
 
 # Map quant_mode string to imported config dict
 quant_config_map = {
     "w4a16kv16": w4a16kv16,
     "w4a8kv8": w4a8kv8,
-    "w4a8kv8_bs256": w4a8kv8_bs256,
     "w1_58a16kv16": w1_58a16kv16,
     "w1_58a8kv8": w1_58a8kv8,
-    "w1_58a8kv8_bs256": w1_58a8kv8_bs256,
     # w_func: weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse (default)
     "w1_58_mp1a16kv16": w1_58_mp1a16kv16,
     "w1_58_mp1a8kv8": w1_58_mp1a8kv8,
@@ -894,11 +780,8 @@ quant_config_map = {
     # Standard quantization config with embedding int4
     "w1_58a16kv16_embint4": w1_58a16kv16_embint4,
     "w1_58a8kv8_embint4": w1_58a8kv8_embint4,
-    "w1_58a8kv8_embint4_bs256": w1_58a8kv8_embint4_bs256,
     "w1_88a16kv16_embint4": w1_88a16kv16_embint4,
     "w1_88a8kv8_embint4": w1_88a8kv8_embint4,
-    "w1_88a8kv8_embint4_bs256": w1_88a8kv8_embint4_bs256,
     "w2_79a16kv16_embint4": w2_79a16kv16_embint4,
     "w2_79a8kv8_embint4": w2_79a8kv8_embint4,
-    "w2_79a8kv8_embint4_bs256": w2_79a8kv8_embint4_bs256,
 }
