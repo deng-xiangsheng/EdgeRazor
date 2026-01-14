@@ -4,6 +4,7 @@ EdgeRazor unified configuration module.
 This module provides a unified configuration class that can load both QAT and KD
 configurations from a single file or separate sources.
 """
+# ruff: noqa: UP035
 
 import json
 from pathlib import Path
@@ -13,6 +14,15 @@ import yaml
 
 from .kd.util import DistillConfig
 from .qat.util import QuantConfig
+
+_original_encoder_default = json.JSONEncoder.default
+
+def _patched_default(self, obj):
+    if hasattr(obj, 'to_dict'):
+        return obj.to_dict()
+    return _original_encoder_default(self, obj)
+
+json.JSONEncoder.default = _patched_default
 
 
 class EdgeRazorConfig:
@@ -492,3 +502,16 @@ class EdgeRazorConfig:
             parts.append("KD=disabled")
         
         return f"EdgeRazorConfig({', '.join(parts)})"
+    
+    class JSONEncoder(json.JSONEncoder):
+        """Custom JSON encoder that handles EdgeRazorConfig objects."""
+        def default(self, obj):
+            if isinstance(obj, EdgeRazorConfig):
+                return obj.to_dict()
+            if hasattr(obj, 'to_dict'):
+                return obj.to_dict()
+            return super().default(obj)
+    
+    def __reduce__(self):
+        """Support for pickle serialization."""
+        return (self.__class__.from_dict, (self.to_dict(),))
