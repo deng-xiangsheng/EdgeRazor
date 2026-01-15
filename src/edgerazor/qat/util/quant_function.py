@@ -119,8 +119,11 @@ def weight_quant_uniform_symmetric_clip_per_block_int1_58(
     with torch.no_grad():
         # Reshape to [..., -1, block_size]
         original_shape = w.shape
-        new_shape = list(original_shape[:-1]) + [-1, block_size]
-        w = w.view(new_shape)
+        if original_shape[-1] % block_size == 0:
+            intermediate_shape = list(original_shape[:-1]) + [-1, block_size]
+        else:
+            intermediate_shape = [-1, block_size]
+        w = w.view(intermediate_shape)
         
         # Compute scale factor for each block
         # Shape: (out_dim, block_num, 1)
@@ -638,8 +641,11 @@ def weight_quant_uniform_symmetric_absmax_per_block_int1_58(
     with torch.no_grad():
         # Reshape to [..., -1, block_size]
         original_shape = w.shape
-        new_shape = list(original_shape[:-1]) + [-1, block_size]
-        w = w.view(new_shape)
+        if original_shape[-1] % block_size == 0:
+            intermediate_shape = list(original_shape[:-1]) + [-1, block_size]
+        else:
+            intermediate_shape = [-1, block_size]
+        w = w.view(intermediate_shape)
         
         # Compute scale factor for each block using maximum absolute value
         # Shape: (out_dim, block_num, 1)
@@ -745,8 +751,11 @@ def weight_quant_uniform_symmetric_absmax_per_block_int4(
     with torch.no_grad():
         # Reshape to [..., -1, block_size]
         original_shape = w.shape
-        new_shape = list(original_shape[:-1]) + [-1, block_size]
-        w = w.view(new_shape)
+        if original_shape[-1] % block_size == 0:
+            intermediate_shape = list(original_shape[:-1]) + [-1, block_size]
+        else:
+            intermediate_shape = [-1, block_size]
+        w = w.view(intermediate_shape)
         
         # Compute scale factor for each block
         # Shape: (out_dim, block_num, 1)
@@ -893,8 +902,11 @@ def weight_quant_uniform_asymmetric_max_per_block_int4(
     with torch.no_grad():
         # Reshape to [..., -1, block_size]
         original_shape = w.shape
-        new_shape = list(original_shape[:-1]) + [-1, block_size]
-        w_reshaped = w.view(new_shape)
+        if original_shape[-1] % block_size == 0:
+            intermediate_shape = list(original_shape[:-1]) + [-1, block_size]
+        else:
+            intermediate_shape = [-1, block_size]
+        w_reshaped = w.view(intermediate_shape)
         
         # Find the maximum value (with sign) for each block
         # Shape: (out_dim, block_num, 1)
@@ -1085,8 +1097,11 @@ def state_quant_uniform_symmetric_absmax_per_block_int2(
     with torch.no_grad():
         # Reshape to [..., -1, block_size]
         original_shape = x.shape
-        new_shape = list(original_shape[:-1]) + [-1, block_size]
-        x = x.view(new_shape)
+        if original_shape[-1] % block_size == 0:
+            intermediate_shape = list(original_shape[:-1]) + [-1, block_size]
+        else:
+            intermediate_shape = [-1, block_size]
+        x = x.view(intermediate_shape)
 
         # Compute scale factor for each block
         # Shape: ([batch,] seq_len, block_num, 1)
@@ -1160,8 +1175,11 @@ def state_quant_uniform_symmetric_absmax_per_block_int4(
     with torch.no_grad():
         # Reshape to [..., -1, block_size]
         original_shape = x.shape
-        new_shape = list(original_shape[:-1]) + [-1, block_size]
-        x = x.view(new_shape)
+        if original_shape[-1] % block_size == 0:
+            intermediate_shape = list(original_shape[:-1]) + [-1, block_size]
+        else:
+            intermediate_shape = [-1, block_size]
+        x = x.view(intermediate_shape)
 
         # Compute scale factor for each block
         # Shape: ([batch,] seq_len, block_num, 1)
@@ -1327,8 +1345,11 @@ def state_quant_uniform_symmetric_absmax_per_block_int8(
     with torch.no_grad():
         # Reshape to [..., -1, block_size]
         original_shape = x.shape
-        new_shape = list(original_shape[:-1]) + [-1, block_size]
-        x = x.view(new_shape)
+        if original_shape[-1] % block_size == 0:
+            intermediate_shape = list(original_shape[:-1]) + [-1, block_size]
+        else:
+            intermediate_shape = [-1, block_size]
+        x = x.view(intermediate_shape)
 
         # Compute scale factor for each block
         # Shape: ([batch,] seq_len, block_num, 1)
