@@ -377,20 +377,20 @@ w4a8kv8_omni = OrderedDict(
                         "weight_quant_uniform_symmetric_absmax_per_block_int4",
                     ),
                     ("w_scale_factor", 2.0),
-                    ("w_block_size", 256),
+                    ("w_block_size", 32),
                     ("w_mixed_precision_prop", -1.0),
                     ("is_w_quantized", True),
                     (
                         "activation_function",
                         "state_quant_uniform_symmetric_absmax_per_block_int8",
                     ),
-                    ("a_block_size", 256),
+                    ("a_block_size", 32),
                     ("a_mixed_precision_prop", -1.0),
                     (
                         "kv_cache_function",
                         "state_quant_uniform_symmetric_absmax_per_block_int8",
                     ),
-                    ("kv_block_size", 128),
+                    ("kv_block_size", 32),
                     ("kv_mixed_precision_prop", -1.0),
                 ]
             ),
