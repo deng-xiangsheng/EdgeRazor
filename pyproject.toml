@@ -3,7 +3,7 @@
 # ============================================================================
 [project]
 name = "edgerazor"
-version = "1.2.0"
+version = "1.2.1"
 description = "Lightweight is All You Need: EdgeRazor for Edge AI Agent"
 readme = "README.md"
 requires-python = "==3.10.19"

@@ -172,10 +172,12 @@ def weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_dynamic(
     max_val_int4 = 2**(bits_int4 - 1) - 1  # 7 for INT4
     
     with torch.no_grad():
-        # Reshape to [..., -1, block_size]
-        # Make sure the last dimension is divisible by block_size
+        # Reshape to [..., -1, block_size] if possible
         original_shape = w.shape
-        intermediate_shape = list(original_shape[:-1]) + [-1, block_size]
+        if original_shape[-1] % block_size == 0:
+            intermediate_shape = list(original_shape[:-1]) + [-1, block_size]
+        else:
+            intermediate_shape = [-1, block_size]
         w_blocked = w.view(intermediate_shape)
         
         # Flatten all dimensions except the last one (block_size) to make indexing easier
@@ -262,10 +264,12 @@ def weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static(
     max_val_int4 = 2**(bits_int4 - 1) - 1  # 7 for INT4
     
     with torch.no_grad():
-        # Reshape to [..., -1, block_size]
-        # Make sure the last dimension is divisible by block_size
+        # Reshape to [..., -1, block_size] if possible
         original_shape = w.shape
-        intermediate_shape = list(original_shape[:-1]) + [-1, block_size]
+        if original_shape[-1] % block_size == 0:
+            intermediate_shape = list(original_shape[:-1]) + [-1, block_size]
+        else:
+            intermediate_shape = [-1, block_size]
         w_blocked = w.view(intermediate_shape)
         
         # Flatten all dimensions except the last one (block_size) to make indexing easier
@@ -509,9 +513,12 @@ def weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_sparse(
     max_val_int4 = 2**(bits_int4 - 1) - 1  # 7 for INT4
     
     with torch.no_grad():
-        # Reshape to a flat 2D tensor of (num_blocks, block_size)
+        # Reshape to [..., -1, block_size] if possible
         original_shape = w.shape
-        intermediate_shape = list(original_shape[:-1]) + [-1, block_size]
+        if original_shape[-1] % block_size == 0:
+            intermediate_shape = list(original_shape[:-1]) + [-1, block_size]
+        else:
+            intermediate_shape = [-1, block_size]
         w_blocked = w.view(intermediate_shape)
         
         num_blocks = w_blocked.numel() // block_size
@@ -1205,9 +1212,12 @@ def state_quant_uniform_symmetric_absmax_per_block_mp_int4_int8_dynamic(
     max_val_int8 = 2**(bits_int8 - 1) - 1  # 127 for INT8
     
     with torch.no_grad():
-        # Reshape to [..., -1, block_size]
+        # Reshape to [..., -1, block_size] if possible
         original_shape = x.shape
-        intermediate_shape = list(original_shape[:-1]) + [-1, block_size]
+        if original_shape[-1] % block_size == 0:
+            intermediate_shape = list(original_shape[:-1]) + [-1, block_size]
+        else:
+            intermediate_shape = [-1, block_size]
         x_blocked = x.reshape(intermediate_shape)
         
         # Flatten all dimensions except the last one (block_size) to make indexing easier
