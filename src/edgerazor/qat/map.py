@@ -360,10 +360,10 @@ w4a8kv8_omni = OrderedDict(
             "select",
             OrderedDict(
                 [
-                    ("target_types", ["linear", "embedding", "qwen3attention", "qwen2_5omniattention"]),
+                    ("target_types", ["linear", "embedding", "qwen2_5omniattention"]),
                     ("target_names", []),
                     ("exclude_types", []),
-                    ("exclude_names", ["thinker.audio_tower.*", "talker.*", "token2wav.*"]),
+                    ("exclude_names", ["thinker.audio_tower.*", "thinker.visual.blocks.*.mlp.down_proj.*", "talker.*", "token2wav.*"]),
                 ]
             ),
         ),
