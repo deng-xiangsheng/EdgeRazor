@@ -47,14 +47,11 @@ def compute_kld(
         temp = max(temp, 0.1)
         input_logits = input_logits / temp
         target_logits = target_logits / temp
-        
-        # Ensure numerical stability by clamping logits
-        input_logits = input_logits.clamp(min=EPS)
-        target_logits = target_logits.clamp(min=EPS)
 
         # Numerically stable computation using log-softmax and softmax
-        log_probs = F.log_softmax(input_logits, dim=-1)
-        target_probs = F.softmax(target_logits, dim=-1)
+        # Ensure numerical stability by clamping logits
+        log_probs = F.softmax(input_logits, dim=-1).clamp(min=EPS).log()
+        target_probs = F.softmax(target_logits, dim=-1).clamp(min=EPS).log()
     elif is_attention and input_logits.dim() == 4:
         # Attention scores: assume already in probability space (after softmax)
         # # Method1: add small value for numerical stability
@@ -62,15 +59,12 @@ def compute_kld(
         #     input_logits + 1e-8
         # )
         ## Method2: use clamp to avoid log(0)
-        input_logits = input_logits.clamp(min=EPS)
-        target_logits = target_logits.clamp(min=EPS)
-        
-        log_probs = torch.log(input_logits)
-        target_probs = target_logits
+        log_probs = input_logits.clamp(min=EPS).log()
+        target_probs = target_logits.clamp(min=EPS).log()
 
     # Compute raw KL divergence elements
     kl_raw = F.kl_div(
-        input=log_probs, target=target_probs, reduction="none", log_target=False
+        input=log_probs, target=target_probs, reduction="none", log_target=True
     ).sum(dim=-1)  # [batch_size, seq_len] or [batch_size, num_attention_heads, seq_len]
 
     if not is_attention and input_logits.dim() == 3:
