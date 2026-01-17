@@ -48,17 +48,12 @@ def compute_kld(
         input_logits = input_logits / temp
         target_logits = target_logits / temp
 
-        # Numerically stable computation using log-softmax and softmax
         # Ensure numerical stability by clamping logits
         log_probs = F.softmax(input_logits, dim=-1).clamp(min=EPS).log()
         target_probs = F.softmax(target_logits, dim=-1).clamp(min=EPS).log()
     elif is_attention and input_logits.dim() == 4:
         # Attention scores: assume already in probability space (after softmax)
-        # # Method1: add small value for numerical stability
-        # log_probs = torch.log(
-        #     input_logits + 1e-8
-        # )
-        ## Method2: use clamp to avoid log(0)
+        # Ensure numerical stability by clamping logits
         log_probs = input_logits.clamp(min=EPS).log()
         target_probs = target_logits.clamp(min=EPS).log()
 
