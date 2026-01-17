@@ -7,6 +7,7 @@ Mapping of quantization functions and classes.
 from collections import OrderedDict
 
 import torch.nn as nn
+from transformers.models.llama.modeling_llama import LlamaAttention
 from transformers.models.olmoe.modeling_olmoe import (
     OlmoeAttention,
     OlmoeFlashAttention2,
@@ -104,6 +105,7 @@ modules_map = {
     "qwen3moeattention": Qwen3MoeAttention,
     "qwen3attention": Qwen3Attention,
     "qwen2_5omniattention": Qwen2_5OmniAttention,
+    "llamaattention": LlamaAttention,
 }
 
 

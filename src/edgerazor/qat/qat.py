@@ -5,6 +5,7 @@ from transformers import PreTrainedModel
 
 from ..log import get_logger
 from .block import (
+    QKVCacheLlamaAttention,
     QKVCacheOlmoeAttention,
     QKVCacheOlmoeFlashAttention2,
     QKVCacheOlmoeSdpaAttention,
@@ -45,6 +46,7 @@ class QAT:
     qkvcacheqwen2_5omniattention_cls_default = QKVCacheQwen2_5OmniAttention
     qkvcacheqwen3attention_cls_default = QKVCacheQwen3Attention
     qkvcacheqwen3moeattention_cls_default = QKVCacheQwen3MoeAttention
+    qkvcachellamaattention_cls_default = QKVCacheLlamaAttention
 
     def __init__(self, config: dict | str | Path | QuantConfig):
         """
@@ -201,6 +203,7 @@ class QAT:
         qkvcacheqwen2_5omniattention_cls: nn.Module = None,
         qkvcacheqwen3attention_cls: nn.Module = None,
         qkvcacheqwen3moeattention_cls: nn.Module = None,
+        qkvcachellamaattention_cls: nn.Module = None,
     ) -> dict:
         """
         Check and use default quantized classes if not provided.
@@ -320,6 +323,13 @@ class QAT:
             qclass_map['qkvcacheqwen3moeattention_cls'] = qkvcacheqwen3moeattention_cls
             self.logger.info(f"Using custom {qkvcacheqwen3moeattention_cls.__name__} class for Qwen3MoeAttention layers")
         
+        # Check QKVCacheLlamaAttention
+        if qkvcachellamaattention_cls is None:
+            qclass_map['qkvcachellamaattention_cls'] = self.qkvcachellamaattention_cls_default
+            self.logger.info("Using default QKVCacheLlamaAttention class for LlamaAttention layers")
+        else:
+            qclass_map['qkvcachellamaattention_cls'] = qkvcachellamaattention_cls
+            self.logger.info(f"Using custom {qkvcachellamaattention_cls.__name__} class for LlamaAttention layers")
         return qclass_map
 
     def quantize(
@@ -337,6 +347,7 @@ class QAT:
         qkvcacheqwen2_5omniattention_cls: nn.Module = None,
         qkvcacheqwen3attention_cls: nn.Module = None,
         qkvcacheqwen3moeattention_cls: nn.Module = None,
+        qkvcachellamaattention_cls: nn.Module = None,
     ) -> nn.Module:
         """
         Apply quantization to the model.
@@ -355,6 +366,7 @@ class QAT:
             qkvcacheqwen2_5omniattention_cls: Custom quantized QKVCacheQwen2_5OmniAttention class (default: QKVCacheQwen2_5OmniAttention)
             qkvcacheqwen3attention_cls: Custom quantized QKVCacheQwen3Attention class (default: QKVCacheQwen3Attention)
             qkvcacheqwen3moeattention_cls: Custom quantized QKVCacheQwen3MoeAttention class (default: QKVCacheQwen3MoeAttention)
+            qkvcachellamaattention_cls: Custom quantized QKVCacheLlamaAttention class (default: QKVCacheLlamaAttention)
             
         Returns:
             Quantized model
@@ -410,6 +422,7 @@ class QAT:
             qkvcacheqwen2_5omniattention_cls=qkvcacheqwen2_5omniattention_cls,
             qkvcacheqwen3attention_cls=qkvcacheqwen3attention_cls,
             qkvcacheqwen3moeattention_cls=qkvcacheqwen3moeattention_cls,
+            qkvcachellamaattention_cls=qkvcachellamaattention_cls,
         )
         
         # Extract classes from map
@@ -425,6 +438,7 @@ class QAT:
         qkvcacheqwen2_5omniattention_cls = qclass_map['qkvcacheqwen2_5omniattention_cls']
         qkvcacheqwen3attention_cls = qclass_map['qkvcacheqwen3attention_cls']
         qkvcacheqwen3moeattention_cls = qclass_map['qkvcacheqwen3moeattention_cls']
+        qkvcachellamaattention_cls = qclass_map['qkvcachellamaattention_cls']
 
         # Apply quantization
         self.logger.info("")
@@ -447,6 +461,7 @@ class QAT:
                 qkvcacheqwen2_5omniattention_cls=qkvcacheqwen2_5omniattention_cls,
                 qkvcacheqwen3attention_cls=qkvcacheqwen3attention_cls,
                 qkvcacheqwen3moeattention_cls=qkvcacheqwen3moeattention_cls,
+                qkvcachellamaattention_cls=qkvcachellamaattention_cls,
             )
 
             self.logger.info("Quantization applied successfully!")
@@ -473,6 +488,7 @@ class QAT:
         qkvcacheqwen2_5omniattention_count = 0
         qkvcacheqwen3attention_count = 0
         qkvcacheqwen3moeattention_count = 0
+        qkvcachellamaattention_count = 0
         for _, module in quantized_model.named_modules():
             if isinstance(module, qlinear_cls):
                 qlinear_count += 1
@@ -499,6 +515,8 @@ class QAT:
                 qkvcacheqwen3attention_count += 1
             elif isinstance(module, qkvcacheqwen3moeattention_cls):
                 qkvcacheqwen3moeattention_count += 1
+            elif isinstance(module, qkvcachellamaattention_cls):
+                qkvcachellamaattention_count += 1
 
         self.logger.info(f"  Quantized Linear modules: {qlinear_count}")
         self.logger.info(f"  Quantized Embedding modules: {qembedding_count}")
@@ -512,7 +530,8 @@ class QAT:
         self.logger.info(f"  Quantized Qwen2_5OmniAttention modules: {qkvcacheqwen2_5omniattention_count}")
         self.logger.info(f"  Quantized Qwen3Attention modules: {qkvcacheqwen3attention_count}")
         self.logger.info(f"  Quantized Qwen3MoeAttention modules: {qkvcacheqwen3moeattention_count}")
-        self.logger.info(f"  Total quantized modules: {qlinear_count + qembedding_count + qconv1d_count + qconv2d_count + qconv3d_count + qmultiheadattention_count + qkvcacheolmoeattention_count + qkvcacheolmoeflashattention2_count + qkvcacheolmoesdpaattention_count + qkvcacheqwen2_5omniattention_count + qkvcacheqwen3attention_count + qkvcacheqwen3moeattention_count}")
+        self.logger.info(f"  Quantized LlamaAttention modules: {qkvcachellamaattention_count}")
+        self.logger.info(f"  Total quantized modules: {qlinear_count + qembedding_count + qconv1d_count + qconv2d_count + qconv3d_count + qmultiheadattention_count + qkvcacheolmoeattention_count + qkvcacheolmoeflashattention2_count + qkvcacheolmoesdpaattention_count + qkvcacheqwen2_5omniattention_count + qkvcacheqwen3attention_count + qkvcacheqwen3moeattention_count + qkvcachellamaattention_count}")
         
         # Fix `tie_word_embeddings=True` issue
         model_class_name = quantized_model.__class__.__name__

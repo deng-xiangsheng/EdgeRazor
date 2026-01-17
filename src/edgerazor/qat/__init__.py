@@ -9,6 +9,7 @@
 # ruff: noqa: F401
 
 from .block import (
+    QKVCacheLlamaAttention,
     QKVCacheOlmoeAttention,
     QKVCacheOlmoeFlashAttention2,
     QKVCacheOlmoeSdpaAttention,
@@ -35,4 +36,5 @@ __all__ = [
     "QKVCacheOlmoeFlashAttention2",
     "QKVCacheOlmoeSdpaAttention",
     "QKVCacheQwen2_5OmniAttention",
+    "QKVCacheLlamaAttention",
 ]

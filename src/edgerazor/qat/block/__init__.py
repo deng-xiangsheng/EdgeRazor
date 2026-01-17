@@ -1,7 +1,7 @@
 """
 Implementation of Quantization Blocks/Modules/Components
 """
-# ruff: noqa: F401
+# ruff: noqa: F401 I001
 
 # Weight and Activation (State) Quantized Modules
 from .qattn import QMultiheadAttention, copy_multiheadattention_to_qmultiheadattention
@@ -24,4 +24,8 @@ from .qkv_cache_qwen3 import (
 from .qkv_cache_qwen3moe import (
     QKVCacheQwen3MoeAttention,
     copy_qwen3moeattention_to_qkvcache_qwen3moeattention,
+)
+from .qkv_cache_llama import (
+    QKVCacheLlamaAttention,
+    copy_llamaattention_to_qkvcache_llamaattention,
 )

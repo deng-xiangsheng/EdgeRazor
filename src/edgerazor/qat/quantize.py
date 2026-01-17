@@ -1,5 +1,6 @@
 import torch.nn as nn
 from transformers import PreTrainedModel
+from transformers.models.llama.modeling_llama import LlamaAttention
 from transformers.models.olmoe.modeling_olmoe import (
     OlmoeAttention,
     OlmoeFlashAttention2,
@@ -10,6 +11,7 @@ from transformers.models.qwen3.modeling_qwen3 import Qwen3Attention
 from transformers.models.qwen3_moe.modeling_qwen3_moe import Qwen3MoeAttention
 
 from .block import (
+    copy_llamaattention_to_qkvcache_llamaattention,
     copy_multiheadattention_to_qmultiheadattention,
     copy_olmoeattention_qkvcache_olmoeattention,
     copy_qwen2_5omniattention_to_qkvcache_qwen2_5omniattention,
@@ -63,6 +65,7 @@ def apply_quantization(
     qkvcacheqwen2_5omniattention_cls: nn.Module = None,  # Quantized QKVCacheQwen2_5OmniAttention class to replace with (optional)
     qkvcacheqwen3attention_cls: nn.Module = None,  # Quantized QKVCacheQwen3Attention class to replace with (optional)
     qkvcacheqwen3moeattention_cls: nn.Module = None,  # Quantized QKVCacheQwen3MoeAttention class to replace with (optional)
+    qkvcachellamaattention_cls: nn.Module = None,  # Quantized QKVCacheLlamaAttention class to replace with (optional)
 ) -> nn.Module:
     """Apply quantization to the model"""
 
@@ -125,6 +128,11 @@ def apply_quantization(
         elif isinstance(module, Qwen3Attention) and qkvcacheqwen3attention_cls is not None:
             new_module = copy_qwen3attention_to_qkvcache_qwen3attention(
                 module, qkvcacheqwen3attention_cls, module_specific_quant_config
+            )
+            block_replacements.append((parent_module, child_name, new_module))
+        elif isinstance(module, LlamaAttention) and qkvcachellamaattention_cls is not None:
+            new_module = copy_llamaattention_to_qkvcache_llamaattention(
+                module, qkvcachellamaattention_cls, module_specific_quant_config
             )
             block_replacements.append((parent_module, child_name, new_module))
 
