@@ -127,7 +127,8 @@ def create_w1_58_config(
     if with_activation_kv:
         target_types.append("qwen3attention")
         target_types.append("qwen2_5omniattention")
-
+        target_types.append("llamaattention")
+    
     config = OrderedDict(
         [
             ("method", "QAT"),
@@ -200,6 +201,7 @@ def create_w1_58_config_embint4(
     if with_activation_kv:
         target_types.append("qwen3attention")
         target_types.append("qwen2_5omniattention")
+        target_types.append("llamaattention")
 
     config = OrderedDict(
         [
@@ -316,7 +318,7 @@ w4a8kv8 = OrderedDict(
             "select",
             OrderedDict(
                 [
-                    ("target_types", ["linear", "embedding", "qwen3attention", "qwen2_5omniattention"]),
+                    ("target_types", ["linear", "embedding", "qwen3attention", "qwen2_5omniattention", "llamaattention"]),
                     ("target_names", []),
                     ("exclude_types", []),
                     ("exclude_names", []),
@@ -448,7 +450,7 @@ w1_58a8kv8 = OrderedDict(
             "select",
             OrderedDict(
                 [
-                    ("target_types", ["linear", "embedding", "qwen3attention", "qwen2_5omniattention"]),
+                    ("target_types", ["linear", "embedding", "qwen3attention", "qwen2_5omniattention", "llamaattention"]),
                     ("target_names", []),
                     ("exclude_types", []),
                     ("exclude_names", []),
