@@ -159,8 +159,17 @@ class QAT:
         # Log function configuration
         self.logger.info("Function Configuration (Global Defaults):")
         self.logger.info(f"  Weight: {self.config.function.weight_function}")
+        self.logger.info(f"    Scale Factor: {self.config.function.w_scale_factor}")
+        self.logger.info(f"    Block Size: {self.config.function.w_block_size}")
+        self.logger.info(f"    Mixed Precision Prop: {self.config.function.w_mixed_precision_prop}")
+        self.logger.info(f"    Is Quantized: {self.config.function.is_w_quantized}")
         self.logger.info(f"  State (Activation): {self.config.function.activation_function}")
+        self.logger.info(f"    Block Size: {self.config.function.a_block_size}")
+        self.logger.info(f"    Mixed Precision Prop: {self.config.function.a_mixed_precision_prop}")
         self.logger.info(f"  State (KV Cache): {self.config.function.kv_cache_function}")
+        self.logger.info(f"    Block Size: {self.config.function.kv_block_size}")
+        self.logger.info(f"    Mixed Precision Prop: {self.config.function.kv_mixed_precision_prop}")
+        self.logger.info(f"  Epsilon: {self.config.function.epsilon}")
 
         # Log overrides if any
         if hasattr(self.config, 'overrides') and self.config.overrides:
