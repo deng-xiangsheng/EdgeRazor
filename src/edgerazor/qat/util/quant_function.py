@@ -353,11 +353,7 @@ def weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_column_
         blocks_per_channel = in_dim // block_size
         
         # Shape: (out_dim, blocks_per_channel, block_size)
-        if in_dim % block_size == 0:
-            intermediate_shape = [out_dim, blocks_per_channel, block_size]
-        else:
-            intermediate_shape = [-1, block_size]
-        w_blocked = w.view(intermediate_shape)
+        w_blocked = w.view(out_dim, blocks_per_channel, block_size)
         
         # Determine how many blocks per channel should use INT4
         # At least 1 block if prop > 0, at most all blocks
@@ -446,11 +442,7 @@ def weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wis
         blocks_per_channel = in_dim // block_size
         
         # Shape: (out_dim, blocks_per_channel, block_size)
-        if in_dim % block_size == 0:
-            intermediate_shape = [out_dim, blocks_per_channel, block_size]
-        else:
-            intermediate_shape = [-1, block_size]
-        w_blocked = w.view(intermediate_shape)
+        w_blocked = w.view(out_dim, blocks_per_channel, block_size)
         
         # Calculate row spacing: every n-th row gets INT4
         # n = 1 / mixed_precision_prop, ensuring at least 1
