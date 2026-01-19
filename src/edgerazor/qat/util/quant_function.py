@@ -1342,25 +1342,48 @@ def state_quant_uniform_symmetric_absmax_per_block_int8(
     bits = 8
     max_val = 2**(bits - 1) - 1  # 127 for INT8
 
+    original_shape = x.shape
+    feature_dim = original_shape[-1]
+    original_numel = x.numel()
+    
     with torch.no_grad():
-        # Reshape to [..., -1, block_size]
-        original_shape = x.shape
-        if original_shape[-1] % block_size == 0:
+        # Case 1: feature_dim is divisible by block_size (most common)
+        if feature_dim % block_size == 0:
             intermediate_shape = list(original_shape[:-1]) + [-1, block_size]
+            x_blocked = x.reshape(intermediate_shape)
+            need_truncate = False
+        
+        # Case 2: total elements divisible by block_size
+        elif original_numel % block_size == 0:
+            x_blocked = x.reshape(-1, block_size)
+            need_truncate = False
+        
+        # Case 3: need to pad to make total elements divisible by block_size
         else:
-            intermediate_shape = [-1, block_size]
-        x = x.view(intermediate_shape)
+            # Calculate how many elements to pad
+            remainder = original_numel % block_size
+            pad_elements = block_size - remainder
+            
+            # Flatten, pad, then reshape to blocks
+            x_flat = x.contiguous().view(-1)
+            x_padded = torch.nn.functional.pad(x_flat, (0, pad_elements), value=0)
+            x_blocked = x_padded.reshape(-1, block_size)
+            need_truncate = True
 
         # Compute scale factor for each block
-        # Shape: ([batch,] seq_len, block_num, 1)
-        x_scale = x.abs().max(dim=-1, keepdim=True).values.clamp_(min=epsilon) / max_val
+        x_scale = x_blocked.abs().max(dim=-1, keepdim=True).values.clamp_(min=epsilon) / max_val
         
         # Quantize to INT8: [-127, 127]
-        x_quant = x.div(x_scale).round().clamp_(-max_val, max_val)
+        x_quant = x_blocked.div(x_scale).round().clamp_(-max_val, max_val)
         x_quant = x_quant * x_scale
-        x_quant = x_quant.view(original_shape)
+        
+        # Restore original shape
+        if need_truncate:
+            x_quant = x_quant.view(-1)[:original_numel].view(original_shape)
+        else:
+            x_quant = x_quant.view(original_shape)
 
-        return x_quant
+    return x_quant
 
 
 def state_quant_uniform_symmetric_absmax_per_block_int4_nested(

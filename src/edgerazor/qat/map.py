@@ -21,10 +21,10 @@ from transformers.models.qwen3_moe.modeling_qwen3_moe import Qwen3MoeAttention
 from .util.quant_function import (
     state_quant_uniform_symmetric_absmax_per_block_int2,
     state_quant_uniform_symmetric_absmax_per_block_int4,
-    state_quant_uniform_symmetric_absmax_per_block_int4_nested,
+    state_quant_uniform_symmetric_absmax_per_block_int4_nested,  # deprecated
     state_quant_uniform_symmetric_absmax_per_block_int8,
-    state_quant_uniform_symmetric_absmax_per_block_mp_int4_int8_dynamic,
-    state_quant_uniform_symmetric_absmax_per_block_mp_int4_int8_dynamic_nested,
+    state_quant_uniform_symmetric_absmax_per_block_mp_int4_int8_dynamic,  # deprecated
+    state_quant_uniform_symmetric_absmax_per_block_mp_int4_int8_dynamic_nested,  # deprecated
     state_quant_uniform_symmetric_absmax_per_token_int2,
     state_quant_uniform_symmetric_absmax_per_token_int4,
     state_quant_uniform_symmetric_absmax_per_token_int8,
@@ -38,11 +38,11 @@ from .util.quant_function import (
     weight_quant_uniform_symmetric_absmax_per_tensor_int1_58,
     weight_quant_uniform_symmetric_absmax_per_tensor_int4,
     weight_quant_uniform_symmetric_clip_per_block_int1_58,
-    weight_quant_uniform_symmetric_clip_per_block_int1_58_nested,
+    weight_quant_uniform_symmetric_clip_per_block_int1_58_nested,  # deprecated
     weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_dynamic,
     weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static,
     weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_column_wise,
-    weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_nested,
+    weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_nested,  # deprecated
     weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse,
     weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_sparse,
     weight_quant_uniform_symmetric_clip_per_channel_int1_58,
@@ -334,7 +334,6 @@ w4a8kv8 = OrderedDict(
                         "weight_function",
                         "weight_quant_uniform_symmetric_absmax_per_block_int4",
                     ),
-                    ("w_scale_factor", 2.0),
                     ("w_block_size", 256),
                     ("w_mixed_precision_prop", -1.0),
                     ("is_w_quantized", True),
@@ -380,7 +379,6 @@ w4a8kv8_bs32 = OrderedDict(
                         "weight_function",
                         "weight_quant_uniform_symmetric_absmax_per_block_int4",
                     ),
-                    ("w_scale_factor", 2.0),
                     ("w_block_size", 32),
                     ("w_mixed_precision_prop", -1.0),
                     ("is_w_quantized", True),
@@ -426,7 +424,6 @@ w4a8kv8_bs256 = OrderedDict(
                         "weight_function",
                         "weight_quant_uniform_symmetric_absmax_per_block_int4",
                     ),
-                    ("w_scale_factor", 2.0),
                     ("w_block_size", 256),
                     ("w_mixed_precision_prop", -1.0),
                     ("is_w_quantized", True),
@@ -472,7 +469,6 @@ w4a8kv8_omni = OrderedDict(
                         "weight_function",
                         "weight_quant_uniform_symmetric_absmax_per_block_int4",
                     ),
-                    ("w_scale_factor", 2.0),
                     ("w_block_size", 32),
                     ("w_mixed_precision_prop", -1.0),
                     ("is_w_quantized", True),
@@ -518,7 +514,6 @@ w4a8kv8_mobilellm = OrderedDict(
                         "weight_function",
                         "weight_quant_uniform_symmetric_absmax_per_block_int4",
                     ),
-                    ("w_scale_factor", 2.0),
                     ("w_block_size", 256),
                     ("w_mixed_precision_prop", -1.0),
                     ("is_w_quantized", True),
@@ -532,7 +527,7 @@ w4a8kv8_mobilellm = OrderedDict(
                         "kv_cache_function",
                         "state_quant_uniform_symmetric_absmax_per_block_int8",
                     ),
-                    ("kv_block_size", 64),
+                    ("kv_block_size", 256),
                     ("kv_mixed_precision_prop", -1.0),
                 ]
             ),
@@ -908,7 +903,7 @@ w1_58a8kv8_embint4_mobilellm = create_w1_58_config_embint4(
     with_activation_kv=True,
     w_block_size=256,
     a_block_size=256,
-    kv_block_size=64,
+    kv_block_size=256,
 )
 
 w1_88a16kv16_embint4 = create_w1_58_config_embint4(
@@ -941,9 +936,9 @@ w1_88a8kv8_embint4_mobilellm = create_w1_58_config_embint4(
     w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse",
     mp_prop=0.125,
     with_activation_kv=True,
-    w_block_size=64,
-    a_block_size=64,
-    kv_block_size=64,
+    w_block_size=256,
+    a_block_size=256,
+    kv_block_size=256,
 )
 
 w2_79a16kv16_embint4 = create_w1_58_config_embint4(
@@ -976,9 +971,9 @@ w2_79a8kv8_embint4_mobilellm = create_w1_58_config_embint4(
     w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse",
     mp_prop=0.50,
     with_activation_kv=True,
-    w_block_size=64,
-    a_block_size=64,
-    kv_block_size=64,
+    w_block_size=256,
+    a_block_size=256,
+    kv_block_size=256,
 )
 
 # Map quant_mode string to imported config dict
