@@ -936,9 +936,9 @@ w1_88a8kv8_embint4_mobilellm = create_w1_58_config_embint4(
     w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse",
     mp_prop=0.125,
     with_activation_kv=True,
-    w_block_size=256,
-    a_block_size=256,
-    kv_block_size=256,
+    w_block_size=64,
+    a_block_size=64,
+    kv_block_size=64,
 )
 
 w2_79a16kv16_embint4 = create_w1_58_config_embint4(
@@ -971,9 +971,9 @@ w2_79a8kv8_embint4_mobilellm = create_w1_58_config_embint4(
     w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse",
     mp_prop=0.50,
     with_activation_kv=True,
-    w_block_size=256,
-    a_block_size=256,
-    kv_block_size=256,
+    w_block_size=64,
+    a_block_size=64,
+    kv_block_size=64,
 )
 
 # Map quant_mode string to imported config dict
