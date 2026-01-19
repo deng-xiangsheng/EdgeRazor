@@ -5,7 +5,7 @@ import torch.nn as nn
 
 from .edgerazor_config import EdgeRazorConfig
 from .kd import KD
-from .log import get_logger
+from .log import get_logger, setup_logging
 from .qat import QAT
 
 
@@ -64,10 +64,11 @@ class EdgeRazor:
         Raises:
             ValueError: If no configuration provided
         """
-        self.logger = get_logger('EdgeRazor')
-        
         # Load configuration using EdgeRazorConfig.load()
         edge_config = EdgeRazorConfig.load(config, qat_config, kd_config)
+        
+        # Initialize logging
+        self.logger = get_logger('EdgeRazor')
         
         # Initialize QAT and KD modules
         self.model = None
@@ -80,8 +81,9 @@ class EdgeRazor:
             status.append("QAT")
         if self.kd:
             status.append("KD")
+        
         self.logger.info(
-            f"EdgeRazor initialized ({' + '.join(status)} enabled)"
+            f"EdgeRazor initialized ({' + '.join(status)} enabled | Log Level: {edge_config.log_level})"
             if status else "EdgeRazor initialized (no modules)"
         )
     

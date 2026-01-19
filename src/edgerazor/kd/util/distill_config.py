@@ -15,6 +15,7 @@ loss_2:
 # ruff: noqa: UP035 UP007 UP006
 
 import json
+import logging
 from collections import OrderedDict
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
@@ -108,6 +109,9 @@ class DistillConfig:
     router_aux_loss_coef: float = 0.01
     router_z_loss_coef: float = 0.001
     
+    # Default logging level for distillation process
+    log_level: Union[str, int] = logging.INFO
+    
     def __post_init__(self):
         """Validate configuration parameters"""
         if self.method != "KD":
@@ -145,6 +149,9 @@ class DistillConfig:
             del config_dict[key]
         
         config_dict['losses'] = losses
+        
+        if 'log_level' in config_dict:
+            cls.log_level = config_dict.get('log_level')
         
         return cls(**config_dict)
     

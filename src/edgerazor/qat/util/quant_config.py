@@ -283,6 +283,7 @@ class QuantConfig:
         )
 
         self.training = config_dict.get("training", "all")
+        self.log_level = config_dict.get("log_level", "ERROR")
 
         # Parse and map string identifiers to actual functions and modules
         self._init_map_operate()

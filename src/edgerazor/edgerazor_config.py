@@ -7,6 +7,7 @@ configurations from a single file or separate sources.
 # ruff: noqa: UP035
 
 import json
+import logging
 from pathlib import Path
 from typing import Any, Dict, Union
 
@@ -72,6 +73,7 @@ class EdgeRazorConfig:
         self,
         qat_config: QuantConfig | None = None,
         kd_config: DistillConfig | None = None,
+        log_level: str | int = logging.INFO,
     ):
         """
         Initialize EdgeRazorConfig with QAT and/or KD configurations.
@@ -91,6 +93,7 @@ class EdgeRazorConfig:
         
         self.qat_config = qat_config
         self.kd_config = kd_config
+        self.log_level = log_level
     
     @classmethod
     def load(
@@ -219,7 +222,15 @@ class EdgeRazorConfig:
                 else:
                     raise TypeError(f"Unsupported kd_config type: {type(kd_config)}")
             
-            return cls(qat_config=qat_cfg, kd_config=kd_cfg)
+            # log_level assignment order: EdgeRazor => QAT => KD => default ERROR
+            if qat_cfg is not None and getattr(qat_cfg, 'log_level', None) is not None:
+                log_level = qat_cfg.log_level
+            elif kd_cfg is not None and getattr(kd_cfg, 'log_level', None) is not None:
+                log_level = kd_cfg.log_level
+            else:
+                log_level = logging.ERROR
+            
+            return cls(qat_config=qat_cfg, kd_config=kd_cfg, log_level=log_level)
         
         raise ValueError("No configuration provided")
     
@@ -288,7 +299,17 @@ class EdgeRazorConfig:
                     kd_dict['method'] = 'KD'
                 kd_config = DistillConfig.from_dict(kd_dict)
         
-        return cls(qat_config=qat_config, kd_config=kd_config)
+        # log_level assignment order: EdgeRazor => QAT => KD => default ERROR
+        if config_dict.get('log_level') is not None:
+            log_level = config_dict.get('log_level')
+        elif qat_config is not None and getattr(qat_config, 'log_level', None) is not None:
+            log_level = qat_config.log_level
+        elif kd_config is not None and getattr(kd_config, 'log_level', None) is not None:
+            log_level = kd_config.log_level
+        else:
+            log_level = logging.ERROR
+        
+        return cls(qat_config=qat_config, kd_config=kd_config, log_level=log_level)
     
     @classmethod
     def from_yaml(
@@ -353,7 +374,15 @@ class EdgeRazorConfig:
                     raise FileNotFoundError(f"KD config file not found: {kd_yaml}")
                 kd_config = DistillConfig.from_yaml(kd_yaml)
             
-            return cls(qat_config=qat_config, kd_config=kd_config)
+            # log_level assignment order: EdgeRazor => QAT => KD => default ERROR
+            if qat_config is not None and getattr(qat_config, 'log_level', None) is not None:
+                log_level = qat_config.log_level
+            elif kd_config is not None and getattr(kd_config, 'log_level', None) is not None:
+                log_level = kd_config.log_level
+            else:
+                log_level = logging.ERROR
+            
+            return cls(qat_config=qat_config, kd_config=kd_config, log_level=log_level)
         
         else:
             raise ValueError(
@@ -421,7 +450,15 @@ class EdgeRazorConfig:
                     raise FileNotFoundError(f"KD config file not found: {kd_json}")
                 kd_config = DistillConfig.from_json(kd_json)
             
-            return cls(qat_config=qat_config, kd_config=kd_config)
+            # log_level assignment order: EdgeRazor => QAT => KD => default ERROR
+            if qat_config is not None and getattr(qat_config, 'log_level', None) is not None:
+                log_level = qat_config.log_level
+            elif kd_config is not None and getattr(kd_config, 'log_level', None) is not None:
+                log_level = kd_config.log_level
+            else:
+                log_level = logging.ERROR
+            
+            return cls(qat_config=qat_config, kd_config=kd_config, log_level=log_level)
         
         else:
             raise ValueError(

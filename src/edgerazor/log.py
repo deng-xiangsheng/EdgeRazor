@@ -169,5 +169,8 @@ def get_logger(component: str) -> logging.Logger:
 
 
 def setup_logging(**kwargs):
-    """Convenience function to setup logging."""
+    """Convenience function to setup logging.
+    Example:
+        setup_logging(level='ERROR')
+    """
     return EdgeRazorLogger.setup_logging(**kwargs)
