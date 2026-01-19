@@ -117,11 +117,11 @@ def create_w1_58_config(
     kv_block_size=128,
 ):
     """
-    创建 w1_58 量化配置
+    Create w1_58 quantization config.
 
     Args:
-        mp_prop: mixed precision proportion (例如 0.01 或 0.05)
-        with_activation_kv: 是否包含 activation 和 kv_cache 量化
+        mp_prop: mixed precision proportion (e.g. 0.01 or 0.05)
+        with_activation_kv: whether to include activation and kv_cache quantization
     """
     target_types = ["linear", "embedding"]
     if with_activation_kv:
@@ -191,11 +191,11 @@ def create_w1_58_config_embint4(
     kv_block_size=128,
 ):
     """
-    创建 w1_58 量化配置，embedding 和 lm_head 使用 int4 量化
+    Create w1_58 quantization config, using int4 quantization for embedding and lm_head.
 
     Args:
-        mp_prop: mixed precision proportion (例如 0.125 0.25 或 0.50)
-        with_activation_kv: 是否包含 activation 和 kv_cache 量化
+        mp_prop: mixed precision proportion (e.g. 0.125, 0.25, or 0.50)
+        with_activation_kv: whether to include activation and kv_cache quantization
     """
     target_types = ["linear", "embedding"]
     if with_activation_kv:
@@ -487,6 +487,52 @@ w4a8kv8_omni = OrderedDict(
                         "state_quant_uniform_symmetric_absmax_per_block_int8",
                     ),
                     ("kv_block_size", 32),
+                    ("kv_mixed_precision_prop", -1.0),
+                ]
+            ),
+        ),
+        ("training", "all"),
+    ]
+)
+
+w4a8kv8_mobilellm = OrderedDict(
+    [
+        ("method", "QAT"),
+        (
+            "select",
+            OrderedDict(
+                [
+                    ("target_types", ["linear", "embedding", "qwen3attention", "qwen2_5omniattention", "llamaattention"]),
+                    ("target_names", []),
+                    ("exclude_types", []),
+                    ("exclude_names", []),
+                ]
+            ),
+        ),
+        (
+            "function",
+            OrderedDict(
+                [
+                    ("epsilon", 1e-05),
+                    (
+                        "weight_function",
+                        "weight_quant_uniform_symmetric_absmax_per_block_int4",
+                    ),
+                    ("w_scale_factor", 2.0),
+                    ("w_block_size", 256),
+                    ("w_mixed_precision_prop", -1.0),
+                    ("is_w_quantized", True),
+                    (
+                        "activation_function",
+                        "state_quant_uniform_symmetric_absmax_per_block_int8",
+                    ),
+                    ("a_block_size", 256),
+                    ("a_mixed_precision_prop", -1.0),
+                    (
+                        "kv_cache_function",
+                        "state_quant_uniform_symmetric_absmax_per_block_int8",
+                    ),
+                    ("kv_block_size", 64),
                     ("kv_mixed_precision_prop", -1.0),
                 ]
             ),
@@ -856,6 +902,15 @@ w1_58a8kv8_embint4_bs256 = create_w1_58_config_embint4(
     a_block_size=256,
     kv_block_size=256,
 )
+w1_58a8kv8_embint4_mobilellm = create_w1_58_config_embint4(
+    w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse",
+    mp_prop=0.00,
+    with_activation_kv=True,
+    w_block_size=256,
+    a_block_size=256,
+    kv_block_size=64,
+)
+
 w1_88a16kv16_embint4 = create_w1_58_config_embint4(
     w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse",
     mp_prop=0.125,
@@ -882,6 +937,15 @@ w1_88a8kv8_embint4_bs64 = create_w1_58_config_embint4(
     a_block_size=64,
     kv_block_size=64,
 )
+w1_88a8kv8_embint4_mobilellm = create_w1_58_config_embint4(
+    w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse",
+    mp_prop=0.125,
+    with_activation_kv=True,
+    w_block_size=64,
+    a_block_size=64,
+    kv_block_size=64,
+)
+
 w2_79a16kv16_embint4 = create_w1_58_config_embint4(
     w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse",
     mp_prop=0.50,
@@ -901,6 +965,14 @@ w2_79a8kv8_embint4_bs32 = create_w1_58_config_embint4(
     kv_block_size=32,
 )
 w2_79a8kv8_embint4_bs64 = create_w1_58_config_embint4(
+    w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse",
+    mp_prop=0.50,
+    with_activation_kv=True,
+    w_block_size=64,
+    a_block_size=64,
+    kv_block_size=64,
+)
+w2_79a8kv8_embint4_mobilellm = create_w1_58_config_embint4(
     w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse",
     mp_prop=0.50,
     with_activation_kv=True,
@@ -983,4 +1055,9 @@ quant_config_map = {
     "w2_79a8kv8_embint4": w2_79a8kv8_embint4,
     "w2_79a8kv8_embint4_bs32": w2_79a8kv8_embint4_bs32,
     "w2_79a8kv8_embint4_bs64": w2_79a8kv8_embint4_bs64,
+    # MobileLLM-specific configs with embedding int4
+    "w4a8kv8_mobilellm": w4a8kv8_mobilellm,
+    "w2_79a8kv8_embint4_mobilellm": w2_79a8kv8_embint4_mobilellm,
+    "w1_88a8kv8_embint4_mobilellm": w1_88a8kv8_embint4_mobilellm,
+    "w1_58a8kv8_embint4_mobilellm": w1_58a8kv8_embint4_mobilellm,
 }
