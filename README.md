@@ -1,22 +1,26 @@
 ![EdgeRazor Title](./asset/Title.png)
 
-EdgeRazor is a unified lightweight framework for edge AI, designed to make models lighter, faster, and deployable across diverse scenarios. It seamlessly integrates mainstream lightweight techniques into your existing full-precision training pipeline with minimal code modification. Whether you're targeting mobile devices, embedded systems, resource-constrained edge deployments, or compute-intensive cloud services, EdgeRazor empowers you to compress state-of-the-art models without sacrificing unacceptable performance.
+EdgeRazor is a unified lightweight framework for edge AI, designed to make models lighter, faster, and deployable across diverse scenarios. It seamlessly integrates mainstream lightweight techniques into your existing full-precision training pipeline with minimal code modification. Whether you're targeting mobile devices, embedded systems, resource-constrained edge deployments, or compute-intensive cloud services, EdgeRazor empowers you to compress models with promising performance.
 
-**Table of Contents**
+## News
+
+- [2026/02] 🔥 EdgeRazor V1 is released! Check our paper [here](...).
+- [2025/10] 📝 TernaryCLIP is released! Check our paper [here](https://arxiv.org/abs/2510.21879).
+
+## Contents
 
 - [News](#news)
+- [Contents](#contents)
 - [Getting Started](#getting-started)
   - [Installation](#installation)
   - [Usage](#usage)
 - [Features](#features)
-- [Example](#example)
-- [Reference](#reference)
-- [Contributors](#contributors)
-
-## News
-
-- [2026/01] 🔥 EdgeRazor V1 is released!
-- [2025/10] 📝 TernaryCLIP is released! Check our paper [here](https://arxiv.org/abs/2510.21879).
+- [Applications](#applications)
+- [Model Zoo](#model-zoo)
+  - [LLM](#llm)
+  - [MLLM](#mllm)
+- [Citation](#citation)
+- [Contributor List](#contributor-list)
 
 ## Getting Started
 
@@ -53,14 +57,55 @@ loss, loss_dict = edgerazor.compute_loss(student_outputs, teacher_outputs, label
 - Quantization-Aware Distillation, QAD 💎
 - Pruning ✂️ (Work in Progress)
 
-## Example
+## Applications
 
 - Lightweight ViT-S/16 on MNIST, check [here](./example/vit/README.md).
 - Lightweight ResNet-18 on MNIST, check [here](./example/resnet/README.md).
+- Lightweight Qwen3-0.6B/1.7B, doing.
+- Lightweight MobileLLM-ParetoQ-1.5B-BF16, doing.
+- Lightweight Qwen2.5-Omni-7B, doing.
 
-## Reference
+## Model Zoo
 
-❤️ If you find our code/paper useful or relevant to your research and work, please kindly cite our paper:
+### LLM
+
+- Avg. Performance: average of performance scores in multiple tasks with [lm-eval v0.4.9.1](https://github.com/EleutherAI/lm-evaluation-harness/tree/v0.4.9.1).
+  - Instruct model tasks: arc_easy, arc_challenge, hellaswag, boolq, social_iqa, openbookqa, piqa, winogrande, truthfulqa_mc2, hendrycks_ethics, mmlu, gsm8k, humaneval_instruct, ifeval.
+  - Base model tasks: arc_easy, arc_challenge, hellaswag, boolq, social_iqa, openbookqa, piqa, winogrande, truthfulqa_mc2, hendrycks_ethics, mmlu, gsm8k, humaneval.
+  - Except for 5-shot gsm8k, all other tasks are zero-shot.
+
+- Hub Link: EdgeRazor indicates the original quantized checkpoints. We also transfer the checkpoints into GGUF ([llama.cpp](https://github.com/ggml-org/llama.cpp)) and GPTQ ([GPTQModel](https://github.com/ModelCloud/GPTQModel)) formats if compatible.
+
+| Model          | Quantization | Group Size | Avg. Performance | Hub Link                                                            |
+| -------------- | ------------ | ---------- | ---------------- | ------------------------------------------------------------------- |
+| Qwen3-0.6B     | W16-A16-KV16 | -          | 47.35            | [Base](https://huggingface.co/Qwen/Qwen3-0.6B)                      |
+| Qwen3-0.6B     | W4-A8-KV8    | 256        | 47.80            | EdgeRazor\|GGUF\|GPTQ                                               |
+| Qwen3-0.6B     | W2.79-A8-KV8 | 256        | 44.10            | EdgeRazor                                                           |
+| Qwen3-0.6B     | W1.88-A8-KV8 | 256        | 41.76            | EdgeRazor                                                           |
+| Qwen3-0.6B     | W1.58-A8-KV8 | 256        | 39.81            | EdgeRazor\|GGUF\|GPTQ                                               |
+| Qwen3-1.7B     | W16-A16-KV16 | -          | 58.65            | [Base](https://huggingface.co/Qwen/Qwen3-1.7B)                      |
+| Qwen3-1.7B     | W4-A8-KV8    | 256        | 58.57            | EdgeRazor\|GGUF\|GPTQ                                               |
+| Qwen3-1.7B     | W2.79-A8-KV8 | 256        | 53.00            | EdgeRazor                                                           |
+| Qwen3-1.7B     | W1.88-A8-KV8 | 256        | 47.14            | EdgeRazor                                                           |
+| Qwen3-1.7B     | W1.58-A8-KV8 | 256        | 43.91            | EdgeRazor\|GGUF\|GPTQ                                               |
+| MobileLLM-350M | W16-A16-KV16 | -          | 41.18            | [Base](https://huggingface.co/facebook/MobileLLM-ParetoQ-350M-BF16) |
+| MobileLLM-350M | W4-A8-KV8    | 256        | 41.86            | EdgeRazor\|GGUF\|GPTQ                                               |
+| MobileLLM-350M | W2.79-A8-KV8 | 64         | 40.62            | EdgeRazor                                                           |
+| MobileLLM-350M | W1.88-A8-KV8 | 64         | 39.02            | EdgeRazor                                                           |
+| MobileLLM-350M | W1.58-A8-KV8 | 64         | 38.12            | EdgeRazor\|GGUF\|GPTQ                                               |
+
+### MLLM
+
+- Video-MME and MLVU are video understanding tasks with [lmms-eval v0.5](https://github.com/EvolvingLMMs-Lab/lmms-eval/tree/v0.5).
+
+| Model           | Quantization | Group Size | Video-MME | MLVU  | Hub Link              |
+| --------------- | ------------ | ---------- | --------- | ----- | --------------------- |
+| Qwen2.5-Omni-7B | W16-A16-KV16 | -          | 62.81     | 48.01 | Base                  |
+| Qwen2.5-Omni-7B | W4-A16-KV16  | 32         | 62.22     | 48.82 | EdgeRazor\|GGUF\|GPTQ |
+
+## Citation
+
+If you find our papar and code useful in your research, please consider giving a star ⭐️ and kindly cite our paper ✏️:
 
 ```
 @article{zhangsh-ternaryclip,
@@ -71,6 +116,6 @@ loss, loss_dict = edgerazor.compute_loss(student_outputs, teacher_outputs, label
 }
 ```
 
-## Contributors
+## Contributor List
 
 - Shu-Hao Zhang: Core developer and maintainer of EdgeRazor-V1.

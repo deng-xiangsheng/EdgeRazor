@@ -456,7 +456,7 @@ w4a8kv8_omni = OrderedDict(
                     ("target_types", ["linear", "embedding", "qwen2_5omniattention"]),
                     ("target_names", []),
                     ("exclude_types", []),
-                    ("exclude_names", ["thinker.audio_tower.*", "thinker.visual.blocks.*.mlp.down_proj.*", "talker.*", "token2wav.*"]),
+                    ("exclude_names", ["thinker.audio_tower.*", "talker.*", "token2wav.*"]),
                 ]
             ),
         ),
@@ -901,9 +901,9 @@ w1_58a8kv8_embint4_mobilellm = create_w1_58_config_embint4(
     w_func="weight_quant_uniform_symmetric_clip_per_block_mp_int1_58_int4_static_row_wise_sparse",
     mp_prop=0.00,
     with_activation_kv=True,
-    w_block_size=256,
-    a_block_size=256,
-    kv_block_size=256,
+    w_block_size=64,
+    a_block_size=64,
+    kv_block_size=64,
 )
 
 w1_88a16kv16_embint4 = create_w1_58_config_embint4(
