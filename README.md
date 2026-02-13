@@ -1,6 +1,28 @@
 <div align="center">
   <img src="./asset/EdgeRazor-Logo-Light.png" alt="EdgeRazor Logo" width="60%">
   <br/>
+  <br/>
+  
+  <p>
+    <a href="https://github.com/zhangsq-nju/EdgeRazor">
+      <img src="https://img.shields.io/badge/Documentation-MkDocs-blue?style=flat&logo=readthedocs&logoColor=white" alt="Documentation">
+    </a>
+    <a href="https://github.com/zhangsq-nju/EdgeRazor/stargazers">
+      <img src="https://img.shields.io/github/stars/zhangsq-nju/EdgeRazor?style=flat&logo=github&color=yellow&label=Stars" alt="GitHub Stars">
+    </a>
+    <a href="https://github.com/zhangsq-nju/EdgeRazor/blob/main/LICENSE">
+      <img src="https://img.shields.io/github/license/zhangsq-nju/EdgeRazor?style=flat&color=green&label=License" alt="License">
+    </a>
+    <a href="https://www.python.org/">
+      <img src="https://img.shields.io/badge/Python-3.10+-blue?style=flat&logo=python&logoColor=white" alt="Python">
+    </a>
+    <a href="https://pytorch.org/">
+      <img src="https://img.shields.io/badge/PyTorch-2.9.1+-orange?style=flat&logo=pytorch&logoColor=white" alt="PyTorch">
+    </a>
+    <a href="https://huggingface.co/">
+      <img src="https://img.shields.io/badge/🤗_Transformers-4.57.1+-yellow?style=flat" alt="Transformers">
+    </a>
+  </p>
 </div>
 
 **EdgeRazor** is a unified, lightweight framework for edge AI that seamlessly integrates model compression techniques into existing full-precision training pipelines with minimal code modification. It is designed to produce models that are smaller, faster, and readily deployable across diverse hardware targets, ranging from mobile devices and embedded systems to resource-constrained edge endpoints and latency-sensitive cloud clusters, while preserving promising task performance.
