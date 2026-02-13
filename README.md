@@ -62,9 +62,9 @@ loss, loss_dict = edgerazor.compute_loss(student_outputs, teacher_outputs, label
 
 ## Main Techniques
 
-- Quantization-aware distillation, QAD
+- Quantization-aware distillation, QAD (proposed in our first work [TernaryCLIP](https://arxiv.org/abs/2510.21879))
   - Configurable quantization-aware training for weights, activations, and KV cache
-  - Customizable knowledge distillation pipelines between 16-bit and N-bit LLMs
+  - Customizable knowledge distillation pipelines between 16-bit and N-bit models
 - Pruning (Work in Progress)
 
 ## Applications
@@ -108,10 +108,10 @@ loss, loss_dict = edgerazor.compute_loss(student_outputs, teacher_outputs, label
 
 - Video-MME and MLVU are video understanding tasks with [lmms-eval v0.5](https://github.com/EvolvingLMMs-Lab/lmms-eval/tree/v0.5).
 
-| Model           | Quantization | Group Size | Video-MME | MLVU  | Hub Link              |
-| --------------- | ------------ | ---------- | --------- | ----- | --------------------- |
-| Qwen2.5-Omni-7B | W16-A16-KV16 | -          | 62.81     | 48.01 | Base                  |
-| Qwen2.5-Omni-7B | W4-A16-KV16  | 32         | 62.22     | 48.82 | EdgeRazor\|GGUF\|GPTQ |
+| Model           | Quantization | Group Size | Video-MME | MLVU  | Hub Link                                            |
+| --------------- | ------------ | ---------- | --------- | ----- | --------------------------------------------------- |
+| Qwen2.5-Omni-7B | W16-A16-KV16 | -          | 62.81     | 48.01 | [Base](https://huggingface.co/Qwen/Qwen2.5-Omni-7B) |
+| Qwen2.5-Omni-7B | W4-A16-KV16  | 32         | 62.22     | 48.82 | EdgeRazor\|GGUF\|GPTQ                               |
 
 ## Citation
 
