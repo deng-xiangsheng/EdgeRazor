@@ -4,9 +4,6 @@
   <br/>
   
   <p>
-    <a href="https://github.com/zhangsq-nju/EdgeRazor">
-      <img src="https://img.shields.io/badge/Documentation-MkDocs-blue?style=flat&logo=readthedocs&logoColor=white" alt="Documentation">
-    </a>
     <a href="https://github.com/zhangsq-nju/EdgeRazor/stargazers">
       <img src="https://img.shields.io/github/stars/zhangsq-nju/EdgeRazor?style=flat&logo=github&color=yellow&label=Stars" alt="GitHub Stars">
     </a>
