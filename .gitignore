@@ -8,9 +8,10 @@ runs*
 runs-*
 checkpoints
 docs
+drawio
 
 Schedule.md
-README_draft.md
+README_draft*.md
 *.log
 project_code.py
 project_code_all.py
