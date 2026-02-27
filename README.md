@@ -1,9 +1,9 @@
 <div align="center">
   <br/>
   <img src="./asset/Logo-full.png" alt="EdgeRazor Logo" width="60%">
-  <!-- edgerazor-logo-to-be-designed -->
-  <br/>
-  <br/>
+  <h3>
+    Lightweight Framework for Edge AI
+  </h3>
   
   <p>
     <a href="https://github.com/zhangsq-nju/EdgeRazor/stargazers">
@@ -26,7 +26,7 @@
 
 ---
 
-**EdgeRazor** is a unified and lightweight computational framework for edge AI, designed to produce models that are smaller, faster, and readily deployable across diverse hardware targets, ranging from mobile devices and embedded systems to resource-constrained edge endpoints and latency-sensitive cloud clusters. The EdgeRazor framework **seamlessly integrates** model compression techniques into existing full-precision training pipelines with **minimal code modification**, preserving promising task performance and enabling low-cost and high-efficiency computations.
+**EdgeRazor** is a unified and lightweight computational framework for edge AI, designed to produce models that are smaller, faster, and deployable across diverse hardware targets, ranging from mobile devices and embedded systems to resource-constrained edge endpoints and latency-sensitive cloud clusters. The EdgeRazor framework **seamlessly integrates** model compression techniques into existing full-precision training pipelines with **minimal code modification**, preserving promising task performance and enabling low-cost and high-efficiency computations.
 
 EdgeRazor currently focuses on low-bit LLM compression via configurable quantization-aware distillation. In terms of **quantization**, EdgeRazor supports quantizing the connection weights (including embedding and lm_head layers), activations, and the KV cache. Quantized bit-widths include the uniform 1.58-bit and 4-bit, as well as block-wise and mixed-precision configurations, such as 2.79-bit (50% 4-bit + 50% 1.58-bit) and 1.88-bit (12.5% 4-bit + 87.5% 1.58-bit). In terms of **distillation**, EdgeRazor offers the logits, features, and attention distillation, all of which can be flexibly combined within a unified configuration interface.
 
