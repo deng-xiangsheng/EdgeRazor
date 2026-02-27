@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="./asset/EdgeRazor-Logo-Light.png" alt="EdgeRazor Logo" width="60%">
+  <img src="./asset/Logo-full.png" alt="EdgeRazor Logo" width="60%">
   <!-- edgerazor-logo-to-be-designed -->
   <br/>
   <br/>
@@ -151,4 +151,4 @@ If you find our papar and code useful in your research, please consider giving a
 
 ## Contributor List
 
-This project was supported by the [LAMDA group](https://www.lamda.nju.edu.cn) and Assistant Professor [Shao-Qun Zhang](https://www.lamda.nju.edu.cn/zhangsq). Xiang-Sheng Deng and Le-Tong Huang jointly participated in the development of this project. [Shu-Hao Zhang](https://github.com/zhsh9) is the core developer and maintainer of EdgeRazor-V1.
+This project was supported by the [LAMDA group](https://www.lamda.nju.edu.cn) and Assistant Professor [Shao-Qun Zhang](https://www.lamda.nju.edu.cn/zhangsq). [Shu-Hao Zhang](https://github.com/zhsh9) is the core developer and maintainer of EdgeRazor-V1. Xiang-Sheng Deng and Le-Tong Huang jointly participated in the development of this project.
