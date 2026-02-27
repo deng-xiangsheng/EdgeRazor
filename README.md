@@ -2,7 +2,6 @@
   <img src="./asset/Logo-full.png" alt="EdgeRazor Logo" width="60%">
   <!-- edgerazor-logo-to-be-designed -->
   <br/>
-  <br/>
   
   <p>
     <a href="https://github.com/zhangsq-nju/EdgeRazor/stargazers">
