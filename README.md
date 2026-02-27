@@ -1,6 +1,8 @@
 <div align="center">
+  <br/>
   <img src="./asset/Logo-full.png" alt="EdgeRazor Logo" width="60%">
   <!-- edgerazor-logo-to-be-designed -->
+  <br/>
   <br/>
   
   <p>
@@ -21,6 +23,8 @@
     </a>
   </p>
 </div>
+
+---
 
 **EdgeRazor** is a unified and lightweight computational framework for edge AI, designed to produce models that are smaller, faster, and readily deployable across diverse hardware targets, ranging from mobile devices and embedded systems to resource-constrained edge endpoints and latency-sensitive cloud clusters. The EdgeRazor framework **seamlessly integrates** model compression techniques into existing full-precision training pipelines with **minimal code modification**, preserving promising task performance and enabling low-cost and high-efficiency computations.
 
