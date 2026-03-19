@@ -1,0 +1,19 @@
+# Quantized LLM Evaluation Task Configuration for EdgeRazor
+# Model: Qwen3-0.6B / 1.7B / ...
+
+group: EdgeRazor_Eval_QLLM
+task:
+  - arc_easy
+  - arc_challenge
+  - hellaswag
+  - boolq
+  - social_iqa
+  - openbookqa
+  - piqa
+  - winogrande
+  - truthfulqa_mc2
+  - hendrycks_ethics
+  - mmlu
+  - gsm8k
+  - humaneval_instruct
+  - ifeval_qwen3_instruct # for Qwen3-Fusion Model (Instruct Mode Only)

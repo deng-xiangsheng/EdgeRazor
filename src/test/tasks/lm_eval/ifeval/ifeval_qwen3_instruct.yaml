@@ -1,0 +1,4 @@
+include: ifeval.yaml
+task: ifeval_qwen3_instruct
+gen_prefix: "<think>\n\n</think>\n\n" # For qwen3 instruct-only mode
+# doc_to_text: "{{prompt}} /no_think" # For qwen3 instruct-only mode

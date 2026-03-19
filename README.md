@@ -90,7 +90,7 @@ loss, loss_dict = edgerazor.compute_loss(student_outputs, teacher_outputs, label
 
 - Quantization-aware distillation (QAD), proposed in [TernaryCLIP](https://arxiv.org/abs/2510.21879), the first installment of our series of works
   - Configurable quantization-aware training for weights, activations, and KV cache
-  - Customizable knowledge distillation pipelines between 16-bit and N-bit models
+  - Customizable knowledge distillation pipelines between 16-bit and *n*-bit models
 - Pruning (Work in Progress)
 
 ## Applications
