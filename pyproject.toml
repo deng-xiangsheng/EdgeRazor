@@ -1,16 +1,21 @@
 # ============================================================================
 # Project Metadata
 # ============================================================================
+[project.urls]
+Homepage = "https://github.com/zhangsq-nju/EdgeRazor"
+
 [project]
 name = "edgerazor"
 version = "1.2.5"
 description = "Lightweight is All You Need: EdgeRazor for Edge AI Agent"
 readme = "README.md"
-requires-python = "==3.10.19"
+requires-python = "==3.10.20"
 license = { text = "MIT" }
 authors = [
-    { name = "Shu-Hao Zhang", email = "zhangsh@lamda.nju.edu.cn" }
+    { name = "Shu-Hao Zhang" },
+    { email = "zhangsh@lamda.nju.edu.cn" }
 ]
+
 keywords = [
     "Lightweight AI", "Edge AI", "Model Compression",
     "Quantization-Aware Distillation", "Quantization", "Distillation"
