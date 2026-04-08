@@ -29,11 +29,11 @@
 
 ---
 
-**EdgeRazor** is a unified and lightweight computational framework for edge AI, designed to produce models that are smaller, faster, and deployable across diverse hardware targets, ranging from mobile devices and embedded systems to resource-constrained edge endpoints and latency-sensitive cloud clusters. The EdgeRazor framework **seamlessly integrates** model compression techniques into existing full-precision training pipelines with **minimal code modification**, preserving promising task performance and enabling low-cost and high-efficiency computations.
+**EdgeRazor** is a unified and lightweight framework for edge AI, designed to produce models that are smaller, faster, and deployable across diverse hardware, ranging from mobile and edge endpoints to latency-sensitive clouds. The EdgeRazor framework **seamlessly integrates** model compression techniques into existing full-precision training pipelines with **minimal code modification**, preserving promising task performance and enabling low-cost and high-efficiency computations.
 
 EdgeRazor currently focuses on low-bit LLM compression via configurable quantization-aware distillation. In terms of **quantization**, EdgeRazor supports quantizing the connection weights (including embedding and lm_head layers), activations, and the KV cache. Quantized bit-widths include the uniform 1.58-bit and 4-bit, as well as block-wise and mixed-precision configurations, such as 2.79-bit (50% 4-bit + 50% 1.58-bit) and 1.88-bit (12.5% 4-bit + 87.5% 1.58-bit). In terms of **distillation**, EdgeRazor offers the logits, features, and attention distillation, all of which can be flexibly combined within a unified configuration interface.
 
-EdgeRazor achieves the state-of-the-art performance across a range of models, including base LLMs, instruction-tuned LLMs, and multimodal LLMs. Taking Qwen3-0.6B as an example, **Qwen3-0.6B-EdgeRazor** attains benchmark scores of **47.80 / 44.10 / 41.76 / 39.81** at 4-bit / 2.79-bit / 1.88-bit / 1.58-bit performance, corresponding to compression ratios of **3.94× / 5.05× / 6.40× / 7.03×**, respectively. In comparison, the best prior methods achieve only 45.74 / 37.38 / 30.49 at 4-bit / 3-bit / 2-bit with compression ratios of 2.21× / 2.47× / 2.78×, demonstrating that EdgeRazor delivers consistently superior performance under significantly higher compression ratios.
+EdgeRazor achieves the state-of-the-art performance across a range of models, including base LLMs, instruction-tuned LLMs, and multimodal LLMs. For instance, **Qwen3-0.6B-EdgeRazor** attains benchmark scores of **47.80 / 44.10 / 41.76 / 39.81** at 4-bit / 2.79-bit / 1.88-bit / 1.58-bit performance, corresponding to compression ratios of **3.94× / 5.05× / 6.40× / 7.03×**, respectively. In comparison, the best prior methods achieve only 45.74 / 37.38 / 30.49 at 4-bit / 3-bit / 2-bit with compression ratios of 2.21× / 2.47× / 2.78×, demonstrating that EdgeRazor delivers consistently superior performance under significantly higher compression ratios.
 
 <p align="center">
   <img src="./asset/Architeacture.png" alt="EdgeRazor Architecture">
@@ -45,8 +45,8 @@ EdgeRazor achieves the state-of-the-art performance across a range of models, in
 
 - 🔥 **[2026-04]**: 🏆 Low-bit LLMs by EdgeRazor is released! Check our Hugging Face collection: [...](...).
 - 🔥 **[2026-04]**: 🛠️ Open-sourced EdgeRazor-V1 is released! Now configurable on diverse models for seamless integration and customization!
-- 🔥 [2026-04] 📄 Paper-EdgeRazor is available on arXiv: [...](...)
-- [2025-10] 📄 Paper-TernaryCLIP is available on arXiv: [https://arxiv.org/abs/2510.21879](https://arxiv.org/abs/2510.21879).
+- 🔥 **[2026-04]**: 📄 Paper-EdgeRazor is available on arXiv: [...](...)
+- 🔥 **[2025-10]**: 📄 Paper-TernaryCLIP is available on arXiv: [https://arxiv.org/abs/2510.21879](https://arxiv.org/abs/2510.21879).
 
 ## Contents
 
@@ -110,7 +110,7 @@ loss, loss_dict = edgerazor.compute_loss(student_outputs, teacher_outputs, label
 
 ### LLMs
 
-- Avg. Performance: average of performance scores in multiple tasks using [lm-eval v0.4.9.1](https://github.com/EleutherAI/lm-evaluation-harness/tree/v0.4.9.1) with [tasks](./src/test/tasks/lm_eval/).
+- Avg. Performance: average of performance scores in multiple tasks using [lm-eval v0.4.9.1](https://github.com/EleutherAI/lm-evaluation-harness/tree/v0.4.9.1) with [tasks](./src/eval/tasks/lm_eval/).
   - Instruct model tasks: arc_easy, arc_challenge, hellaswag, boolq, social_iqa, openbookqa, piqa, winogrande, truthfulqa_mc2, hendrycks_ethics, mmlu, gsm8k, humaneval_instruct, ifeval.
   - Base model tasks: arc_easy, arc_challenge, hellaswag, boolq, social_iqa, openbookqa, piqa, winogrande, truthfulqa_mc2, hendrycks_ethics, mmlu, gsm8k, humaneval.
   - Except for 5-shot gsm8k, all other tasks are zero-shot.
@@ -137,7 +137,7 @@ loss, loss_dict = edgerazor.compute_loss(student_outputs, teacher_outputs, label
 
 ### MLLMs
 
-- Video-MME and MLVU are video understanding tasks using [lmms-eval v0.5](https://github.com/EvolvingLMMs-Lab/lmms-eval/tree/v0.5) with [tasks](./src/test/tasks/lmms-eval/).
+- Video-MME and MLVU are video understanding tasks using [lmms-eval v0.5](https://github.com/EvolvingLMMs-Lab/lmms-eval/tree/v0.5) with [tasks](./src/eval/tasks/lmms-eval/).
 
 | Model           | Quantization | Group Size | Video-MME | MLVU  | Hub Link                                            |
 | --------------- | ------------ | ---------- | --------- | ----- | --------------------------------------------------- |
