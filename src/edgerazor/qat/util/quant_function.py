@@ -29,6 +29,8 @@ from .quant_function_config import (
     mixed_precision_prop,
     w2a8_block_size,
     w4a8_block_size,
+    w5a8_block_size,
+    w8a8_block_size,
 )
 
 # =============================================================
@@ -762,6 +764,94 @@ def weight_quant_uniform_symmetric_absmax_per_block_int4(
         w_scale = w.abs().max(dim=-1, keepdim=True).values.clamp_(min=epsilon) / max_val
         
         # Quantize to INT4: [-7, 7]
+        w_quant = w.div(w_scale).round_().clamp_(-max_val, max_val)
+
+        w_quant = w_quant * w_scale
+        w_quant = w_quant.view(original_shape)
+
+    return w_quant
+
+
+def weight_quant_uniform_symmetric_absmax_per_block_int5(
+    w: Tensor,
+    epsilon: float = 1e-5,
+    block_size: int = w5a8_block_size,
+) -> Tensor:
+    """
+    Quantize weight to INT5 per-block using absmax method.
+
+    Quantizes weight to INT5: [-15, 15] * w_scale.
+    Scale factor is computed per block within each output channel.
+
+    Args:
+        w: Weight tensor to quantize, shape (out_dim, in_dim)
+        epsilon: Small value to prevent division by zero
+        block_size: Size of each quantization block
+
+    Returns:
+        Quantized weight tensor with values in [-15, 15] * w_scale
+    """
+    bits = 5
+    max_val = 2**(bits - 1) - 1  # 15 for INT5
+
+    with torch.no_grad():
+        # Reshape to [..., -1, block_size]
+        original_shape = w.shape
+        if original_shape[-1] % block_size == 0:
+            intermediate_shape = list(original_shape[:-1]) + [-1, block_size]
+        else:
+            intermediate_shape = [-1, block_size]
+        w = w.view(intermediate_shape)
+
+        # Compute scale factor for each block
+        # Shape: (out_dim, block_num, 1)
+        w_scale = w.abs().max(dim=-1, keepdim=True).values.clamp_(min=epsilon) / max_val
+
+        # Quantize to INT5: [-15, 15]
+        w_quant = w.div(w_scale).round_().clamp_(-max_val, max_val)
+
+        w_quant = w_quant * w_scale
+        w_quant = w_quant.view(original_shape)
+
+    return w_quant
+
+
+def weight_quant_uniform_symmetric_absmax_per_block_int8(
+    w: Tensor,
+    epsilon: float = 1e-5,
+    block_size: int = w8a8_block_size,
+) -> Tensor:
+    """
+    Quantize weight to INT8 per-block using absmax method.
+
+    Quantizes weight to INT8: [-127, 127] * w_scale.
+    Scale factor is computed per block within each output channel.
+
+    Args:
+        w: Weight tensor to quantize, shape (out_dim, in_dim)
+        epsilon: Small value to prevent division by zero
+        block_size: Size of each quantization block
+
+    Returns:
+        Quantized weight tensor with values in [-127, 127] * w_scale
+    """
+    bits = 8
+    max_val = 2**(bits - 1) - 1  # 127 for INT8
+
+    with torch.no_grad():
+        # Reshape to [..., -1, block_size]
+        original_shape = w.shape
+        if original_shape[-1] % block_size == 0:
+            intermediate_shape = list(original_shape[:-1]) + [-1, block_size]
+        else:
+            intermediate_shape = [-1, block_size]
+        w = w.view(intermediate_shape)
+
+        # Compute scale factor for each block
+        # Shape: (out_dim, block_num, 1)
+        w_scale = w.abs().max(dim=-1, keepdim=True).values.clamp_(min=epsilon) / max_val
+
+        # Quantize to INT8: [-127, 127]
         w_quant = w.div(w_scale).round_().clamp_(-max_val, max_val)
 
         w_quant = w_quant * w_scale
