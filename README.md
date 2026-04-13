@@ -6,9 +6,9 @@
   </h3>
 
   <p>
-    <a href="https://arxiv.org/abs/2604.xxxxx" target="blank">
+    <!-- <a href="https://arxiv.org/abs/2604.xxxxx" target="blank">
       <img src="https://img.shields.io/badge/arXiv-EdgeRazor-b31b1b?style=flat&logo=arxiv" alt="arXiv EdgeRazor">
-    </a>
+    </a> -->
     <a href="./README_ZH.md">
       <img src="https://img.shields.io/badge/README-ZH-blue?style=flat&logo=readme" alt="README ZH">
     </a>
