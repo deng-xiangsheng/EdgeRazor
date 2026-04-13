@@ -97,9 +97,12 @@ Quantization-Aware Distillation (QAD):
 
 - Lightweight ViT-S/16, check [here](./example/vit/README.md).
 - Lightweight ResNet-18, check [here](./example/resnet/README.md).
-- Lightweight Qwen3-0.6B/1.7B, check [here](./example/qwen3/README.md).
+- Lightweight Qwen3-0.6B/1.7B, coming soon.
+- Lightweight MobileLLM-ParetoQ-350M-BF16, coming soon.
+- Lightweight Qwen2.5-Omni-7B, coming soon.
+<!-- - Lightweight Qwen3-0.6B/1.7B, check [here](./example/qwen3/README.md).
 - Lightweight MobileLLM-ParetoQ-350M-BF16, check [here](./example/mobilellm/README.md).
-- Lightweight Qwen2.5-Omni-7B, check [here](./example/qwen2_5-omni/README.md).
+- Lightweight Qwen2.5-Omni-7B, check [here](./example/qwen2_5-omni/README.md). -->
 
 ## Model Zoo
 

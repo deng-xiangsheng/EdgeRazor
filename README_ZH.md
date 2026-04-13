@@ -99,9 +99,12 @@ loss, loss_dict = edgerazor.compute_loss(student_outputs, teacher_outputs, label
 
 - 轻量化 ViT-S/16，[点击这里查看]((./example/vit/README.md))。
 - 轻量化 ResNet-18，[点击这里查看](./example/resnet/README.md)。
-- 轻量化 Qwen3-0.6B/1.7B，[点击这里查看](./example/qwen3/README.md)。
+- 轻量化 Qwen3-0.6B/1.7B，敬请期待。
+- 轻量化 MobileLLM-ParetoQ-350M-BF16，敬请期待。
+- 轻量化 Qwen2.5-Omni-7B，敬请期待。
+<!-- - 轻量化 Qwen3-0.6B/1.7B，[点击这里查看](./example/qwen3/README.md)。
 - 轻量化 MobileLLM-ParetoQ-350M-BF16，[点击这里查看](./example/mobilellm/README.md)。
-- 轻量化 Qwen2.5-Omni-7B，[点击这里查看](./example/qwen2_5-omni/README.md)。
+- 轻量化 Qwen2.5-Omni-7B，[点击这里查看](./example/qwen2_5-omni/README.md)。 -->
 
 ## 模型列表
 
