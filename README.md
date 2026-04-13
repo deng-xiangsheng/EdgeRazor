@@ -9,6 +9,9 @@
     <!-- <a href="https://arxiv.org/abs/2604.xxxxx" target="blank">
       <img src="https://img.shields.io/badge/arXiv-EdgeRazor-b31b1b?style=flat&logo=arxiv" alt="arXiv EdgeRazor">
     </a> -->
+    <a href="https://huggingface.co/collections/zhangsq-nju/edgerazor-nbit" target="blank">
+      <img src="https://img.shields.io/badge/HuggingFace-Collection-FFD21F?style=flat&logo=huggingface&logoColor=FFD21F" alt="Hugging Face Collection">
+    </a>
     <a href="./README_ZH.md">
       <img src="https://img.shields.io/badge/README-ZH-blue?style=flat&logo=readme" alt="README ZH">
     </a>
@@ -37,8 +40,8 @@ EdgeRazor achieves the state-of-the-art performance across a range of models, in
 
 - 🔥 **[2026-04]**: 🏆 Low-bit LLMs by EdgeRazor is released! Check our Hugging Face collection: [zhangsq-nju/edgerazor-nbit](https://huggingface.co/collections/zhangsq-nju/edgerazor-nbit).
 - 🔥 **[2026-04]**: 🛠️ Open-sourced EdgeRazor-V1 is released! Now configurable on diverse models for seamless integration and customization!
-<!-- - 🔥 **[2026-04]**: 📄 Paper-EdgeRazor is available on arXiv: [2604.xxxxx](https://arxiv.org/abs/2604.xxxxx)! -->
 - 🔥 **[2025-10]**: 📄 Paper-TernaryCLIP is available on arXiv: [2510.21879](https://arxiv.org/abs/2510.21879)!
+<!-- - 🔥 **[2026-04]**: 📄 Paper-EdgeRazor is available on arXiv: [2604.xxxxx](https://arxiv.org/abs/2604.xxxxx)! -->
 
 ## Contents
 

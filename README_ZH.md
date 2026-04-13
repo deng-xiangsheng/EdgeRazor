@@ -9,6 +9,9 @@
     <!-- <a href="https://arxiv.org/abs/2604.xxxxx" target="blank">
       <img src="https://img.shields.io/badge/arXiv-EdgeRazor-b31b1b?style=flat&logo=arxiv" alt="arXiv EdgeRazor">
     </a> -->
+    <a href="https://huggingface.co/collections/zhangsq-nju/edgerazor-nbit" target="blank">
+      <img src="https://img.shields.io/badge/HuggingFace-Collection-FFD21F?style=flat&logo=huggingface&logoColor=FFD21F" alt="Hugging Face Collection">
+    </a>
     <a href="./README.md">
       <img src="https://img.shields.io/badge/README-EN-blue?style=flat&logo=readme" alt="README ZH">
     </a>
@@ -37,8 +40,8 @@ EdgeRazor 在多类模型上均取得了当前最先进表现，涵盖基础大�
 
 - 🔥 **[2026-04]**: 🏆 由 EdgeRazor 框架训练的低比特大模型已在 Hugging Face 上发布！查看我们的 Hugging Face 模型集：[zhangsq-nju/edgerazor-nbit](https://huggingface.co/collections/zhangsq-nju/edgerazor-nbit)。
 - 🔥 **[2026-04]**: 🛠️ 开源 EdgeRazor-V1 发布！现在可在各种模型的训练流程上无缝集成和定制！
-<!-- - 🔥 **[2026-04]**: 📄 论文-EdgeRazor 已在 arXiv 上发布：[2604.xxxxx](https://arxiv.org/abs/2604.xxxxx)！ -->
 - 🔥 **[2025-10]**: 📄 论文-TernaryCLIP 已在 arXiv 上发布：[https://arxiv.org/abs/2510.21879](https://arxiv.org/abs/2510.21879)！
+<!-- - 🔥 **[2026-04]**: 📄 论文-EdgeRazor 已在 arXiv 上发布：[2604.xxxxx](https://arxiv.org/abs/2604.xxxxx)！ -->
 
 ## Contents
 
