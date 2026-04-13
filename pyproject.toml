@@ -6,7 +6,7 @@ Homepage = "https://github.com/zhangsq-nju/EdgeRazor"
 
 [project]
 name = "edgerazor"
-version = "1.2.5"
+version = "1.2.6"
 description = "Lightweight is All You Need: EdgeRazor for Edge AI Agent"
 readme = "README.md"
 requires-python = "==3.10.20"
