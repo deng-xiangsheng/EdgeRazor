@@ -1,6 +1,6 @@
 <div align="center">
   <br/>
-  <img src="./asset/Logo-full.svg" alt="EdgeRazor Logo" width="60%">
+  <img src="./asset/Logo-full.png" alt="EdgeRazor Logo" width="60%">
   <h3>
     端侧 AI 的轻量化框架
   </h3>
