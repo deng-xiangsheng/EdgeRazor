@@ -16,7 +16,7 @@
       <img src="https://img.shields.io/badge/License-Apache_2.0-green?logo=opensourceinitiative&logoColor=green" alt="License: Apache 2.0">
     </a>
   </p>
-  
+
   <h5>
     ✨ If you like our project, please give us a star ⭐️ for the latest update.
   </h5>
@@ -113,34 +113,34 @@ Quantization-Aware Distillation (QAD):
   - Tasks for base LLMs: arc_easy, arc_challenge, hellaswag, boolq, social_iqa, openbookqa, piqa, winogrande, truthfulqa_mc2, hendrycks_ethics, mmlu, gsm8k, humaneval.
   - Except for 5-shot gsm8k, all other tasks are 0-shot.
 
-- Hub Link: We provide the original quantized checkpoints. We also transfer the checkpoints into GGUF ([llama.cpp](https://github.com/ggml-org/llama.cpp)) and GPTQ ([GPTQModel](https://github.com/ModelCloud/GPTQModel)) formats if compatible (working in progress).
+- Hub Link: We provide the original quantized checkpoints. We also transfer the checkpoints into GGUF ([llama.cpp](https://github.com/ggml-org/llama.cpp)) and GPTQ ([GPTQModel](https://github.com/ModelCloud/GPTQModel), working in progress) formats if compatible.
 
-| Model          | W-A-KV       | Group Size | Avg.  | Hub Link                                                                               |
-| -------------- | ------------ | ---------- | ----- | -------------------------------------------------------------------------------------- |
-| Qwen3-0.6B     | W16-A16-KV16 | -          | 47.35 | [Base](https://huggingface.co/Qwen/Qwen3-0.6B)                                         |
-| Qwen3-0.6B     | W4-A8-KV8    | 256        | 47.80 | [EdgeRazor](https://huggingface.co/zhangsq-nju/Qwen3-0.6B-EdgeRazor-4bit)\|GGUF        |
-| Qwen3-0.6B     | W2.79-A8-KV8 | 256        | 44.10 | [EdgeRazor](https://huggingface.co/zhangsq-nju/Qwen3-0.6B-EdgeRazor-2.79bit)           |
-| Qwen3-0.6B     | W1.88-A8-KV8 | 256        | 41.76 | [EdgeRazor](https://huggingface.co/zhangsq-nju/Qwen3-0.6B-EdgeRazor-1.88bit)           |
-| Qwen3-0.6B     | W1.58-A8-KV8 | 256        | 39.81 | [EdgeRazor](https://huggingface.co/zhangsq-nju/Qwen3-0.6B-EdgeRazor-1.58bit)\|GGUF     |
-| Qwen3-1.7B     | W16-A16-KV16 | -          | 58.65 | [Base](https://huggingface.co/Qwen/Qwen3-1.7B)                                         |
-| Qwen3-1.7B     | W4-A8-KV8    | 256        | 58.57 | [EdgeRazor](https://huggingface.co/zhangsq-nju/Qwen3-1.7B-EdgeRazor-4bit)\|GGUF        |
-| Qwen3-1.7B     | W2.79-A8-KV8 | 256        | 53.00 | [EdgeRazor](https://huggingface.co/zhangsq-nju/Qwen3-1.7B-EdgeRazor-2.79bit)           |
-| Qwen3-1.7B     | W1.88-A8-KV8 | 256        | 47.14 | [EdgeRazor](https://huggingface.co/zhangsq-nju/Qwen3-1.7B-EdgeRazor-1.88bit)           |
-| Qwen3-1.7B     | W1.58-A8-KV8 | 256        | 43.91 | [EdgeRazor](https://huggingface.co/zhangsq-nju/Qwen3-1.7B-EdgeRazor-1.58bit)\|GGUF     |
-| MobileLLM-350M | W16-A16-KV16 | -          | 41.18 | [Base](https://huggingface.co/facebook/MobileLLM-ParetoQ-350M-BF16)                    |
-| MobileLLM-350M | W4-A8-KV8    | 64         | 41.86 | [EdgeRazor](https://huggingface.co/zhangsq-nju/MobileLLM-350M-EdgeRazor-4bit)\|GGUF    |
-| MobileLLM-350M | W2.79-A8-KV8 | 64         | 40.62 | [EdgeRazor](https://huggingface.co/zhangsq-nju/MobileLLM-350M-EdgeRazor-2.79bit)       |
-| MobileLLM-350M | W1.88-A8-KV8 | 64         | 39.02 | [EdgeRazor](https://huggingface.co/zhangsq-nju/MobileLLM-350M-EdgeRazor-1.88bit)       |
-| MobileLLM-350M | W1.58-A8-KV8 | 64         | 38.12 | [EdgeRazor](https://huggingface.co/zhangsq-nju/MobileLLM-350M-EdgeRazor-1.58bit)\|GGUF |
+| Model          | W-A-KV       | Group Size | Avg.  | Hub Link                                                                                                                                                                                                                                                                                                                       |
+| -------------- | ------------ | ---------- | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Qwen3-0.6B     | W16-A16-KV16 | -          | 47.35 | [Base](https://huggingface.co/Qwen/Qwen3-0.6B)                                                                                                                                                                                                                                                                                 |
+| Qwen3-0.6B     | W4-A8-KV8    | 256        | 47.80 | [EdgeRazor](https://huggingface.co/zhangsq-nju/Qwen3-0.6B-EdgeRazor-4bit), [Q4_0.gguf](https://huggingface.co/zhangsq-nju/Qwen3-0.6B-EdgeRazor-GGUF/resolve/main/Qwen3-0.6B-EdgeRazor-Q4_0.gguf)                                                                                                                               |
+| Qwen3-0.6B     | W2.79-A8-KV8 | 256        | 44.10 | [EdgeRazor](https://huggingface.co/zhangsq-nju/Qwen3-0.6B-EdgeRazor-2.79bit)                                                                                                                                                                                                                                                   |
+| Qwen3-0.6B     | W1.88-A8-KV8 | 256        | 41.76 | [EdgeRazor](https://huggingface.co/zhangsq-nju/Qwen3-0.6B-EdgeRazor-1.88bit)                                                                                                                                                                                                                                                   |
+| Qwen3-0.6B     | W1.58-A8-KV8 | 256        | 39.81 | [EdgeRazor](https://huggingface.co/zhangsq-nju/Qwen3-0.6B-EdgeRazor-1.58bit), [TQ1_0.gguf](https://huggingface.co/zhangsq-nju/Qwen3-0.6B-EdgeRazor-GGUF/resolve/main/Qwen3-0.6B-EdgeRazor-TQ1_0.gguf), [TQ2_0.gguf](https://huggingface.co/zhangsq-nju/Qwen3-0.6B-EdgeRazor-GGUF/resolve/main/Qwen3-0.6B-EdgeRazor-TQ2_0.gguf) |
+| Qwen3-1.7B     | W16-A16-KV16 | -          | 58.65 | [Base](https://huggingface.co/Qwen/Qwen3-1.7B)                                                                                                                                                                                                                                                                                 |
+| Qwen3-1.7B     | W4-A8-KV8    | 256        | 58.57 | [EdgeRazor](https://huggingface.co/zhangsq-nju/Qwen3-1.7B-EdgeRazor-4bit), [Q4_0.gguf](https://huggingface.co/zhangsq-nju/Qwen3-1.7B-EdgeRazor-GGUF/resolve/main/Qwen3-1.7B-EdgeRazor-Q4_0.gguf)                                                                                                                               |
+| Qwen3-1.7B     | W2.79-A8-KV8 | 256        | 53.00 | [EdgeRazor](https://huggingface.co/zhangsq-nju/Qwen3-1.7B-EdgeRazor-2.79bit)                                                                                                                                                                                                                                                   |
+| Qwen3-1.7B     | W1.88-A8-KV8 | 256        | 47.14 | [EdgeRazor](https://huggingface.co/zhangsq-nju/Qwen3-1.7B-EdgeRazor-1.88bit)                                                                                                                                                                                                                                                   |
+| Qwen3-1.7B     | W1.58-A8-KV8 | 256        | 43.91 | [EdgeRazor](https://huggingface.co/zhangsq-nju/Qwen3-1.7B-EdgeRazor-1.58bit), [TQ1_0.gguf](https://huggingface.co/zhangsq-nju/Qwen3-1.7B-EdgeRazor-GGUF/resolve/main/Qwen3-1.7B-EdgeRazor-TQ1_0.gguf), [TQ2_0.gguf](https://huggingface.co/zhangsq-nju/Qwen3-1.7B-EdgeRazor-GGUF/resolve/main/Qwen3-1.7B-EdgeRazor-TQ2_0.gguf) |
+| MobileLLM-350M | W16-A16-KV16 | -          | 41.18 | [Base](https://huggingface.co/facebook/MobileLLM-ParetoQ-350M-BF16)                                                                                                                                                                                                                                                            |
+| MobileLLM-350M | W4-A8-KV8    | 64         | 41.86 | [EdgeRazor](https://huggingface.co/zhangsq-nju/MobileLLM-350M-EdgeRazor-4bit)                                                                                                                                                                                                                                                  |
+| MobileLLM-350M | W2.79-A8-KV8 | 64         | 40.62 | [EdgeRazor](https://huggingface.co/zhangsq-nju/MobileLLM-350M-EdgeRazor-2.79bit)                                                                                                                                                                                                                                               |
+| MobileLLM-350M | W1.88-A8-KV8 | 64         | 39.02 | [EdgeRazor](https://huggingface.co/zhangsq-nju/MobileLLM-350M-EdgeRazor-1.88bit)                                                                                                                                                                                                                                               |
+| MobileLLM-350M | W1.58-A8-KV8 | 64         | 38.12 | [EdgeRazor](https://huggingface.co/zhangsq-nju/MobileLLM-350M-EdgeRazor-1.58bit)                                                                                                                                                                                                                                               |
 
 ### MLLMs
 
 - Video-MME and MLVU are video understanding tasks using [lmms-eval v0.5.0](https://github.com/EvolvingLMMs-Lab/lmms-eval/tree/v0.5) with [tasks](./src/eval/tasks/lmms-eval/).
 
-| Model           | W-A-KV       | Group Size | Video-MME | MLVU  | Hub Link                                                                                                                                                            |
-| --------------- | ------------ | ---------- | --------- | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Qwen2.5-Omni-7B | W16-A16-KV16 | -          | 62.81     | 48.01 | [Base](https://huggingface.co/Qwen/Qwen2.5-Omni-7B)                                                                                                                 |
-| Qwen2.5-Omni-7B | W4-A16-KV16  | 32         | 62.22     | 48.82 | [EdgeRazor](https://huggingface.co/zhangsq-nju/Qwen2.5-Omni-7B-EdgeRazor-4bit)\|[GPTQ](https://huggingface.co/zhangsq-nju/Qwen2.5-Omni-7B-EdgeRazor-4bit-GPTQModel) |
+| Model           | W-A-KV       | Group Size | Video-MME | MLVU  | Hub Link                                                                       |
+| --------------- | ------------ | ---------- | --------- | ----- | ------------------------------------------------------------------------------ |
+| Qwen2.5-Omni-7B | W16-A16-KV16 | -          | 62.81     | 48.01 | [Base](https://huggingface.co/Qwen/Qwen2.5-Omni-7B)                            |
+| Qwen2.5-Omni-7B | W4-A16-KV16  | 32         | 62.22     | 48.82 | [EdgeRazor](https://huggingface.co/zhangsq-nju/Qwen2.5-Omni-7B-EdgeRazor-4bit) |
 
 ## Citation
 
