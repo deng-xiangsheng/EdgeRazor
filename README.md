@@ -6,10 +6,10 @@
   </h3>
 
   <p>
-    <!-- <a href="https://arxiv.org/abs/2604.xxxxx" target="blank">
+    <!-- <a href="https://arxiv.org/abs/2604.xxxxx" target="_blank">
       <img src="https://img.shields.io/badge/arXiv-EdgeRazor-b31b1b?style=flat&logo=arxiv" alt="arXiv EdgeRazor">
     </a> -->
-    <a href="https://huggingface.co/collections/zhangsq-nju/edgerazor-nbit" target="blank">
+    <a href="https://huggingface.co/collections/zhangsq-nju/edgerazor-nbit" target="_blank">
       <img src="https://img.shields.io/badge/HuggingFace-Collection-FFD21F?style=flat&logo=huggingface&logoColor=FFD21F" alt="Hugging Face Collection">
     </a>
     <a href="./README_ZH.md">
@@ -23,7 +23,11 @@
   <h5>
     ✨ If you like our project, please give us a star ⭐️ for the latest update.
   </h5>
+
+  <img src="./asset/Demo.gif" alt="EdgeRazor Demo" width="75%">
 </div>
+
+---
 
 **EdgeRazor** is a unified and lightweight framework for edge AI, designed to train models that are smaller, faster, and deployable across diverse hardware, ranging from mobile and edge endpoints to latency-sensitive clouds. The EdgeRazor framework **seamlessly integrates** model compression techniques into existing full-precision training pipelines with **minimal code modification**, preserving promising task performance and enabling low-cost and high-efficiency computations.
 
@@ -112,8 +116,8 @@ Quantization-Aware Distillation (QAD):
 ### LLMs
 
 - Average Performance (Avg.): average of performance scores in multiple tasks using [lm-eval v0.4.9.1](https://github.com/EleutherAI/lm-evaluation-harness/tree/v0.4.9.1) with [tasks](./src/eval/tasks/lm_eval/).
-  - Tasks for instruct LLMs: arc_easy, arc_challenge, hellaswag, boolq, social_iqa, openbookqa, piqa, winogrande, truthfulqa_mc2, hendrycks_ethics, mmlu, gsm8k, humaneval_instruct, ifeval.
-  - Tasks for base LLMs: arc_easy, arc_challenge, hellaswag, boolq, social_iqa, openbookqa, piqa, winogrande, truthfulqa_mc2, hendrycks_ethics, mmlu, gsm8k, humaneval.
+  - Tasks for instruct LLMs: arc_easy, arc_challenge, hellaswag, boolq, social_iqa, openbookqa, piqa, winogrande, hendrycks_ethics, truthfulqa_mc2, mmlu, gsm8k, humaneval_instruct, ifeval.
+  - Tasks for base LLMs: arc_easy, arc_challenge, hellaswag, boolq, social_iqa, openbookqa, piqa, winogrande, hendrycks_ethics, truthfulqa_mc2, mmlu, gsm8k, humaneval.
   - Except for 5-shot gsm8k, all other tasks are 0-shot.
 
 - Hub Link: We provide the original quantized checkpoints. We also transfer the checkpoints into GGUF ([llama.cpp](https://github.com/ggml-org/llama.cpp)) and GPTQ ([GPTQModel](https://github.com/ModelCloud/GPTQModel), working in progress) formats if compatible.

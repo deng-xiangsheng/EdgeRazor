@@ -6,10 +6,10 @@
   </h3>
 
   <p>
-    <!-- <a href="https://arxiv.org/abs/2604.xxxxx" target="blank">
+    <!-- <a href="https://arxiv.org/abs/2604.xxxxx" target="_blank">
       <img src="https://img.shields.io/badge/arXiv-EdgeRazor-b31b1b?style=flat&logo=arxiv" alt="arXiv EdgeRazor">
     </a> -->
-    <a href="https://huggingface.co/collections/zhangsq-nju/edgerazor-nbit" target="blank">
+    <a href="https://huggingface.co/collections/zhangsq-nju/edgerazor-nbit" target="_blank">
       <img src="https://img.shields.io/badge/HuggingFace-Collection-FFD21F?style=flat&logo=huggingface&logoColor=FFD21F" alt="Hugging Face Collection">
     </a>
     <a href="./README.md">
@@ -23,7 +23,11 @@
   <h5>
     ✨ 如果您喜欢我们的项目，请给我们一个星 ⭐️ 以支持最新更新。
   </h5>
+
+  <img src="./asset/Demo.gif" alt="EdgeRazor Demo" width="75%">
 </div>
+
+---
 
 **EdgeRazor** 是一个针对端侧 AI 的轻量化训练框架，旨在训练出更小、更快，并可部署于多样化硬件平台的模型，覆盖从端侧设备到对时延敏感的云端场景。EdgeRazor 框架能够以**最小代码改动**将模型压缩技术**无缝集成**到现有全精度训练流程中，在保持优良任务性能的同时，实现低成本与高效率计算。
 
@@ -114,8 +118,8 @@ loss, loss_dict = edgerazor.compute_loss(student_outputs, teacher_outputs, label
 ### 语言大模型
 
 - 平均性能（Avg.）：使用 [lm-eval v0.4.9.1](https://github.com/EleutherAI/lm-evaluation-harness/tree/v0.4.9.1) 及对应 [tasks](./src/eval/tasks/lm_eval/) 在多项任务上评测得到的平均分。
-  - 指令大模型的评测列表：arc_easy, arc_challenge, hellaswag, boolq, social_iqa, openbookqa, piqa, winogrande, truthfulqa_mc2, hendrycks_ethics, mmlu, gsm8k, humaneval_instruct, ifeval。
-  - 基础大模型的评测列表：arc_easy, arc_challenge, hellaswag, boolq, social_iqa, openbookqa, piqa, winogrande, truthfulqa_mc2, hendrycks_ethics, mmlu, gsm8k, humaneval。
+  - 指令大模型的评测列表：arc_easy, arc_challenge, hellaswag, boolq, social_iqa, openbookqa, piqa, winogrande, hendrycks_ethics, truthfulqa_mc2, mmlu, gsm8k, humaneval_instruct, ifeval。
+  - 基础大模型的评测列表：arc_easy, arc_challenge, hellaswag, boolq, social_iqa, openbookqa, piqa, winogrande, hendrycks_ethics, truthfulqa_mc2, mmlu, gsm8k, humaneval。
   - 除了 gsm8k 是 5-shot 之外，其余的任务都采用 0-shot。
 
 - Hub Link：我们提供原始量化后的权重；在兼容的情况下，也会将其转换为 GGUF（[llama.cpp](https://github.com/ggml-org/llama.cpp)）与 GPTQ（[GPTQModel](https://github.com/ModelCloud/GPTQModel)，推进中）格式。
