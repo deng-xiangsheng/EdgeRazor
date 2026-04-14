@@ -1,5 +1,5 @@
 # Quantized LLM Evaluation Task Configuration for EdgeRazor
-# Model: Qwen3-0.6B / 1.7B / ...
+# For instruct LLMs: Qwen3-0.6B / 1.7B / ... (instruct mode)
 
 group: EdgeRazor_Eval_QLLM
 task:
@@ -11,9 +11,9 @@ task:
   - openbookqa
   - piqa
   - winogrande
-  - truthfulqa_mc2
   - hendrycks_ethics
+  - truthfulqa_mc2
   - mmlu
   - gsm8k
-  - humaneval_instruct
-  - ifeval_qwen3_instruct # for Qwen3-Fusion Model (Instruct Mode Only)
+  - humaneval_instruct # fixed gen_prefix = instruct mode
+  - ifeval_qwen3_instruct # src/eval/tasks/lm_eval/ifeval/ifeval_qwen3_instruct.yaml

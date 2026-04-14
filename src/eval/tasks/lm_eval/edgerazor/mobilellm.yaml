@@ -1,5 +1,5 @@
 # Quantized LLM Evaluation Task Configuration for EdgeRazor
-# Model: MobileLLM-350M / ...
+# For base LLMs: MobileLLM-350M / ...
 
 group: EdgeRazor_Eval_QLLM_Base
 task:
@@ -11,8 +11,8 @@ task:
   - openbookqa
   - piqa
   - winogrande
-  - truthfulqa_mc2
   - hendrycks_ethics
+  - truthfulqa_mc2
   - mmlu
   - gsm8k
   - humaneval
