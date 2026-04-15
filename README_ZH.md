@@ -54,6 +54,7 @@ EdgeRazor 在多类模型上均取得了当前最先进表现，涵盖基础大�
 - [上手指南](#上手指南)
   - [安装](#安装)
   - [用法](#用法)
+  - [在 Docker 上部署低比特大模型](#在-docker-上部署低比特大模型)
 - [主要技术](#主要技术)
 - [实际应用](#实际应用)
 - [模型列表](#模型列表)
@@ -77,6 +78,8 @@ pip install -e .[cu128]
 
 ### 用法
 
+安装完成后，您可以将 EdgeRazor 集成到现有训练流程中，构建轻量化模型。
+
 1. 使用统一配置接口，可通过 [yaml](./example/configs/qad/qat_w4_a8_kd_fd.yaml)、[json](./example/configs/qad/qat_w4_a8_kd_fd.json) 或 [dict](./example/configs/qad/qat_w4_a8_kd_fd.py) 进行配置。
 
 2. 将 EdgeRazor 无缝接入您的全精度模型训练流程，即刻开启轻量化之旅！
@@ -90,6 +93,16 @@ student_outputs = student(inputs)
 teacher_outputs = teacher(inputs)
 # 计算损失
 loss, loss_dict = edgerazor.compute_loss(student_outputs, teacher_outputs, labels)
+```
+
+### 在 Docker 上部署低比特大模型
+
+您可以基于 EdgeRazor 训练得到的权重生成轻量化模型。例如，可将 Qwen3-EdgeRazor-4bit 权重转换为 Q4_0 GGUF 格式。我们也在 [collection](https://huggingface.co/collections/zhangsq-nju/edgerazor-nbit) 中提供了开箱即用的量化模型，包括 [Qwen3-0.6B-EdgeRazor-GGUF](https://huggingface.co/zhangsq-nju/Qwen3-0.6B-EdgeRazor-GGUF) 和 [Qwen3-1.7B-EdgeRazor-GGUF](https://huggingface.co/zhangsq-nju/Qwen3-1.7B-EdgeRazor-GGUF)。
+
+```bash
+docker pull ghcr.io/ggml-org/llama.cpp:server
+hf download zhangsq-nju/Qwen3-1.7B-EdgeRazor-GGUF Qwen3-1.7B-EdgeRazor-TQ2_0.gguf --local-dir /path/to/Qwen3-1.7B-EdgeRazor-GGUF
+cd ./docker && bash local_server_tq2_0.sh
 ```
 
 ## 主要技术

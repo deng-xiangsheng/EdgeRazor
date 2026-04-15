@@ -54,6 +54,7 @@ EdgeRazor achieves the state-of-the-art performance across a range of models, in
 - [Getting Started](#getting-started)
   - [Installation](#installation)
   - [Usage](#usage)
+  - [Low-bit LLMs Serving on Docker](#low-bit-llms-serving-on-docker)
 - [Main Techniques](#main-techniques)
 - [Applications](#applications)
 - [Model Zoo](#model-zoo)
@@ -77,6 +78,8 @@ pip install -e .[cu128]
 
 ### Usage
 
+After installation, you can integrate EdgeRazor into your existing training pipeline to build lightweight models.
+
 1. Use unified configuration by [yaml](./example/configs/qad/qat_w4_a8_kd_fd.yaml), [json](./example/configs/qad/qat_w4_a8_kd_fd.json) or [dict](./example/configs/qad/qat_w4_a8_kd_fd.py).
 
 2. Seamlessly integrate EdgeRazor into your FULL-PRECISION model training and enjoy your lightweight journey!
@@ -90,6 +93,16 @@ student_outputs = student(inputs)
 teacher_outputs = teacher(inputs)
 # Calculate loss
 loss, loss_dict = edgerazor.compute_loss(student_outputs, teacher_outputs, labels)
+```
+
+### Low-bit LLMs Serving on Docker
+
+You can obtain lightweight models from checkpoints trained with EdgeRazor. For example, you can convert Qwen3-EdgeRazor-4bit checkpoints to Q4_0 GGUF models. We also provide ready-to-use quantized models in our [collection](https://huggingface.co/collections/zhangsq-nju/edgerazor-nbit), including [Qwen3-0.6B-EdgeRazor-GGUF](https://huggingface.co/zhangsq-nju/Qwen3-0.6B-EdgeRazor-GGUF) and [Qwen3-1.7B-EdgeRazor-GGUF](https://huggingface.co/zhangsq-nju/Qwen3-1.7B-EdgeRazor-GGUF).
+
+```bash
+docker pull ghcr.io/ggml-org/llama.cpp:server
+hf download zhangsq-nju/Qwen3-1.7B-EdgeRazor-GGUF Qwen3-1.7B-EdgeRazor-TQ2_0.gguf --local-dir /path/to/Qwen3-1.7B-EdgeRazor-GGUF
+cd ./docker && bash local_server_tq2_0.sh
 ```
 
 ## Main Techniques
