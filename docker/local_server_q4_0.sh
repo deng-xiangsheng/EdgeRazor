@@ -2,6 +2,7 @@
 set -euo pipefail
 
 # Serving Qwen3-1.7B-EdgeRazor-GGUF model using llama.cpp's server in a Docker container
+# Quantization: W4-A8-KV8
 
 # Model
 LOCAL_MODEL_DIR=${LOCAL_MODEL_DIR:-"/path/to/Qwen3-1.7B-EdgeRazor-GGUF"}

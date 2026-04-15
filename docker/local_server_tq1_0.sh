@@ -6,7 +6,7 @@ set -euo pipefail
 
 # Model
 LOCAL_MODEL_DIR=${LOCAL_MODEL_DIR:-"/path/to/Qwen3-1.7B-EdgeRazor-GGUF"}
-LOCAL_MODEL_NAME=${LOCAL_MODEL_NAME:-"Qwen3-1.7B-EdgeRazor-TQ2_0.gguf"}
+LOCAL_MODEL_NAME=${LOCAL_MODEL_NAME:-"Qwen3-1.7B-EdgeRazor-TQ1_0.gguf"}
 
 # Quant types for KV cache
 KV_CACHE_TYPE=${KV_CACHE_TYPE:-q8_0}

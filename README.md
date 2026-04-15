@@ -171,7 +171,7 @@ EdgeRazor is continuously evolving! Here's what's coming:
 - [ ] Support pypi installation
 - [ ] Upgrade to support the newest dependencies
 
-Have ideas or suggestions? We welcome and appreciate any contribution and collaborations! Please feel free to submit issues or pull requests! 🚀
+Have ideas or suggestions? We welcome and appreciate any contributions and collaborations! Please feel free to submit issues or pull requests! 🚀
 
 ## Citation
 
