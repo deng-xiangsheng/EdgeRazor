@@ -1,6 +1,6 @@
 <div align="center">
   <br/>
-  <img src="./asset/Logo-full.png" alt="EdgeRazor Logo" width="60%">
+  <img src="https://raw.githubusercontent.com/zhangsq-nju/EdgeRazor/main/asset/Logo-full.png" alt="EdgeRazor Logo" width="60%">
   <h3>
     Lightweight Framework for Edge AI
   </h3>
@@ -12,7 +12,7 @@
     <a href="https://huggingface.co/collections/zhangsq-nju/edgerazor-nbit" target="_blank">
       <img src="https://img.shields.io/badge/HuggingFace-Collection-FFD21F?style=flat&logo=huggingface&logoColor=FFD21F" alt="Hugging Face Collection">
     </a>
-    <a href="./README_ZH.md">
+    <a href="https://github.com/zhangsq-nju/EdgeRazor/blob/main/README_ZH.md" target="_blank">
       <img src="https://img.shields.io/badge/README-ZH-blue?style=flat&logo=readme" alt="README ZH">
     </a>
     <a href="https://github.com/zhangsq-nju/EdgeRazor/blob/main/LICENSE">
@@ -24,7 +24,7 @@
     ✨ If you like our project, please give us a star ⭐️ for the latest update.
   </h5>
 
-  <img src="./asset/Demo.gif" alt="EdgeRazor Demo" width="75%">
+  <img src="https://raw.githubusercontent.com/zhangsq-nju/EdgeRazor/main/asset/Demo.gif" alt="EdgeRazor Demo" width="75%">
 </div>
 
 ---
@@ -36,7 +36,7 @@ EdgeRazor currently focuses on low-bit LLM compression via configurable quantiza
 EdgeRazor achieves the state-of-the-art performance across a range of models, including base LLMs, instruction-tuned LLMs, and multimodal LLMs. For W-A8-KV8 quantization, **Qwen3-0.6B-EdgeRazor** attains average scores of **47.80** / **44.10** / **41.76** / **39.81** at 4-bit / 2.79-bit / 1.88-bit / 1.58-bit, corresponding to compression ratios of **3.94×** / **5.05×** / **6.40×** / **7.03×**, respectively. In comparison, the best prior methods achieve <u>45.74</u> / <u>37.38</u> / <u>30.49</u> at 4-bit / 3-bit / 2-bit with compression ratios of <u>2.21×</u> / <u>2.47×</u> / <u>2.78×</u>.
 
 <p align="center">
-  <img src="./asset/Architeacture.png" alt="EdgeRazor Architecture">
+  <img src="https://raw.githubusercontent.com/zhangsq-nju/EdgeRazor/main/asset/Architeacture.png" alt="EdgeRazor Architecture">
   <br> Figure: The EdgeRazor framework with lightweight model training pipeline.
 </p>
 
@@ -68,9 +68,15 @@ EdgeRazor achieves the state-of-the-art performance across a range of models, in
 
 ### Installation
 
+- Download from PyPi
+
+```bash
+pip install edgerazor
+```
+
 - Download from GitHub (latest version)
 
-```
+```bash
 git clone https://github.com/zhangsq-nju/EdgeRazor.git && cd EdgeRazor
 conda create -n edgerazor python=3.10.20 -y
 conda activate edgerazor
@@ -168,8 +174,8 @@ Quantization-Aware Distillation (QAD):
 
 EdgeRazor is continuously evolving! Here's what's coming:
 
+- [x] Support pypi installation
 - [ ] Lightweight MobileLLM, Qwen3, and Qwen2.5-Omni: training code
-- [ ] Support pypi installation
 - [ ] Upgrade to support the newest dependencies
 
 Have ideas or suggestions? We welcome and appreciate any contributions and collaborations! Please feel free to submit issues or pull requests! 🚀

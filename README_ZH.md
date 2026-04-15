@@ -1,6 +1,6 @@
 <div align="center">
   <br/>
-  <img src="./asset/Logo-full.png" alt="EdgeRazor Logo" width="60%">
+  <img src="https://raw.githubusercontent.com/zhangsq-nju/EdgeRazor/main/asset/Logo-full.png" alt="EdgeRazor Logo" width="60%">
   <h3>
     端侧 AI 的轻量化框架
   </h3>
@@ -12,8 +12,8 @@
     <a href="https://huggingface.co/collections/zhangsq-nju/edgerazor-nbit" target="_blank">
       <img src="https://img.shields.io/badge/HuggingFace-Collection-FFD21F?style=flat&logo=huggingface&logoColor=FFD21F" alt="Hugging Face Collection">
     </a>
-    <a href="./README.md">
-      <img src="https://img.shields.io/badge/README-EN-blue?style=flat&logo=readme" alt="README ZH">
+    <a href="https://github.com/zhangsq-nju/EdgeRazor/blob/main/README.md" target="_blank">
+      <img src="https://img.shields.io/badge/README-EN-blue?style=flat&logo=readme" alt="README EN">
     </a>
     <a href="https://github.com/zhangsq-nju/EdgeRazor/blob/main/LICENSE">
       <img src="https://img.shields.io/badge/License-Apache_2.0-green?logo=opensourceinitiative&logoColor=green" alt="License: Apache 2.0">
@@ -24,7 +24,7 @@
     ✨ 如果您喜欢我们的项目，请给我们一个星 ⭐️ 以支持最新更新。
   </h5>
 
-  <img src="./asset/Demo.gif" alt="EdgeRazor Demo" width="75%">
+  <img src="https://raw.githubusercontent.com/zhangsq-nju/EdgeRazor/main/asset/Demo.gif" alt="EdgeRazor Demo" width="75%">
 </div>
 
 ---
@@ -36,7 +36,7 @@ EdgeRazor 当前聚焦于通过可配置的量化感知蒸馏实现低比特 LLM
 EdgeRazor 在多类模型上均取得了当前最先进表现，涵盖基础大模型、指令微调大模型与多模态大模型。以 W-A8-KV8 量化为例，**Qwen3-0.6B-EdgeRazor** 在 4-bit / 2.79-bit / 1.88-bit / 1.58-bit 下的平均分分别达到 **47.80** / **44.10** / **41.76** / **39.81**，对应压缩倍率分别为 **3.94×** / **5.05×** / **6.40×** / **7.03×**。相比之下，现有最佳方法在 4-bit / 3-bit / 2-bit 下仅达到 <u>45.74</u> / <u>37.38</u> / <u>30.49</u>，对应压缩倍率为 <u>2.21×</u> / <u>2.47×</u> / <u>2.78×</u>。
 
 <p align="center">
-  <img src="./asset/Architeacture.png" alt="EdgeRazor Architecture">
+  <img src="https://raw.githubusercontent.com/zhangsq-nju/EdgeRazor/main/asset/Architeacture.png" alt="EdgeRazor Architecture">
   <br> EdgeRazor 框架用于轻量化模型训练的流程图
 </p>
 
@@ -68,9 +68,15 @@ EdgeRazor 在多类模型上均取得了当前最先进表现，涵盖基础大�
 
 ### 安装
 
+- 从 PyPi 下载
+
+```bash
+pip install edgerazor
+```
+
 - 从 GitHub 下载（最新版本）
 
-```
+```bash
 git clone https://github.com/zhangsq-nju/EdgeRazor.git && cd EdgeRazor
 conda create -n edgerazor python=3.10.20 -y
 conda activate edgerazor
@@ -170,8 +176,8 @@ cd ./docker && bash local_server_tq2_0.sh
 
 EdgeRazor 正在持续不断发展！以下是即将推出的内容：
 
+- [x] 支持 pypi 安装
 - [ ] 一系列轻量化大模型的训练代码
-- [ ] 支持 pypi 安装
 - [ ] 升级针对最新依赖库的支持
 
 有任何想法或建议吗？我们欢迎任何贡献和合作！请随时提交 issues 或 pull requests！🚀
