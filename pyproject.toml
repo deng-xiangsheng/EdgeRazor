@@ -6,7 +6,7 @@ Homepage = "https://github.com/zhangsq-nju/EdgeRazor"
 
 [project]
 name = "edgerazor"
-version = "1.2.7"
+version = "1.2.8"
 description = "EdgeRazor: Lightweight framework for Edge AI."
 readme = "README.md"
 requires-python = "==3.10.20"
@@ -39,70 +39,9 @@ dependencies = [
     "ruff>=0.13.1",
     "transformers==4.57.1",
     "pyyaml==6.0.3",
-]
-
-# ============================================================================
-# Optional Dependencies
-# ============================================================================
-[project.optional-dependencies]
-cpu = [
     "torch==2.9.1",
     "torchvision==0.24.1",
 ]
-cu126 = [
-    "torch==2.9.1",
-    "torchvision==0.24.1",
-]
-cu128 = [
-    "torch==2.9.1",
-    "torchvision==0.24.1",
-]
-
-# ============================================================================
-# UV Package Manager Configuration
-# ============================================================================
-[tool.uv]
-index-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-
-# Prevent installing both CPU and CUDA versions simultaneously
-conflicts = [
-    [
-        { extra = "cpu" },
-        { extra = "cu126" },
-        { extra = "cu128" },
-    ],
-]
-
-# Package source configuration
-[tool.uv.sources]
-torch = [
-    { index = "pytorch-cpu", extra = "cpu" },
-    { index = "pytorch-cu126", extra = "cu126", marker = "sys_platform == 'linux' or sys_platform == 'win32'" },
-    { index = "pytorch-cu128", extra = "cu128", marker = "sys_platform == 'linux' or sys_platform == 'win32'" },
-]
-torchvision = [
-    { index = "pytorch-cpu", extra = "cpu" },
-    { index = "pytorch-cu126", extra = "cu126", marker = "sys_platform == 'linux' or sys_platform == 'win32'" },
-    { index = "pytorch-cu128", extra = "cu128", marker = "sys_platform == 'linux' or sys_platform == 'win32'" },
-]
-
-# PyTorch CPU index
-[[tool.uv.index]]
-name = "pytorch-cpu"
-url = "https://download.pytorch.org/whl/cpu"
-explicit = true
-
-# PyTorch CUDA 12.6 index
-[[tool.uv.index]]
-name = "pytorch-cu126"
-url = "https://download.pytorch.org/whl/cu126"
-explicit = true
-
-# PyTorch CUDA 12.8 index
-[[tool.uv.index]]
-name = "pytorch-cu128"
-url = "https://download.pytorch.org/whl/cu128"
-explicit = true
 
 # ============================================================================
 # Ruff Linter & Formatter Configuration
