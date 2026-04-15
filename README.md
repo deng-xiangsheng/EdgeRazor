@@ -60,6 +60,7 @@ EdgeRazor achieves the state-of-the-art performance across a range of models, in
 - [Model Zoo](#model-zoo)
   - [LLMs](#llms)
   - [MLLMs](#mllms)
+- [Todo List](#todo-list)
 - [Citation](#citation)
 - [Contributor List](#contributor-list)
 
@@ -161,6 +162,16 @@ Quantization-Aware Distillation (QAD):
 | --------------- | ------------ | ---------- | --------- | ----- | ------------------------------------------------------------------------------ |
 | Qwen2.5-Omni-7B | W16-A16-KV16 | -          | 62.81     | 48.01 | [Base](https://huggingface.co/Qwen/Qwen2.5-Omni-7B)                            |
 | Qwen2.5-Omni-7B | W4-A16-KV16  | 32         | 62.22     | 48.82 | [EdgeRazor](https://huggingface.co/zhangsq-nju/Qwen2.5-Omni-7B-EdgeRazor-4bit) |
+
+## Todo List
+
+EdgeRazor is continuously evolving! Here's what's coming:
+
+- [ ] Lightweight MobileLLM, Qwen3, and Qwen2.5-Omni: training code
+- [ ] Support pypi installation
+- [ ] Upgrade to support the newest dependencies
+
+Have ideas or suggestions? We welcome and appreciate any contribution and collaborations! Please feel free to submit issues or pull requests! 🚀
 
 ## Citation
 
