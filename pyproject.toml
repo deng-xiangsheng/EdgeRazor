@@ -7,7 +7,7 @@ Homepage = "https://github.com/zhangsq-nju/EdgeRazor"
 [project]
 name = "edgerazor"
 version = "1.2.6"
-description = "Lightweight is All You Need: EdgeRazor for Edge AI Agent"
+description = "EdgeRazor: Lightweight framework for Edge AI."
 readme = "README.md"
 requires-python = "==3.10.20"
 license = { text = "MIT" }
@@ -18,16 +18,20 @@ authors = [
 
 keywords = [
     "Lightweight AI", "Edge AI", "Model Compression",
-    "Quantization-Aware Distillation", "Quantization", "Distillation"
+    "Quantization-Aware Distillation", "Quantization", "Distillation",
+    "LLM", "Lightweight LLM", "LLM Compression", "LLM Quantization", "LLM Distillation",
 ]
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 4 - Beta",  # "Development Status :: 5 - Production/Stable" is coming soon.
     "Intended Audience :: Developers",
     "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
-    "Topic :: Scientific/Engineering :: Artificial Intelligence :: Lightweight AI :: Model Compression",
+    "Operating System :: Unix",
+    "Operating System :: POSIX :: Linux", 
+    "Operating System :: MacOS :: MacOS X",
+    "Operating System :: Microsoft :: Windows",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
 
 # Core dependencies
@@ -143,3 +147,14 @@ quote-style = "double"
 indent-style = "space"
 skip-magic-trailing-comma = false
 line-ending = "auto"
+
+[build-system]
+requires = ["setuptools>=82.0.1"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["edgerazor*"]

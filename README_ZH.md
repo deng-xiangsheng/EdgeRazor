@@ -101,6 +101,7 @@ loss, loss_dict = edgerazor.compute_loss(student_outputs, teacher_outputs, label
 您可以基于 EdgeRazor 训练得到的权重生成轻量化模型。例如，可将 Qwen3-EdgeRazor-4bit 权重转换为 Q4_0 GGUF 格式。我们也在 [collection](https://huggingface.co/collections/zhangsq-nju/edgerazor-nbit) 中提供了开箱即用的量化模型，包括 [Qwen3-0.6B-EdgeRazor-GGUF](https://huggingface.co/zhangsq-nju/Qwen3-0.6B-EdgeRazor-GGUF) 和 [Qwen3-1.7B-EdgeRazor-GGUF](https://huggingface.co/zhangsq-nju/Qwen3-1.7B-EdgeRazor-GGUF)。
 
 ```bash
+# 仅使用 CPU 来进行量化大模型的部署：
 docker pull ghcr.io/ggml-org/llama.cpp:server
 hf download zhangsq-nju/Qwen3-1.7B-EdgeRazor-GGUF Qwen3-1.7B-EdgeRazor-TQ2_0.gguf --local-dir /path/to/Qwen3-1.7B-EdgeRazor-GGUF
 cd ./docker && bash local_server_tq2_0.sh

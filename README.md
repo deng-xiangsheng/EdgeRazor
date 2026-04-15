@@ -101,6 +101,7 @@ loss, loss_dict = edgerazor.compute_loss(student_outputs, teacher_outputs, label
 You can obtain lightweight models from checkpoints trained with EdgeRazor. For example, you can convert Qwen3-EdgeRazor-4bit checkpoints to Q4_0 GGUF models. We also provide ready-to-use quantized models in our [collection](https://huggingface.co/collections/zhangsq-nju/edgerazor-nbit), including [Qwen3-0.6B-EdgeRazor-GGUF](https://huggingface.co/zhangsq-nju/Qwen3-0.6B-EdgeRazor-GGUF) and [Qwen3-1.7B-EdgeRazor-GGUF](https://huggingface.co/zhangsq-nju/Qwen3-1.7B-EdgeRazor-GGUF).
 
 ```bash
+# Serve quantized LLMs under CPU-only environments:
 docker pull ghcr.io/ggml-org/llama.cpp:server
 hf download zhangsq-nju/Qwen3-1.7B-EdgeRazor-GGUF Qwen3-1.7B-EdgeRazor-TQ2_0.gguf --local-dir /path/to/Qwen3-1.7B-EdgeRazor-GGUF
 cd ./docker && bash local_server_tq2_0.sh
