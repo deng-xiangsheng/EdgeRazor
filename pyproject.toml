@@ -6,11 +6,11 @@ Homepage = "https://github.com/zhangsq-nju/EdgeRazor"
 
 [project]
 name = "edgerazor"
-version = "1.2.6"
+version = "1.2.7"
 description = "EdgeRazor: Lightweight framework for Edge AI."
 readme = "README.md"
 requires-python = "==3.10.20"
-license = { text = "MIT" }
+license = { text = "Apache 2.0" }
 authors = [
     { name = "Shu-Hao Zhang" },
     { email = "zhangsh@lamda.nju.edu.cn" }
