@@ -29,7 +29,7 @@
 
 ---
 
-**EdgeRazor** is a unified and lightweight framework for edge AI, designed to train models that are smaller, faster, and deployable across diverse hardware, ranging from mobile and edge endpoints to latency-sensitive clouds. The EdgeRazor framework **seamlessly integrates** model compression techniques into existing full-precision training pipelines with **minimal code modification**, preserving promising task performance and enabling low-cost and high-efficiency computations.
+**EdgeRazor** is a lightweight framework for edge AI, designed to train models that are smaller, faster, and deployable across diverse hardware, ranging from mobile and edge endpoints to latency-sensitive clouds. The EdgeRazor framework **seamlessly integrates** model compression techniques into existing full-precision training pipelines with **minimal code modification**, preserving promising task performance and enabling low-cost and high-efficiency computations.
 
 EdgeRazor currently focuses on low-bit LLM compression via configurable quantization-aware distillation. In terms of **quantization**, EdgeRazor supports quantizing weights (including embedding and lm_head layers), activations, and KV cache. Quantized bit-widths include the uniform 1.58-bit and 4-bit, as well as matrix-wise mixed-precision, such as 2.79-bit (50% 4-bit + 50% 1.58-bit) and 1.88-bit (12.5% 4-bit + 87.5% 1.58-bit). In terms of **distillation**, EdgeRazor offers the logits, features, and attention distillation, all of which can be flexibly combined within a unified configuration interface.
 
@@ -42,6 +42,7 @@ EdgeRazor achieves the state-of-the-art performance across a range of models, in
 
 ## News
 
+- 🔥 **[2026-04]**: 🏅 [CACC 2025 Final](https://cacc.ccf.org.cn/#/tzgg/%E9%80%9A%E7%9F%A5%E5%85%AC%E5%91%8A/6ce6fd51cffa62eb3859a8bb80af1040) (China Algorithm Capability Competition) apply EdgeRazor as a solution in the AI subject!
 - 🔥 **[2026-04]**: 🏆 Low-bit LLMs by EdgeRazor is released! Check our Hugging Face collection: [zhangsq-nju/edgerazor-nbit](https://huggingface.co/collections/zhangsq-nju/edgerazor-nbit).
 - 🔥 **[2026-04]**: 🛠️ Open-sourced EdgeRazor-V1 is released! Now configurable on diverse models for seamless integration and customization!
 - 🔥 **[2025-10]**: 📄 Paper-TernaryCLIP is available on arXiv: [2510.21879](https://arxiv.org/abs/2510.21879)!

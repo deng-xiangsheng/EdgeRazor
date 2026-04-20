@@ -29,7 +29,7 @@
 
 ---
 
-**EdgeRazor** 是一个针对端侧 AI 的轻量化训练框架，旨在训练出更小、更快，并可部署于多样化硬件平台的模型，覆盖从端侧设备到对时延敏感的云端场景。EdgeRazor 框架能够以**最小代码改动**将模型压缩技术**无缝集成**到现有全精度训练流程中，在保持优良任务性能的同时，实现低成本与高效率计算。
+**EdgeRazor** 是一个针对端侧 AI 的轻量化框架，旨在训练出更小、更快，并可部署于多样化硬件平台的模型，覆盖从端侧设备到对时延敏感的云端场景。EdgeRazor 框架能够以**最小代码改动**将模型压缩技术**无缝集成**到现有全精度训练流程中，在保持优良任务性能的同时，实现低成本与高效率计算。
 
 EdgeRazor 当前聚焦于通过可配置的量化感知蒸馏实现低比特 LLM 压缩。在**量化**方面，EdgeRazor 支持对权重（包括 embedding 与 lm_head 层）、激活值以及 KV cache 进行量化。量化位宽不仅包含统一的 1.58-bit 与 4-bit，还支持矩阵维度的混合精度配置，例如 2.79-bit（50% 4-bit + 50% 1.58-bit）和 1.88-bit（12.5% 4-bit + 87.5% 1.58-bit）。在**蒸馏**方面，EdgeRazor 提供 logits、特征与注意力蒸馏，并可在统一配置接口下灵活组合。
 
@@ -42,6 +42,7 @@ EdgeRazor 在多类模型上均取得了当前最先进表现，涵盖基础大�
 
 ## 最新消息
 
+- 🔥 **[2026-04]**: 🏅 [CCF 算法能力大赛决赛](https://cacc.ccf.org.cn/#/tzgg/%E9%80%9A%E7%9F%A5%E5%85%AC%E5%91%8A/6ce6fd51cffa62eb3859a8bb80af1040)在 AI 赛道使用 EdgRazor作为题目的工具库！人机共舞，智创未来！
 - 🔥 **[2026-04]**: 🏆 由 EdgeRazor 框架训练的低比特大模型已在 Hugging Face 上发布！查看我们的 Hugging Face 模型集：[zhangsq-nju/edgerazor-nbit](https://huggingface.co/collections/zhangsq-nju/edgerazor-nbit)。
 - 🔥 **[2026-04]**: 🛠️ 开源 EdgeRazor-V1 发布！现在可在各种模型的训练流程上无缝集成和定制！
 - 🔥 **[2025-10]**: 📄 论文-TernaryCLIP 已在 arXiv 上发布：[https://arxiv.org/abs/2510.21879](https://arxiv.org/abs/2510.21879)！
