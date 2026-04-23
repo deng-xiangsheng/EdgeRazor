@@ -161,7 +161,7 @@ cd ./docker && bash local_server_tq2_0.sh
 | MobileLLM-350M | W16-A16-KV16 | -          | 41.18 | [Base](https://huggingface.co/facebook/MobileLLM-ParetoQ-350M-BF16)                                                                                                                                                                                                                                                            |
 | MobileLLM-350M | W4-A8-KV8    | 64         | 41.86 | [EdgeRazor](https://huggingface.co/zhangsq-nju/MobileLLM-350M-EdgeRazor-4bit)                                                                                                                                                                                                                                                  |
 | MobileLLM-350M | W2.79-A8-KV8 | 64         | 40.62 | [EdgeRazor](https://huggingface.co/zhangsq-nju/MobileLLM-350M-EdgeRazor-2.79bit)                                                                                                                                                                                                                                               |
-| MobileLLM-350M | W1.88-A8-KV8 | 64         | 39.02 | [EdgeRazor](https://huggingface.co/zhangsq-nju/MobileLLM-350M-EdgeRazor-1.88bit)                                                                                                                                                                                                                                               |
+| MobileLLM-350M | W1.88-A8-KV8 | 64         | 39.32 | [EdgeRazor](https://huggingface.co/zhangsq-nju/MobileLLM-350M-EdgeRazor-1.88bit)                                                                                                                                                                                                                                               |
 | MobileLLM-350M | W1.58-A8-KV8 | 64         | 38.12 | [EdgeRazor](https://huggingface.co/zhangsq-nju/MobileLLM-350M-EdgeRazor-1.58bit)                                                                                                                                                                                                                                               |
 
 ### 多模态大模型
@@ -204,4 +204,4 @@ EdgeRazor 正在持续不断发展！以下是即将推出的内容：
 
 ## 贡献者列表
 
-这个项目由 [LAMDA](https://www.lamda.nju.edu.cn) 实验室和[张绍群](https://www.lamda.nju.edu.cn/zhangsq)教授支持。[张书豪](https://github.com/zhsh9)是本项目的核心开发者和维护者，[邓翔升](https://github.com/deng-xiangsheng)和[黄乐彤](https://github.com/LT1923)是本项目的参与者和开发者。
+这个项目由[机器学习与数据挖掘研究所（LAMDA）](https://www.lamda.nju.edu.cn)和[张绍群教授](https://www.lamda.nju.edu.cn/zhangsq)支持。[张书豪](https://github.com/zhsh9)是本项目的核心开发者和维护者，[邓翔升](https://github.com/deng-xiangsheng)和[黄乐彤](https://github.com/LT1923)是本项目的参与者和开发者。

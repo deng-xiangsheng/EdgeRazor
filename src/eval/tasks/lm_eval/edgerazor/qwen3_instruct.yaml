@@ -15,5 +15,3 @@ task:
   - truthfulqa_mc2
   - mmlu
   - gsm8k
-  - humaneval_instruct # fixed gen_prefix = instruct mode
-  - ifeval_qwen3_instruct # src/eval/tasks/lm_eval/ifeval/ifeval_qwen3_instruct.yaml

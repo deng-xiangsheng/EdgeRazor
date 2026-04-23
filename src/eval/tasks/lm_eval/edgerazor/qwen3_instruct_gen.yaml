@@ -1,0 +1,8 @@
+# Quantized LLM Evaluation Task Configuration for EdgeRazor
+# For instruct LLMs: Qwen3-0.6B / 1.7B / ... (instruct mode)
+
+# This group need param in `lm_eval`: `--apply_chat_template`
+group: EdgeRazor_Eval_QLLM_Chat
+task:
+  - humaneval_instruct # note: fixed gen_prefix = instruct mode
+  - ifeval_qwen3_instruct # add: src/eval/tasks/lm_eval/ifeval/ifeval_qwen3_instruct.yaml
