@@ -9,11 +9,14 @@
     <!-- <a href="https://arxiv.org/abs/2604.xxxxx" target="_blank">
       <img src="https://img.shields.io/badge/arXiv-EdgeRazor-b31b1b?style=flat&logo=arxiv" alt="arXiv EdgeRazor">
     </a> -->
-    <a href="https://huggingface.co/collections/zhangsq-nju/edgerazor-nbit" target="_blank">
-      <img src="https://img.shields.io/badge/HuggingFace-Collection-FFD21F?style=flat&logo=huggingface&logoColor=FFD21F" alt="Hugging Face Collection">
+    <a href="https://huggingface.co/spaces/zhangsq-nju/EdgeRazor-Playground" target="_blank">
+      <img src="https://img.shields.io/badge/HF-Sapce-FFD21F?style=flat&logo=huggingface&logoColor=FFD21F" alt="Hugging Face Space">
     </a>
-    <a href="https://github.com/zhangsq-nju/EdgeRazor/blob/main/README.md" target="_blank">
-      <img src="https://img.shields.io/badge/README-EN-blue?style=flat&logo=readme" alt="README EN">
+    <a href="https://huggingface.co/collections/zhangsq-nju/edgerazor-nbit" target="_blank">
+      <img src="https://img.shields.io/badge/HF-Collection-FFD21F?style=flat&logo=huggingface&logoColor=FFD21F" alt="Hugging Face Collection">
+    </a>
+    <a href="https://github.com/zhangsq-nju/EdgeRazor/blob/main/README_ZH.md" target="_blank">
+      <img src="https://img.shields.io/badge/README-ZH-blue?style=flat&logo=readme" alt="README ZH">
     </a>
     <a href="https://github.com/zhangsq-nju/EdgeRazor/blob/main/LICENSE">
       <img src="https://img.shields.io/badge/License-Apache_2.0-green?logo=opensourceinitiative&logoColor=green" alt="License: Apache 2.0">
@@ -56,6 +59,7 @@ EdgeRazor 在多类模型上均取得了当前最先进表现，涵盖基础大�
   - [安装](#安装)
   - [用法](#用法)
   - [在 Docker 上部署低比特大模型](#在-docker-上部署低比特大模型)
+  - [在 Playground 上开始](#在-playground-上开始)
 - [主要技术](#主要技术)
 - [实际应用](#实际应用)
 - [模型列表](#模型列表)
@@ -105,7 +109,7 @@ loss, loss_dict = edgerazor.compute_loss(student_outputs, teacher_outputs, label
 
 ### 在 Docker 上部署低比特大模型
 
-您可以基于 EdgeRazor 训练得到的权重生成轻量化模型。例如，可将 Qwen3-EdgeRazor-4bit 权重转换为 Q4_0 GGUF 格式。我们也在 [collection](https://huggingface.co/collections/zhangsq-nju/edgerazor-nbit) 中提供了开箱即用的量化模型，包括 [Qwen3-0.6B-EdgeRazor-GGUF](https://huggingface.co/zhangsq-nju/Qwen3-0.6B-EdgeRazor-GGUF) 和 [Qwen3-1.7B-EdgeRazor-GGUF](https://huggingface.co/zhangsq-nju/Qwen3-1.7B-EdgeRazor-GGUF)。
+您可以基于 EdgeRazor 训练得到的权重转化为轻量化模型。例如，可将 Qwen3-EdgeRazor-4bit 权重转换为 Q4_0 GGUF 格式。我们也在 [collection](https://huggingface.co/collections/zhangsq-nju/edgerazor-nbit) 中提供了开箱即用的量化模型，包括 [Qwen3-0.6B-EdgeRazor-GGUF](https://huggingface.co/zhangsq-nju/Qwen3-0.6B-EdgeRazor-GGUF) 和 [Qwen3-1.7B-EdgeRazor-GGUF](https://huggingface.co/zhangsq-nju/Qwen3-1.7B-EdgeRazor-GGUF)。
 
 ```bash
 # 仅使用 CPU 来进行量化大模型的部署：
@@ -113,6 +117,18 @@ docker pull ghcr.io/ggml-org/llama.cpp:server
 hf download zhangsq-nju/Qwen3-1.7B-EdgeRazor-GGUF Qwen3-1.7B-EdgeRazor-TQ2_0.gguf --local-dir /path/to/Qwen3-1.7B-EdgeRazor-GGUF
 cd ./docker && bash local_server_tq2_0.sh
 ```
+
+### 在 Playground 上开始
+
+上线 CPU 友好的 EdgeRazor Playground！在端侧设备上尽情享受低比特大模型的魅力！
+
+```bash
+cd EdgeRazor/playground
+pip install -r requirements.txt
+python app.py
+```
+
+![EdgeRazor Playground Sreenshot](https://raw.githubusercontent.com/zhangsq-nju/EdgeRazor/main/asset/Playground.png)
 
 ## 主要技术
 
@@ -177,7 +193,6 @@ cd ./docker && bash local_server_tq2_0.sh
 
 EdgeRazor 正在持续不断发展！以下是即将推出的内容：
 
-- [x] 支持 pypi 安装
 - [ ] 一系列轻量化大模型的训练代码
 - [ ] 升级针对最新依赖库的支持
 

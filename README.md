@@ -9,8 +9,11 @@
     <!-- <a href="https://arxiv.org/abs/2604.xxxxx" target="_blank">
       <img src="https://img.shields.io/badge/arXiv-EdgeRazor-b31b1b?style=flat&logo=arxiv" alt="arXiv EdgeRazor">
     </a> -->
+    <a href="https://huggingface.co/spaces/zhangsq-nju/EdgeRazor-Playground" target="_blank">
+      <img src="https://img.shields.io/badge/HF-Sapce-FFD21F?style=flat&logo=huggingface&logoColor=FFD21F" alt="Hugging Face Space">
+    </a>
     <a href="https://huggingface.co/collections/zhangsq-nju/edgerazor-nbit" target="_blank">
-      <img src="https://img.shields.io/badge/HuggingFace-Collection-FFD21F?style=flat&logo=huggingface&logoColor=FFD21F" alt="Hugging Face Collection">
+      <img src="https://img.shields.io/badge/HF-Collection-FFD21F?style=flat&logo=huggingface&logoColor=FFD21F" alt="Hugging Face Collection">
     </a>
     <a href="https://github.com/zhangsq-nju/EdgeRazor/blob/main/README_ZH.md" target="_blank">
       <img src="https://img.shields.io/badge/README-ZH-blue?style=flat&logo=readme" alt="README ZH">
@@ -42,6 +45,7 @@ EdgeRazor achieves the state-of-the-art performance across a range of models, in
 
 ## News
 
+- 🔥 **[2026-04]**: 🚀 [EdgeRazor Playground](https://huggingface.co/spaces/zhangsq-nju/EdgeRazor-Playground) is launched and open-sourced! CPU-friendly! Have a try!
 - 🔥 **[2026-04]**: 🏅 [CACC 2025 Final](https://cacc.ccf.org.cn/#/tzgg/%E9%80%9A%E7%9F%A5%E5%85%AC%E5%91%8A/6ce6fd51cffa62eb3859a8bb80af1040) (China Algorithm Capability Competition) apply EdgeRazor as a solution in the AI subject!
 - 🔥 **[2026-04]**: 🏆 Low-bit LLMs by EdgeRazor is released! Check our Hugging Face collection: [zhangsq-nju/edgerazor-nbit](https://huggingface.co/collections/zhangsq-nju/edgerazor-nbit).
 - 🔥 **[2026-04]**: 🛠️ Open-sourced EdgeRazor-V1 is released! Now configurable on diverse models for seamless integration and customization!
@@ -52,10 +56,11 @@ EdgeRazor achieves the state-of-the-art performance across a range of models, in
 
 - [News](#news)
 - [Contents](#contents)
-- [Getting Started](#getting-started)
+- [Quick Start](#quick-start)
   - [Installation](#installation)
   - [Usage](#usage)
-  - [Low-bit LLMs Serving on Docker](#low-bit-llms-serving-on-docker)
+  - [Docker](#docker)
+  - [Playground](#playground)
 - [Main Techniques](#main-techniques)
 - [Applications](#applications)
 - [Model Zoo](#model-zoo)
@@ -65,7 +70,7 @@ EdgeRazor achieves the state-of-the-art performance across a range of models, in
 - [Citation](#citation)
 - [Contributor List](#contributor-list)
 
-## Getting Started
+## Quick Start
 
 ### Installation
 
@@ -103,9 +108,9 @@ teacher_outputs = teacher(inputs)
 loss, loss_dict = edgerazor.compute_loss(student_outputs, teacher_outputs, labels)
 ```
 
-### Low-bit LLMs Serving on Docker
+### Docker
 
-You can obtain lightweight models from checkpoints trained with EdgeRazor. For example, you can convert Qwen3-EdgeRazor-4bit checkpoints to Q4_0 GGUF models. We also provide ready-to-use quantized models in our [collection](https://huggingface.co/collections/zhangsq-nju/edgerazor-nbit), including [Qwen3-0.6B-EdgeRazor-GGUF](https://huggingface.co/zhangsq-nju/Qwen3-0.6B-EdgeRazor-GGUF) and [Qwen3-1.7B-EdgeRazor-GGUF](https://huggingface.co/zhangsq-nju/Qwen3-1.7B-EdgeRazor-GGUF).
+Lightweight models are available from checkpoints trained with EdgeRazor. For example, you can convert Qwen3-EdgeRazor-4bit checkpoints to Q4_0 GGUF models. We also provide ready-to-use quantized models in our [collection](https://huggingface.co/collections/zhangsq-nju/edgerazor-nbit), including [Qwen3-0.6B-EdgeRazor-GGUF](https://huggingface.co/zhangsq-nju/Qwen3-0.6B-EdgeRazor-GGUF) and [Qwen3-1.7B-EdgeRazor-GGUF](https://huggingface.co/zhangsq-nju/Qwen3-1.7B-EdgeRazor-GGUF).
 
 ```bash
 # Serve quantized LLMs under CPU-only environments:
@@ -113,6 +118,18 @@ docker pull ghcr.io/ggml-org/llama.cpp:server
 hf download zhangsq-nju/Qwen3-1.7B-EdgeRazor-GGUF Qwen3-1.7B-EdgeRazor-TQ2_0.gguf --local-dir /path/to/Qwen3-1.7B-EdgeRazor-GGUF
 cd ./docker && bash local_server_tq2_0.sh
 ```
+
+### Playground
+
+EdgeRazor Playgound is CPU-friendly! Enjoy low-bit LLMs from EdgeRazor on your edge devices!
+
+```bash
+cd EdgeRazor/playground
+pip install -r requirements.txt
+python app.py
+```
+
+![EdgeRazor Playground Sreenshot](https://raw.githubusercontent.com/zhangsq-nju/EdgeRazor/main/asset/Playground.png)
 
 ## Main Techniques
 
@@ -175,7 +192,6 @@ Quantization-Aware Distillation (QAD):
 
 EdgeRazor is continuously evolving! Here's what's coming:
 
-- [x] Support pypi installation
 - [ ] Lightweight MobileLLM, Qwen3, and Qwen2.5-Omni: training code
 - [ ] Upgrade to support the newest dependencies
 
