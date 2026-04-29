@@ -1,0 +1,31 @@
+/* Logo: natural size, left-aligned, no border/background */
+.logo-wrap {
+    display: flex !important;
+    justify-content: flex-start !important;
+    padding: 8px 0 4px 0 !important;
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+.logo-wrap img {
+    height: 64px !important;
+    width: auto !important;
+    object-fit: contain !important;
+    border-radius: 0 !important;
+}
+/* Hide Gradio image toolbar buttons */
+.logo-wrap .icon-button-wrapper,
+.logo-wrap .download-button {
+    display: none !important;
+}
+/* Header text: left-aligned */
+.header-md {
+    text-align: left !important;
+    margin-bottom: 12px !important;
+}
+/* Efficiency metrics info: code */
+code {
+    padding: 0 0 0 0 !important;
+    background: none !important;
+    border: none !important;
+}

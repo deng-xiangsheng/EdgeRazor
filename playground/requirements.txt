@@ -1,0 +1,4 @@
+# https://github.com/abetlen/llama-cpp-python/releases/download/v0.3.21/llama_cpp_python-0.3.21-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl # For Hugging Face Space
+gradio==6.5.1
+llama_cpp_python==0.3.16 # For local development
+huggingface_hub>=0.20.0
