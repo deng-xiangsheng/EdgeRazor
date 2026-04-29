@@ -10,7 +10,7 @@
       <img src="https://img.shields.io/badge/arXiv-EdgeRazor-b31b1b?style=flat&logo=arxiv" alt="arXiv EdgeRazor">
     </a> -->
     <a href="https://huggingface.co/spaces/zhangsq-nju/EdgeRazor-Playground" target="_blank">
-      <img src="https://img.shields.io/badge/HF-Sapce-FFD21F?style=flat&logo=huggingface&logoColor=FFD21F" alt="Hugging Face Space">
+      <img src="https://img.shields.io/badge/HF-Playground-FFD21F?style=flat&logo=huggingface&logoColor=FFD21F" alt="Hugging Face Space">
     </a>
     <a href="https://huggingface.co/collections/zhangsq-nju/edgerazor-nbit" target="_blank">
       <img src="https://img.shields.io/badge/HF-Collection-FFD21F?style=flat&logo=huggingface&logoColor=FFD21F" alt="Hugging Face Collection">
