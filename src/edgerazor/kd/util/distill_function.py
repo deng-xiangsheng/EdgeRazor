@@ -256,8 +256,8 @@ def compute_teacher_confidence(
 
     if use_entropy:
         # Entropy-based confidence:
-        # - Lower entropy → higher confidence → prefer Reverse KLD (mode covering)
-        # - Higher entropy → lower confidence → prefer Forward KLD (mode seeking)
+        # - Lower entropy → higher confidence → prefer Reverse KLD (mode seeking)
+        # - Higher entropy → lower confidence → prefer Forward KLD (mode covering)
         # Compute entropy of teacher distribution
         entropy = -torch.sum(teacher_probs * torch.log(teacher_probs + 1e-8), dim=-1)
         

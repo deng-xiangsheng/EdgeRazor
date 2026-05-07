@@ -6,9 +6,9 @@
   </h3>
 
   <p>
-    <!-- <a href="https://arxiv.org/abs/2604.xxxxx" target="_blank">
+    <a href="https://arxiv.org/abs/2605.04062" target="_blank">
       <img src="https://img.shields.io/badge/arXiv-EdgeRazor-b31b1b?style=flat&logo=arxiv" alt="arXiv EdgeRazor">
-    </a> -->
+    </a>
     <a href="https://huggingface.co/spaces/zhangsq-nju/EdgeRazor-Playground" target="_blank">
       <img src="https://img.shields.io/badge/HF-Playground-FFD21F?style=flat&logo=huggingface&logoColor=FFD21F" alt="Hugging Face Space">
     </a>
@@ -45,12 +45,12 @@ EdgeRazor achieves the state-of-the-art performance across a range of models, in
 
 ## News
 
+- 🔥 **[2026-04]**: 📄 Paper-EdgeRazor is available on arXiv: [2605.04062](https://arxiv.org/abs/2605.04062)!
 - 🔥 **[2026-04]**: 🚀 [EdgeRazor Playground](https://huggingface.co/spaces/zhangsq-nju/EdgeRazor-Playground) is launched and open-sourced! CPU-friendly! Have a try!
 - 🔥 **[2026-04]**: 🏅 [CACC 2025 Final](https://cacc.ccf.org.cn/#/tzgg/%E9%80%9A%E7%9F%A5%E5%85%AC%E5%91%8A/6ce6fd51cffa62eb3859a8bb80af1040) (China Algorithm Capability Competition) apply EdgeRazor as a solution in the AI subject!
 - 🔥 **[2026-04]**: 🏆 Low-bit LLMs by EdgeRazor is released! Check our Hugging Face collection: [zhangsq-nju/edgerazor-nbit](https://huggingface.co/collections/zhangsq-nju/edgerazor-nbit).
 - 🔥 **[2026-04]**: 🛠️ Open-sourced EdgeRazor-V1 is released! Now configurable on diverse models for seamless integration and customization!
 - 🔥 **[2025-10]**: 📄 Paper-TernaryCLIP is available on arXiv: [2510.21879](https://arxiv.org/abs/2510.21879)!
-<!-- - 🔥 **[2026-04]**: 📄 Paper-EdgeRazor is available on arXiv: [2604.xxxxx](https://arxiv.org/abs/2604.xxxxx)! -->
 
 ## Contents
 
@@ -206,6 +206,7 @@ If you find our papar and code useful in your research, please consider kindly c
   title={{EdgeRazor}: A Lightweight Framework for Large Language Models via Mixed-Precision Quantization-Aware Distillation},
   author={Shu-Hao Zhang and Le-Tong Huang and Xiang-Sheng Deng and Xin-Yi Zou and Chen Wu and Nan Li and Shao-Qun Zhang},
   year={2026},
+  journal={arXiv preprint arXiv:2605.04062}
 }
 
 @article{zhangsh-ternaryclip,

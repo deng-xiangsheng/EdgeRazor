@@ -467,7 +467,7 @@ w1_58a16kv16_qwen3 = OrderedDict(
                     ),
                     ("w_scale_factor", 2.0),
                     ("w_block_size", 256),
-                    ("w_mixed_precision_prop", 0.05),
+                    ("w_mixed_precision_prop", 0.00),
                     ("is_w_quantized", True),
                     ("activation_function", ""),
                     ("a_block_size", -1),
@@ -507,7 +507,7 @@ w1_58a8kv8_qwen3 = OrderedDict(
                     ),
                     ("w_scale_factor", 2.0),
                     ("w_block_size", 256),
-                    ("w_mixed_precision_prop", 0.05),
+                    ("w_mixed_precision_prop", 0.00),
                     ("is_w_quantized", True),
                     (
                         "activation_function",
