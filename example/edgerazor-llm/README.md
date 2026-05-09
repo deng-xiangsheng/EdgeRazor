@@ -48,13 +48,3 @@ flash_attn can be installed via: pip install flash-attn --no-build-isolation
 |                | MobileLLM-350M-EdgeRazor-2.79bit     | `./script/mobilellm-350m/2.79-bit/run.sh`   |
 |                | MobileLLM-350M-EdgeRazor-1.88bit     | `./script/mobilellm-350m/1.88-bit/run.sh`   |
 |                | MobileLLM-350M-EdgeRazor-1.58bit     | `./script/mobilellm-350m/1.58-bit/run.sh`   |
-| Ablation       | Qwen3-0.6B-EdgeRazor-2.79bit, SG+A+E | `./script/ablations/2.79-bit/SG+A+E/run.sh` |
-|                | Qwen3-0.6B-EdgeRazor-2.79bit, ST+A+E | `./script/ablations/2.79-bit/ST+A+E/run.sh` |
-|                | Qwen3-0.6B-EdgeRazor-2.19bit, SG+A+E | `./script/ablations/2.19-bit/SG+A+E/run.sh` |
-|                | Qwen3-0.6B-EdgeRazor-2.19bit, SG+A+C | `./script/ablations/2.19-bit/SG+A+C/run.sh` |
-|                | Qwen3-0.6B-EdgeRazor-2.19bit, SG+F+E | `./script/ablations/2.19-bit/SG+F+E/run.sh` |
-|                | Qwen3-0.6B-EdgeRazor-2.19bit, SG+F+F | `./script/ablations/2.19-bit/SG+F+F/run.sh` |
-|                | Qwen3-0.6B-EdgeRazor-1.88bit, SG+A+E | `./script/ablations/1.88-bit/SG+A+E/run.sh` |
-|                | Qwen3-0.6B-EdgeRazor-1.88bit, SG+A+C | `./script/ablations/1.88-bit/SG+A+C/run.sh` |
-|                | Qwen3-0.6B-EdgeRazor-1.88bit, SG+F+E | `./script/ablations/1.88-bit/SG+F+E/run.sh` |
-|                | Qwen3-0.6B-EdgeRazor-1.88bit, SG+F+F | `./script/ablations/1.88-bit/SG+F+F/run.sh` |
