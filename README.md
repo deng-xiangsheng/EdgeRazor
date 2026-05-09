@@ -143,12 +143,9 @@ Quantization-Aware Distillation (QAD):
 
 - Lightweight ViT-S/16, check [here](./example/vit/README.md).
 - Lightweight ResNet-18, check [here](./example/resnet/README.md).
-- Lightweight Qwen3-0.6B/1.7B, coming soon.
-- Lightweight MobileLLM-ParetoQ-350M-BF16, coming soon.
-- Lightweight Qwen2.5-Omni-7B, coming soon.
-<!-- - Lightweight Qwen3-0.6B/1.7B, check [here](./example/qwen3/README.md).
-- Lightweight MobileLLM-ParetoQ-350M-BF16, check [here](./example/mobilellm/README.md).
-- Lightweight Qwen2.5-Omni-7B, check [here](./example/qwen2_5-omni/README.md). -->
+- Lightweight Qwen3-0.6B/1.7B, check [here](./example/edgerazor-llm/README.md).
+- Lightweight MobileLLM-ParetoQ-350M-BF16, check [here](./example/edgerazor-llm/README.md).
+- Lightweight Qwen2.5-Omni-7B, check [here](./example/qwen2.5-omni/README.md).
 
 ## Model Zoo
 
@@ -192,7 +189,7 @@ Quantization-Aware Distillation (QAD):
 
 EdgeRazor is continuously evolving! Here's what's coming:
 
-- [ ] Lightweight MobileLLM, Qwen3, and Qwen2.5-Omni: training code
+- [x] Lightweight MobileLLM, Qwen3, and Qwen2.5-Omni: training code
 - [ ] Upgrade to support the newest dependencies
 
 Have ideas or suggestions? We welcome and appreciate any contributions and collaborations! Please feel free to submit issues or pull requests! 🚀

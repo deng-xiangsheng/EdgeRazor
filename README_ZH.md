@@ -144,12 +144,9 @@ python app.py
 
 - 轻量化 ViT-S/16，[点击这里查看]((./example/vit/README.md))。
 - 轻量化 ResNet-18，[点击这里查看](./example/resnet/README.md)。
-- 轻量化 Qwen3-0.6B/1.7B，敬请期待。
-- 轻量化 MobileLLM-ParetoQ-350M-BF16，敬请期待。
-- 轻量化 Qwen2.5-Omni-7B，敬请期待。
-<!-- - 轻量化 Qwen3-0.6B/1.7B，[点击这里查看](./example/qwen3/README.md)。
-- 轻量化 MobileLLM-ParetoQ-350M-BF16，[点击这里查看](./example/mobilellm/README.md)。
-- 轻量化 Qwen2.5-Omni-7B，[点击这里查看](./example/qwen2_5-omni/README.md)。 -->
+- 轻量化 Qwen3-0.6B/1.7B，[点击这里查看](./example/edgerazor-llm/README.md)。
+- 轻量化 MobileLLM-ParetoQ-350M-BF16，[点击这里查看](./example/edgerazor-llm/README.md)。
+- 轻量化 Qwen2.5-Omni-7B，[点击这里查看](./example/qwen2.5-omni/README.md)。
 
 ## 模型列表
 
@@ -193,7 +190,7 @@ python app.py
 
 EdgeRazor 正在持续不断发展！以下是即将推出的内容：
 
-- [ ] 一系列轻量化大模型的训练代码
+- [x] 一系列轻量化大模型的训练代码
 - [ ] 升级针对最新依赖库的支持
 
 有任何想法或建议吗？我们欢迎任何贡献和合作！请随时提交 issues 或 pull requests！🚀
