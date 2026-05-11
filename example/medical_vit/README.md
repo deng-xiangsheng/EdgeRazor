@@ -26,11 +26,11 @@ Install EdgeRazor with the following steps:
 
 ```
 cd EdgeRazor
-conda create -n cacc_eval python=3.10 -y
+conda create -n cacc_eval python=3.10.19 -y
 conda activate cacc_eval
 pip install -e .[cu128]
+cd example/medical_vit
 pip install -r requirements.txt
-cd ..
 ```
 
 ### Install vit.cpp and compile
@@ -38,7 +38,7 @@ cd ..
 Install and set up vit.cpp with the following steps:
 
 ```
-cd code/vit.cpp
+cd vit.cpp
 python convert-pth-to-ggml.py --list
 ```
 
@@ -67,18 +67,6 @@ Run quantization and its inference:
 ## Train and Save the model
 
 The `src/train/` directory contains training code and scripts, supporting both full-precision training and quantization-aware training (QAT).
-
-The dataset is located in `/data/` with the following structure (consistent with code expectations):
-
-```
-<DATA_ROOT>/
-  train/
-    <class_name>/*.png
-  val/
-    <class_name>/*.png
-  test/
-    <class_name>/*.png
-```
 
 Default data and output paths in scripts can be modified in `src/train/train.sh`.
 

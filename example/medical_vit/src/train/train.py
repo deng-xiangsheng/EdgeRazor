@@ -13,6 +13,7 @@ from torch.utils.data import DataLoader
 import torch.optim as optim
 from torch.optim.lr_scheduler import CosineAnnealingLR
 from sklearn.metrics import f1_score, precision_score, recall_score
+from medmnist import RetinaMNIST
 
 from edgerazor import EdgeRazor
 
@@ -104,22 +105,18 @@ def prepare_dataloaders(data_root, batch_size, num_workers=4):
             transforms.Resize((224, 224)),  # Resize to ViT input size
             transforms.ToTensor(),
             transforms.Normalize((0.1307,), (0.3081,)),  # MNIST mean and std
+            GrayscaleToRGB(),  # Convert grayscale to RGB
         ]
     )
 
-    train_path = os.path.join(data_root, "train")
-    test_path = os.path.join(data_root, "val")
-
-    train_dataset = datasets.ImageFolder(train_path, transform=transform)
-    test_dataset = datasets.ImageFolder(test_path, transform=transform)
+    train_dataset = RetinaMNIST(split="train", download=True, transform=transform)
+    test_dataset = RetinaMNIST(split="val", download=True, transform=transform)
 
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers, pin_memory=True)
     test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers, pin_memory=True)
 
-    print(f"Load dataset successfully. train samples: {len(train_dataset)}, test samples: {len(test_dataset)}")
-    print(f"index mapping: {train_dataset.class_to_idx}")
-
     return train_loader, test_loader
+
 
 def train_epoch(model, train_loader, criterion, optimizer, scheduler, device, epoch, global_step, args, edgerazor=None, teacher_model=None):
     """Train for one epoch."""
